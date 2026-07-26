@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Contact GDE Collectibles about limited engraved firearm collections.">
+  <title>Contact | GDE Collectibles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header dark-header"><a class="brand" href="index.html"><span class="brand-mark">GDE</span><span>Collectibles</span></a><button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button><nav class="site-nav"><a href="index.html">Home</a><a href="collections.html">Collections</a><a href="index.html#compliance">Compliance</a><a class="active" href="contact.html">Contact</a><a class="button button-small cart-nav" href="cart.html">Cart <span class="cart-count">0</span></a></nav></header>
+  <main class="contact-page">
+    <section class="contact-hero"><p class="eyebrow">Private client services</p><h1>Contact Us</h1><p>Questions about a collection, availability, or the FFL transfer process? Our team is here to help.</p></section>
+    <section class="contact-layout">
+      <div class="contact-details">
+        <p class="eyebrow">Direct contact</p><h2>Begin a conversation.</h2>
+        <div class="contact-method"><span>Phone</span><a href="tel:+17869313566">1-786-931-3566</a></div>
+        <div class="contact-method"><span>Email</span><a href="mailto:gdecollectibles@gmail.com">gdecollectibles@gmail.com</a></div>
+        <p class="contact-note">Please do not email sensitive identity documents, payment-card details, or Social Security numbers.</p>
+      </div>
+      <form id="contactForm" class="contact-form">
+        <div class="field-grid">
+          <label>Full name<input required name="name" autocomplete="name"></label>
+          <label>Email address<input required type="email" name="email" autocomplete="email"></label>
+          <label>Phone number<input required type="tel" name="phone" autocomplete="tel"></label>
+          <label>State<input required name="state" autocomplete="address-level1"></label>
+          <label class="wide">Collection of interest<select name="collection"><option>Presidential Collection</option><option>Heritage Collection</option><option>Gold Inlay Collection</option><option>Wildlife Collection</option><option>General inquiry</option></select></label>
+          <label class="wide">Message<textarea required name="message" rows="6"></textarea></label>
+          <label class="wide consent"><input required type="checkbox"><span>I understand all firearm transactions must comply with applicable laws and FFL transfer requirements.</span></label>
+        </div>
+        <button class="button" type="submit">Send Inquiry</button><p class="form-message" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+  <footer class="site-footer"><div><a class="brand footer-brand" href="index.html"><span class="brand-mark">GDE</span><span>Collectibles</span></a><p>Limited engraved firearm collections for serious collectors.</p></div><div class="footer-links"><a href="index.html">Home</a><a href="collections.html">Collections</a><a href="contact.html">Contact</a><a href="cart.html">Cart</a></div><div class="footer-legal"><p>All firearm transactions must comply with federal, state, and local laws.</p><span>© 2026 GDE Collectibles</span></div></footer>
+  <script src="script.js"></script>
+</body>
+</html>

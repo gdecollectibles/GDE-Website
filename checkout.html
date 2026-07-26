@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Checkout | GDE Collectibles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header dark-header"><a class="brand" href="index.html"><span class="brand-mark">GDE</span><span>Collectibles</span></a><button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button><nav class="site-nav"><a href="index.html">Home</a><a href="collections.html">Collections</a><a href="index.html#compliance">Compliance</a><a href="#inquiry">Contact</a><a class="button button-small active" href="checkout.html">Request Availability</a></nav></header>
+  <main class="page-main checkout-page">
+    <section class="page-intro checkout-intro"><p class="eyebrow">Private client intake</p><h1>Checkout</h1><div class="important-note"><span>Important</span><p>This checkout form does not complete a firearm purchase. It submits your purchase request for review. All firearm transfers must comply with federal, state, and local laws. Firearms are shipped only to licensed FFL dealers. Buyer eligibility, background checks, and legal requirements must be completed before transfer.</p></div></section>
+    <form id="purchaseForm" class="checkout-layout">
+      <div class="form-column">
+        <fieldset><legend><span>01</span> Buyer information</legend><div class="field-grid">
+          <label>First name<input required name="firstName" autocomplete="given-name"></label><label>Last name<input required name="lastName" autocomplete="family-name"></label>
+          <label>Email address <span class="required-mark">*</span><input required type="email" name="email" autocomplete="email" aria-required="true"></label><label>Personal phone number <span class="required-mark">*</span><input required type="tel" name="phone" autocomplete="tel" aria-required="true"></label>
+          <label>Date of birth<input required type="date" name="dob"></label><label class="wide">Billing address<input required name="address" autocomplete="street-address"></label>
+          <label>City<input required name="city" autocomplete="address-level2"></label><label>State<select required name="state"><option value="">Select state</option><option>Alabama</option><option>Alaska</option><option>Arizona</option><option>California</option><option>Colorado</option><option>Florida</option><option>Georgia</option><option>Illinois</option><option>New York</option><option>Ohio</option><option>Pennsylvania</option><option>Texas</option><option>Virginia</option><option>Washington</option><option>Other</option></select></label><label>ZIP code<input required name="zip" inputmode="numeric" autocomplete="postal-code"></label>
+        </div></fieldset>
+        <fieldset><legend><span>02</span> Contact preferences</legend><div class="field-grid">
+          <label>Preferred contact method<select required name="contactMethod"><option>Email</option><option>Phone</option><option>Text</option></select></label><label>Best time to contact<input name="contactTime" placeholder="e.g. Weekday afternoons"></label><label class="wide">Additional notes<textarea name="notes" rows="4" placeholder="Questions, timing, or collection preferences"></textarea></label>
+        </div></fieldset>
+        <fieldset><legend><span>03</span> FFL dealer information</legend><div class="field-grid">
+          <label class="wide">FFL dealer business name<input required name="fflBusiness"></label>
+          <label class="wide">FFL phone number<input required type="tel" name="fflPhone"></label>
+          <label class="wide">FFL address<input required name="fflAddress"></label>
+        </div></fieldset>
+        <p class="privacy-note">We do not collect Social Security numbers, driver's license numbers, payment card information, or sensitive identity documents through this form.</p>
+      </div>
+      <aside class="order-summary">
+        <p class="eyebrow">Request summary</p><div id="checkoutSummaryItems" class="checkout-summary-items"></div><dl><div class="summary-price"><dt>Collection total</dt><dd id="summaryPrice">$0</dd></div></dl>
+        <fieldset class="summary-compliance"><legend>Compliance confirmation</legend><div class="check-list compact-checks">
+          <label><input required type="checkbox"> <span>I am legally eligible to purchase and possess firearms.</span></label>
+          <label><input required type="checkbox"> <span>I will use a licensed FFL dealer.</span></label>
+          <label><input required type="checkbox"> <span>I agree to required background checks and laws.</span></label>
+          <label><input required type="checkbox"> <span>I understand this is a request, not a completed sale.</span></label>
+          <label><input required type="checkbox"> <span>GDE may contact me to verify these details.</span></label>
+          <label><input required type="checkbox" name="termsAccepted"> <span>I agree to the <a href="terms.html" target="_blank">Terms</a> and <a href="refund.html" target="_blank">Refund Policy</a>.</span></label>
+        </div></fieldset>
+        <a class="button submit-button summary-submit" id="proceedToPayment" href="payment.html">Proceed to Checkout <span>→</span></a>
+      </aside>
+    </form>
+    <section class="confirmation-panel" id="confirmation" tabindex="-1"><div class="confirmation-mark">✓</div><p class="eyebrow">Request received</p><h2>Thank you.</h2><p>Your purchase request has been submitted. GDE Collectibles will review your information and contact you to verify availability, buyer eligibility, and FFL transfer details.</p><a class="button" href="index.html">Return Home</a></section>
+
+    <section class="inquiry-section" id="inquiry"><div><p class="eyebrow">General inquiries</p><h2>Start a conversation</h2><p>Not ready to submit a purchase request? Tell us what has caught your eye.</p></div><form id="inquiryForm" class="inquiry-form"><label>Full name<input required></label><label>Email<input required type="email"></label><label>Phone<input type="tel"></label><label>State<input required></label><label class="wide">Collection of interest<select><option>Presidential Collection</option><option>Heritage 1911 Collection</option><option>Gold Inlay Collection</option><option>Wildlife Engraving Collection</option><option>Other</option></select></label><label class="wide">Message<textarea required rows="4"></textarea></label><label class="wide consent"><input required type="checkbox"><span>I understand all firearm purchases must follow applicable laws and FFL transfer requirements.</span></label><button class="button" type="submit">Send Inquiry</button><p class="form-message" aria-live="polite"></p></form></section>
+    <section class="faq-section"><p class="eyebrow">Common questions</p><h2>Purchase & transfer FAQ</h2><div class="faq-list">
+      <details><summary>Can I complete a firearm purchase instantly online?</summary><p>No. The checkout form submits a purchase request for review. Sales are finalized only after compliance, buyer eligibility, and FFL transfer requirements are verified.</p></details>
+      <details><summary>Do firearms ship directly to customers?</summary><p>No. Firearms ship only to licensed FFL dealers.</p></details>
+      <details><summary>Are background checks required?</summary><p>Yes. Buyer eligibility, background checks, and all applicable legal requirements must be completed before transfer.</p></details>
+      <details><summary>What FFL information do I need?</summary><p>You should provide your selected FFL dealer's business name, license number if available, contact information, and address.</p></details>
+    </div></section>
+  </main>
+  <footer class="site-footer"><div><a class="brand footer-brand" href="index.html"><span class="brand-mark">GDE</span><span>Collectibles</span></a><p>Limited engraved firearm collections for serious collectors.</p></div><div class="footer-links"><a href="index.html">Home</a><a href="collections.html">Collections</a><a href="checkout.html">Checkout</a><a href="index.html#compliance">Compliance</a><a href="#inquiry">Contact</a></div><div class="footer-legal"><p>All firearm transactions must comply with federal, state, and local laws.</p><span>© 2026 GDE Collectibles</span></div></footer>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cart | GDE Collectibles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header dark-header"><a class="brand" href="index.html"><span class="brand-mark">GDE</span><span>Collectibles</span></a><button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button><nav class="site-nav"><a href="index.html">Home</a><a href="collections.html">Collections</a><a href="index.html#compliance">Compliance</a><a href="index.html#contact">Contact</a><a class="button button-small cart-nav active" href="cart.html">Cart <span class="cart-count">0</span></a></nav></header>
+  <main class="page-main cart-page">
+    <section class="page-intro"><p class="eyebrow">Your selections</p><h1>Cart</h1><p>Review the collections you are interested in before completing the compliance intake form.</p></section>
+    <section class="cart-layout">
+      <div>
+        <div class="cart-heading"><h2>Selected Collections</h2><span id="cartItemCount">0 items</span></div>
+        <div id="cartItems" class="cart-items"></div>
+        <div id="emptyCart" class="empty-cart"><h2>Your cart is empty.</h2><p>Explore the current collection and add a piece to begin.</p><a class="button" href="collections.html">Browse Collections</a></div>
+      </div>
+      <aside class="cart-summary">
+        <p class="eyebrow">Request summary</p>
+        <div class="cart-total"><span>Collection total</span><strong id="cartTotal">$0</strong></div>
+        <a class="button full" id="checkoutButton" href="checkout.html">Continue to Checkout</a>
+        <a class="text-link" href="collections.html">Continue browsing →</a>
+        <div class="summary-notice"><strong>FFL Transfer Required</strong><p>Every firearm must ship to a verified licensed FFL dealer. Eligibility and legal requirements must be completed before transfer.</p></div>
+      </aside>
+    </section>
+  </main>
+  <footer class="site-footer"><div><a class="brand footer-brand" href="index.html"><span class="brand-mark">GDE</span><span>Collectibles</span></a><p>Limited engraved firearm collections for serious collectors.</p></div><div class="footer-links"><a href="index.html">Home</a><a href="collections.html">Collections</a><a href="cart.html">Cart</a><a href="checkout.html">Checkout</a><a href="index.html#compliance">Compliance</a></div><div class="footer-legal"><p>All firearm transactions must comply with federal, state, and local laws.</p><span>© 2026 GDE Collectibles</span></div></footer>
+  <script src="script.js"></script>
+</body>
+</html>
