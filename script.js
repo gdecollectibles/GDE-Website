@@ -126,7 +126,7 @@ document.querySelectorAll(".site-nav").forEach(nav => {
     marketplaceMenu.className = "nav-dropdown marketplaces-menu";
     marketplaceMenu.innerHTML = `<button class="nav-dropdown-toggle" type="button" aria-expanded="false">Marketplaces <span>&or;</span></button>
       <div class="nav-dropdown-panel external-panel">
-        <a href="https://www.gunbroker.com/" target="_blank" rel="noopener noreferrer">GUNBROKER <span>&nearr;</span></a>
+      <a href="https://www.gunbroker.com/All/search?IncludeSellers=7849083" target="_blank" rel="noopener noreferrer">GUNBROKER <span>&nearr;</span></a>
         <a href="https://www.gunsinternational.com/" target="_blank" rel="noopener noreferrer">GUNS INTERNATIONAL <span>&nearr;</span></a>
       </div>`;
     const action = nav.querySelector(".button");
