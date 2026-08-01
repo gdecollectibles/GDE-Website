@@ -140,3 +140,6 @@ body:has(.hero) .cta-section{margin-left:0;margin-right:0;padding-top:85px;paddi
 .site-nav .cart-nav:hover{background:transparent;border:0;box-shadow:none;color:#fff;transform:none}
 .site-nav .cart-nav .cart-icon{stroke:#fff}
 .site-nav .cart-nav .cart-count{background:transparent;border:0;color:#fff}
+
+.product-card .price{font-size:1.65rem;line-height:1.1}.detail-price{font-size:1.85rem;line-height:1.15}
+
