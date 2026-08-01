@@ -277,17 +277,35 @@ function setProductGallery(item) {
   const gallery = document.querySelector(".detail-gallery");
   const detailImage = document.querySelector("#detailImage");
   const row = document.querySelector(".thumb-row");
+  const prev = document.querySelector(".gallery-arrow-prev");
+  const next = document.querySelector(".gallery-arrow-next");
   if (!gallery || !detailImage || !row || !item) return;
   const photos = Array.isArray(item.photos) ? item.photos : [];
-  if (!photos.length) return;
+  if (!photos.length) {
+    prev?.classList.add("is-hidden");
+    next?.classList.add("is-hidden");
+    return;
+  }
+  let activeIndex = 0;
+  const showPhoto = index => {
+    activeIndex = (index + photos.length) % photos.length;
+    applyProductPhoto(detailImage, item, activeIndex);
+    row.querySelectorAll(".thumb").forEach((thumb, thumbIndex) => thumb.classList.toggle("active", thumbIndex === activeIndex));
+    row.querySelector(".thumb.active")?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+  };
   row.innerHTML = photos.map((photo, index) => `<button class="thumb${index === 0 ? " active" : ""}" type="button" aria-label="View product photo ${index + 1}" style="background-image:url('${photo}')"></button>`).join("");
   row.querySelectorAll(".thumb").forEach((button, index) => {
-    button.addEventListener("click", () => {
-      row.querySelectorAll(".thumb").forEach(thumb => thumb.classList.remove("active"));
-      button.classList.add("active");
-      applyProductPhoto(detailImage, item, index);
-    });
+    button.addEventListener("click", () => showPhoto(index));
   });
+  if (photos.length < 2) {
+    prev?.classList.add("is-hidden");
+    next?.classList.add("is-hidden");
+  } else {
+    prev?.classList.remove("is-hidden");
+    next?.classList.remove("is-hidden");
+    prev?.addEventListener("click", () => showPhoto(activeIndex - 1));
+    next?.addEventListener("click", () => showPhoto(activeIndex + 1));
+  }
 }
 function productImageStyle(item) {
   const photos = Array.isArray(item?.photos) ? item.photos : [];
