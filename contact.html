@@ -18,7 +18,8 @@
         <div class="contact-method"><span>Email</span><a href="mailto:gdecollectibles@gmail.com">gdecollectibles@gmail.com</a></div>
         <p class="contact-note">Please do not email sensitive identity documents, payment-card details, or Social Security numbers.</p>
       </div>
-      <form id="contactForm" class="contact-form">
+      <form id="contactForm" class="contact-form" action="https://formspree.io/f/xvzedajo" method="POST">
+        <input type="hidden" name="subject" value="New GDE Collectibles Contact Inquiry">
         <div class="field-grid">
           <label>Full name<input required name="name" autocomplete="name"></label>
           <label>Email address<input required type="email" name="email" autocomplete="email"></label>
@@ -26,7 +27,7 @@
           <label>State<input required name="state" autocomplete="address-level1"></label>
           <label class="wide">Collection of interest<select name="collection"><option>Presidential Collection</option><option>Heritage Collection</option><option>Gold Inlay Collection</option><option>Wildlife Collection</option><option>General inquiry</option></select></label>
           <label class="wide">Message<textarea required name="message" rows="6"></textarea></label>
-          <label class="wide consent"><input required type="checkbox"><span>I understand all firearm transactions must comply with applicable laws and FFL transfer requirements.</span></label>
+          <label class="wide consent"><input required type="checkbox" name="complianceConfirmed" value="Yes"><span>I understand all firearm transactions must comply with applicable laws and FFL transfer requirements.</span></label>
         </div>
         <button class="button" type="submit">Send Inquiry</button><p class="form-message" aria-live="polite"></p>
       </form>
