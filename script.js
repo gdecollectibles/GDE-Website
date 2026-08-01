@@ -389,6 +389,10 @@ if (document.querySelector("#proceedToPayment")) {
   paymentLink.addEventListener("click", event => {
     event.preventDefault();
     const form = document.querySelector("#purchaseForm");
+    if (form && !form.reportValidity()) {
+      status.textContent = "Please complete every checkout field and compliance confirmation before continuing.";
+      return;
+    }
     const cart = getCart().filter(item => products[item] && !products[item].availability.includes("Archive"));
     const customer = form ? Object.fromEntries(new FormData(form).entries()) : {};
     localStorage.setItem("gdeCheckoutDetails", JSON.stringify(customer));
