@@ -87,6 +87,17 @@
       "availability": "Sold / Archive",
       "image": "image-archive",
       "description": "A documented archive edition retained as a reference to earlier GDE craftsmanship and collector provenance."
+    },
+    "payment-test": {
+      "name": "Payment Test Listing",
+      "collection": "Payment Test Collection",
+      "type": "Test",
+      "platform": ".45 ACP",
+      "finish": "Test Finish",
+      "price": "$1",
+      "availability": "Available",
+      "image": "image-gold",
+      "description": "Temporary one dollar listing for live Authorize.net payment testing."
     }
   }
 }

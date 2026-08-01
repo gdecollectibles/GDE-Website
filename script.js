@@ -78,6 +78,16 @@ const products = {
     "availability": "Sold / Archive",
     "image": "image-archive",
     "description": "A documented archive edition retained as a reference to earlier GDE craftsmanship and collector provenance."
+  },
+  "payment-test": {
+    "name": "Payment Test Listing",
+    "collection": "Payment Test Collection",
+    "platform": ".45 ACP",
+    "finish": "Test Finish",
+    "price": "$1",
+    "availability": "Available",
+    "image": "image-gold",
+    "description": "Temporary one dollar listing for live Authorize.net payment testing."
   }
 };
 const priceNumber = value => Number(value.replace(/[$,]/g,""));
@@ -123,6 +133,7 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="collections.html?item=legacy">Legacy Series Rifle</a>
         <a href="collections.html?item=silver">Silver Scroll 1911</a>
         <a href="collections.html?item=executive">Executive Gold Collection</a>
+        <a href="collections.html?item=payment-test">Payment Test Listing</a>
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
   }
