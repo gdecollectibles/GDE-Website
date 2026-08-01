@@ -1,3 +1,26 @@
 {
-  "products": {}
+  "products": {
+    "trump-250-anniversary": {
+      "name": "TRUMP 250 Anniversary",
+      "collection": "TRUMP 250 Anniversary",
+      "type": "Pistol",
+      "manufacturer": "Colt",
+      "model": "Colt M1911",
+      "caliber": ".45 ACP",
+      "platform": ".45 ACP",
+      "frameColor": "Silver/Gold",
+      "gripColor": "Gold",
+      "action": "Semi-Automatic",
+      "adjustableSights": "",
+      "barrelLength": "5 inches",
+      "capacity": "7+1",
+      "frameMaterial": "Stainless Steel",
+      "gripMaterial": "",
+      "finish": "Polished Stainless Steel",
+      "price": "$4,000",
+      "availability": "Available",
+      "image": "image-gold",
+      "description": "TRUMP 250 Anniversary Colt M1911 chambered in .45 ACP with polished stainless steel finish, silver and gold frame coloration, gold grips, and commemorative collector styling."
+    }
+  }
 }

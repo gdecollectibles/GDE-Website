@@ -1,4 +1,27 @@
-const products = {};
+const products = {
+  "trump-250-anniversary": {
+    "name": "TRUMP 250 Anniversary",
+    "collection": "TRUMP 250 Anniversary",
+    "type": "Pistol",
+    "manufacturer": "Colt",
+    "model": "Colt M1911",
+    "caliber": ".45 ACP",
+    "platform": ".45 ACP",
+    "frameColor": "Silver/Gold",
+    "gripColor": "Gold",
+    "action": "Semi-Automatic",
+    "adjustableSights": "",
+    "barrelLength": "5 inches",
+    "capacity": "7+1",
+    "frameMaterial": "Stainless Steel",
+    "gripMaterial": "",
+    "finish": "Polished Stainless Steel",
+    "price": "$4,000",
+    "availability": "Available",
+    "image": "image-gold",
+    "description": "TRUMP 250 Anniversary Colt M1911 chambered in .45 ACP with polished stainless steel finish, silver and gold frame coloration, gold grips, and commemorative collector styling."
+  }
+};
 const priceNumber = value => Number(value.replace(/[$,]/g,""));
 const getCart = () => {
   try { return JSON.parse(localStorage.getItem("gdeRequestCart")) || []; }
@@ -35,7 +58,7 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="collections.html?platform=45-acp">.45 ACP</a>
         <a href="collections.html?platform=38-special">.38 Special</a>
         <p>Individual collections</p>
-
+        <a href="collections.html?item=trump-250-anniversary">TRUMP 250 Anniversary</a>
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
   }
@@ -178,6 +201,27 @@ const key = new URLSearchParams(location.search).get("product");
 const product = (key && products[key]) || Object.values(products)[0];
 function setText(selector, text){ const el=document.querySelector(selector); if(el) el.textContent=text; }
 function setImage(selector){ const el=document.querySelector(selector); if(el && product){ Object.values(products).forEach(p=>el.classList.remove(p.image)); el.classList.add(product.image); } }
+function setExtraSpecs(item) {
+  const specList = document.querySelector(".spec-list");
+  if (!specList || !item) return;
+  specList.querySelectorAll("[data-extra-spec]").forEach(row => row.remove());
+  const specs = [
+    ["Manufacturer", item.manufacturer],
+    ["Model", item.model],
+    ["Caliber", item.caliber],
+    ["Frame color", item.frameColor],
+    ["Grip color", item.gripColor],
+    ["Action", item.action],
+    ["Adjustable sights", item.adjustableSights],
+    ["Barrel length", item.barrelLength],
+    ["Capacity", item.capacity],
+    ["Frame material", item.frameMaterial],
+    ["Grip material", item.gripMaterial]
+  ].filter(([, value]) => value);
+  specs.forEach(([label, value]) => {
+    specList.insertAdjacentHTML("beforeend", `<div data-extra-spec><dt>${label}</dt><dd>${value}</dd></div>`);
+  });
+}
 if (document.querySelector(".product-detail-page")) {
   const request=document.querySelector("#detailRequest");
   if (!product) {
@@ -196,7 +240,7 @@ if (document.querySelector(".product-detail-page")) {
     }
   } else {
     document.title = `${product.name} | GDE Collectibles`;
-    setText("#detailCollection",product.collection); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage");
+    setText("#detailCollection",product.collection); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage"); setExtraSpecs(product);
     if (request) request.dataset.product=key || Object.keys(products)[0];
     if(product.availability.includes("Archive") && request){request.textContent="Archive - Unavailable";request.disabled=true;}
   }
