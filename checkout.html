@@ -8,7 +8,10 @@
   <header class="site-header dark-header"><a class="brand" href="index.html"><span class="brand-mark">GDE</span><span>Collectibles</span></a><button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button><nav class="site-nav"><a href="index.html">Home</a><a href="collections.html">Collections</a><a href="index.html#compliance">Compliance</a><a href="#inquiry">Contact</a><a class="button button-small active" href="checkout.html">Request Availability</a></nav></header>
   <main class="page-main checkout-page">
     <section class="page-intro checkout-intro"><p class="eyebrow">Private client intake</p><h1>Checkout</h1><div class="important-note"><span>Important</span><p>This checkout form does not complete a firearm purchase. It submits your purchase request for review. All firearm transfers must comply with federal, state, and local laws. Firearms are shipped only to licensed FFL dealers. Buyer eligibility, background checks, and legal requirements must be completed before transfer.</p></div></section>
-    <form id="purchaseForm" class="checkout-layout">
+    <form id="purchaseForm" class="checkout-layout" action="https://formspree.io/f/mrenwyyv" method="POST">
+      <input type="hidden" name="subject" value="New GDE Collectibles Checkout">
+      <input type="hidden" name="cartItems" id="checkoutCartItems">
+      <input type="hidden" name="cartTotal" id="checkoutCartTotal">
       <div class="form-column">
         <fieldset><legend><span>01</span> Buyer information</legend><div class="field-grid">
           <label>First name<input required name="firstName" autocomplete="given-name"></label><label>Last name<input required name="lastName" autocomplete="family-name"></label>

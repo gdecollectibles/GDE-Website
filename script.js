@@ -119,7 +119,7 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   if (collectionsLink && !nav.querySelector(".collections-menu")) {
     const collectionMenu = document.createElement("div");
     collectionMenu.className = "nav-dropdown collections-menu";
-    collectionMenu.innerHTML = `<button class="nav-dropdown-toggle" type="button" aria-expanded="false">Collections <span>⌄</span></button>
+    collectionMenu.innerHTML = `<button class="nav-dropdown-toggle" type="button" aria-expanded="false">Collections <span>âŒ„</span></button>
       <div class="nav-dropdown-panel">
         <a href="collections.html">All Collections</a>
         <p>Platform</p>
@@ -140,10 +140,10 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   if (!nav.querySelector(".marketplaces-menu")) {
     const marketplaceMenu = document.createElement("div");
     marketplaceMenu.className = "nav-dropdown marketplaces-menu";
-    marketplaceMenu.innerHTML = `<button class="nav-dropdown-toggle" type="button" aria-expanded="false">Marketplaces <span>⌄</span></button>
+    marketplaceMenu.innerHTML = `<button class="nav-dropdown-toggle" type="button" aria-expanded="false">Marketplaces <span>âŒ„</span></button>
       <div class="nav-dropdown-panel external-panel">
-        <a href="https://www.gunbroker.com/" target="_blank" rel="noopener noreferrer">GUNBROKER <span>↗</span></a>
-        <a href="https://www.gunsinternational.com/" target="_blank" rel="noopener noreferrer">GUNS INTERNATIONAL <span>↗</span></a>
+        <a href="https://www.gunbroker.com/" target="_blank" rel="noopener noreferrer">GUNBROKER <span>â†—</span></a>
+        <a href="https://www.gunsinternational.com/" target="_blank" rel="noopener noreferrer">GUNS INTERNATIONAL <span>â†—</span></a>
       </div>`;
     const action = nav.querySelector(".button");
     action ? nav.insertBefore(marketplaceMenu, action) : nav.appendChild(marketplaceMenu);
@@ -234,7 +234,7 @@ cards.forEach(card => {
   card.dataset.product = itemKey;
   card.dataset.platform = item.platform === ".38 Special" ? "38-special" : "45-acp";
   const meta = card.querySelector(".meta");
-  if (meta) meta.textContent = `${item.collection.replace(" Collection","")} · ${item.platform} · ${item.finish}`;
+  if (meta) meta.textContent = `${item.collection.replace(" Collection","")} Â· ${item.platform} Â· ${item.finish}`;
 });
 const priceRange = document.querySelector("#priceRange");
 if (cards.length) {
@@ -280,7 +280,7 @@ if (document.querySelector(".product-detail-page")) {
   document.title = `${product.name} | GDE Collectibles`;
   setText("#detailCollection",product.collection); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage");
   const request=document.querySelector("#detailRequest"); request.dataset.product=key;
-  if(product.availability.includes("Archive")){request.textContent="Archive — Unavailable";request.disabled=true;}
+  if(product.availability.includes("Archive")){request.textContent="Archive â€” Unavailable";request.disabled=true;}
 }
 
 document.querySelectorAll('a[href^="checkout.html?product="]').forEach(link => {
@@ -289,14 +289,14 @@ document.querySelectorAll('a[href^="checkout.html?product="]').forEach(link => {
   link.addEventListener("click", event => {
     event.preventDefault();
     addToCart(itemKey);
-    link.textContent = "Added — View Cart";
+    link.textContent = "Added â€” View Cart";
     link.href = "cart.html";
     link.addEventListener("click", () => location.href="cart.html", {once:true});
   });
 });
 document.querySelectorAll(".add-to-cart").forEach(button => button.addEventListener("click", () => {
   if (!addToCart(button.dataset.product)) return;
-  button.textContent = "Added — View Cart";
+  button.textContent = "Added â€” View Cart";
   button.classList.add("added");
   setTimeout(() => location.href="cart.html", 450);
 }));
@@ -309,7 +309,7 @@ function renderCart() {
   document.querySelector("#emptyCart").classList.toggle("show", cart.length === 0);
   container.innerHTML = cart.map(item => {
     const p=products[item];
-    return `<article class="cart-item"><div class="cart-item-image ${p.image}"></div><div class="cart-item-copy"><p class="meta">${p.collection}</p><h2>${p.name}</h2><p>${p.platform} · ${p.finish} · ${p.availability}</p><span>FFL Transfer Required</span></div><div class="cart-item-price"><strong>${p.price}</strong><button type="button" class="remove-cart-item" data-product="${item}">Remove</button></div></article>`;
+    return `<article class="cart-item"><div class="cart-item-image ${p.image}"></div><div class="cart-item-copy"><p class="meta">${p.collection}</p><h2>${p.name}</h2><p>${p.platform} Â· ${p.finish} Â· ${p.availability}</p><span>FFL Transfer Required</span></div><div class="cart-item-price"><strong>${p.price}</strong><button type="button" class="remove-cart-item" data-product="${item}">Remove</button></div></article>`;
   }).join("");
   const total = cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0);
   document.querySelector("#cartTotal").textContent = `$${total.toLocaleString()}`;
@@ -329,10 +329,10 @@ if (document.querySelector("#checkoutSummaryItems")) {
   const cart = getCart().filter(item => products[item]);
   const summary = document.querySelector("#checkoutSummaryItems");
   if (cart.length) {
-    summary.innerHTML=cart.map(item=>{const p=products[item];return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"></div><div><h2>${p.name}</h2><p>${p.platform} · ${p.finish}</p><strong>${p.price}</strong></div></div>`}).join("");
+    summary.innerHTML=cart.map(item=>{const p=products[item];return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"></div><div><h2>${p.name}</h2><p>${p.platform} Â· ${p.finish}</p><strong>${p.price}</strong></div></div>`}).join("");
     setText("#summaryPrice",`$${cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0).toLocaleString()}`);
   } else {
-    summary.innerHTML='<div class="checkout-empty"><p>No collections selected.</p><a class="text-link" href="collections.html">Browse collections →</a></div>';
+    summary.innerHTML='<div class="checkout-empty"><p>No collections selected.</p><a class="text-link" href="collections.html">Browse collections â†’</a></div>';
   }
 }
 
@@ -383,6 +383,30 @@ async function startAuthorizeCheckout({button, status, cart, customer, resetText
     button.innerHTML = resetText;
   }
 }
+async function sendCheckoutEmail({form, cart, status}) {
+  const items = cart.map(item => products[item]);
+  const total = cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0);
+  const cartItemsInput = document.querySelector("#checkoutCartItems");
+  const cartTotalInput = document.querySelector("#checkoutCartTotal");
+  if (cartItemsInput) cartItemsInput.value = items.map(item => `${item.name} | ${item.platform} | ${item.finish} | ${item.price}`).join("\n");
+  if (cartTotalInput) cartTotalInput.value = `$${total.toLocaleString()}`;
+  const data = new FormData(form);
+  data.set("cartItems", cartItemsInput?.value || "");
+  data.set("cartTotal", cartTotalInput?.value || "");
+  data.set("complianceEligible", "Yes - checked");
+  data.set("complianceFFLDealer", "Yes - checked");
+  data.set("complianceBackgroundChecks", "Yes - checked");
+  data.set("complianceRequestOnly", "Yes - checked");
+  data.set("complianceContactPermission", "Yes - checked");
+  status.textContent = "Sending checkout details to GDE Collectibles...";
+  const response = await fetch(form.action, {
+    method: "POST",
+    headers: { "Accept": "application/json" },
+    body: data
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || result.errors?.[0]?.message || "Checkout details could not be emailed. Please try again.");
+}
 if (document.querySelector("#proceedToPayment")) {
   const paymentLink = document.querySelector("#proceedToPayment");
   const status = document.querySelector("#checkoutPaymentStatus");
@@ -396,7 +420,16 @@ if (document.querySelector("#proceedToPayment")) {
     const cart = getCart().filter(item => products[item] && !products[item].availability.includes("Archive"));
     const customer = form ? Object.fromEntries(new FormData(form).entries()) : {};
     localStorage.setItem("gdeCheckoutDetails", JSON.stringify(customer));
-    startAuthorizeCheckout({button: paymentLink, status, cart, customer, resetText: 'Proceed to Checkout <span>→</span>'});
+    const resetText = 'Proceed to Checkout <span>&rarr;</span>';
+    paymentLink.classList.add("disabled");
+    paymentLink.textContent = "Sending checkout details...";
+    sendCheckoutEmail({form, cart, status})
+      .then(() => startAuthorizeCheckout({button: paymentLink, status, cart, customer, resetText}))
+      .catch(error => {
+        status.textContent = error.message;
+        paymentLink.classList.remove("disabled");
+        paymentLink.innerHTML = resetText;
+      });
   });
 }
 if (document.querySelector("#paymentSummaryItems")) {
@@ -405,8 +438,8 @@ if (document.querySelector("#paymentSummaryItems")) {
   const container = document.querySelector("#paymentSummaryItems");
   container.innerHTML = cart.length ? cart.map(item => {
     const p = products[item];
-    return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"></div><div><h2>${p.name}</h2><p>${p.platform} · ${p.finish}</p><strong>${p.price}</strong></div></div>`;
-  }).join("") : '<div class="checkout-empty"><p>No collection selected.</p><a class="text-link" href="collections.html">Browse collections →</a></div>';
+    return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"></div><div><h2>${p.name}</h2><p>${p.platform} Â· ${p.finish}</p><strong>${p.price}</strong></div></div>`;
+  }).join("") : '<div class="checkout-empty"><p>No collection selected.</p><a class="text-link" href="collections.html">Browse collections â†’</a></div>';
   document.querySelector("#paymentTotal").textContent = `$${cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0).toLocaleString()}`;
 }
 document.querySelector("#authorizePayButton")?.addEventListener("click", event => {
