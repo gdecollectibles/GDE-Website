@@ -19,7 +19,22 @@ const products = {
     "price": "$4,000",
     "availability": "Available",
     "image": "image-gold",
-    "description": "TRUMP 250 Anniversary Colt M1911 chambered in .45 ACP with polished stainless steel finish, silver and gold frame coloration, gold grips, and commemorative collector styling."
+    "description": "TRUMP 250 Anniversary Colt M1911 chambered in .45 ACP with polished stainless steel finish, silver and gold frame coloration, gold grips, and commemorative collector styling.",
+    "photos": [
+      "assets/listings/trump-250-anniversary/trump-250-01.jpeg",
+      "assets/listings/trump-250-anniversary/trump-250-02.jpeg",
+      "assets/listings/trump-250-anniversary/trump-250-03.jpeg",
+      "assets/listings/trump-250-anniversary/trump-250-04.jpeg",
+      "assets/listings/trump-250-anniversary/trump-250-05.jpeg",
+      "assets/listings/trump-250-anniversary/trump-250-06.jpeg",
+      "assets/listings/trump-250-anniversary/trump-250-07.jpeg",
+      "assets/listings/trump-250-anniversary/trump-250-08.jpeg",
+      "assets/listings/trump-250-anniversary/trump-250-09.jpeg",
+      "assets/listings/trump-250-anniversary/trump-250-10.jpeg",
+      "assets/listings/trump-250-anniversary/trump-250-11.jpeg",
+      "assets/listings/trump-250-anniversary/trump-250-12.jpeg",
+      "assets/listings/trump-250-anniversary/trump-250-13.jpeg"
+    ]
   }
 };
 const priceNumber = value => Number(value.replace(/[$,]/g,""));
@@ -200,7 +215,40 @@ if (cards.length) {
 const key = new URLSearchParams(location.search).get("product");
 const product = (key && products[key]) || Object.values(products)[0];
 function setText(selector, text){ const el=document.querySelector(selector); if(el) el.textContent=text; }
-function setImage(selector){ const el=document.querySelector(selector); if(el && product){ Object.values(products).forEach(p=>el.classList.remove(p.image)); el.classList.add(product.image); } }
+function applyProductPhoto(el, item, index = 0) {
+  if (!el || !item) return;
+  Object.values(products).forEach(p => { if (p.image) el.classList.remove(p.image); });
+  const photos = Array.isArray(item.photos) ? item.photos : [];
+  if (photos[index]) {
+    el.style.backgroundImage = `url("${photos[index]}")`;
+    el.classList.add("has-photo");
+  } else {
+    el.style.backgroundImage = "";
+    el.classList.remove("has-photo");
+    if (item.image) el.classList.add(item.image);
+  }
+}
+function setImage(selector){ const el=document.querySelector(selector); applyProductPhoto(el, product, 0); }
+function setProductGallery(item) {
+  const gallery = document.querySelector(".detail-gallery");
+  const detailImage = document.querySelector("#detailImage");
+  const row = document.querySelector(".thumb-row");
+  if (!gallery || !detailImage || !row || !item) return;
+  const photos = Array.isArray(item.photos) ? item.photos : [];
+  if (!photos.length) return;
+  row.innerHTML = photos.map((photo, index) => `<button class="thumb${index === 0 ? " active" : ""}" type="button" aria-label="View product photo ${index + 1}" style="background-image:url('${photo}')"></button>`).join("");
+  row.querySelectorAll(".thumb").forEach((button, index) => {
+    button.addEventListener("click", () => {
+      row.querySelectorAll(".thumb").forEach(thumb => thumb.classList.remove("active"));
+      button.classList.add("active");
+      applyProductPhoto(detailImage, item, index);
+    });
+  });
+}
+function productImageStyle(item) {
+  const photos = Array.isArray(item?.photos) ? item.photos : [];
+  return photos[0] ? ` style="background-image:url('${photos[0]}')"` : "";
+}
 function setExtraSpecs(item) {
   const specList = document.querySelector(".spec-list");
   if (!specList || !item) return;
@@ -240,7 +288,7 @@ if (document.querySelector(".product-detail-page")) {
     }
   } else {
     document.title = `${product.name} | GDE Collectibles`;
-    setText("#detailCollection",product.collection); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage"); setExtraSpecs(product);
+    setText("#detailCollection",product.collection); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage"); setProductGallery(product); setExtraSpecs(product);
     if (request) request.dataset.product=key || Object.keys(products)[0];
     if(product.availability.includes("Archive") && request){request.textContent="Archive - Unavailable";request.disabled=true;}
   }
@@ -272,7 +320,7 @@ function renderCart() {
   document.querySelector("#emptyCart").classList.toggle("show", cart.length === 0);
   container.innerHTML = cart.map(item => {
     const p=products[item];
-    return `<article class="cart-item"><div class="cart-item-image ${p.image}"></div><div class="cart-item-copy"><p class="meta">${p.collection}</p><h2>${p.name}</h2><p>${p.platform} · ${p.finish} · ${p.availability}</p><span>FFL Transfer Required</span></div><div class="cart-item-price"><strong>${p.price}</strong><button type="button" class="remove-cart-item" data-product="${item}">Remove</button></div></article>`;
+    return `<article class="cart-item"><div class="cart-item-image ${p.image}"${productImageStyle(p)}></div><div class="cart-item-copy"><p class="meta">${p.collection}</p><h2>${p.name}</h2><p>${p.platform} · ${p.finish} · ${p.availability}</p><span>FFL Transfer Required</span></div><div class="cart-item-price"><strong>${p.price}</strong><button type="button" class="remove-cart-item" data-product="${item}">Remove</button></div></article>`;
   }).join("");
   const total = cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0);
   document.querySelector("#cartTotal").textContent = `$${total.toLocaleString()}`;
@@ -292,7 +340,7 @@ if (document.querySelector("#checkoutSummaryItems")) {
   const cart = getCart().filter(item => products[item]);
   const summary = document.querySelector("#checkoutSummaryItems");
   if (cart.length) {
-    summary.innerHTML=cart.map(item=>{const p=products[item];return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"></div><div><h2>${p.name}</h2><p>${p.platform} · ${p.finish}</p><strong>${p.price}</strong></div></div>`}).join("");
+    summary.innerHTML=cart.map(item=>{const p=products[item];return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"${productImageStyle(p)}></div><div><h2>${p.name}</h2><p>${p.platform} · ${p.finish}</p><strong>${p.price}</strong></div></div>`}).join("");
     setText("#summaryPrice",`$${cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0).toLocaleString()}`);
   } else {
     summary.innerHTML='<div class="checkout-empty"><p>No collections selected.</p><a class="text-link" href="collections.html">Browse collections &rarr;</a></div>';
@@ -369,7 +417,7 @@ if (document.querySelector("#paymentSummaryItems")) {
   const container = document.querySelector("#paymentSummaryItems");
   container.innerHTML = cart.length ? cart.map(item => {
     const p = products[item];
-    return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"></div><div><h2>${p.name}</h2><p>${p.platform} · ${p.finish}</p><strong>${p.price}</strong></div></div>`;
+    return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"${productImageStyle(p)}></div><div><h2>${p.name}</h2><p>${p.platform} · ${p.finish}</p><strong>${p.price}</strong></div></div>`;
   }).join("") : '<div class="checkout-empty"><p>No collection selected.</p><a class="text-link" href="collections.html">Browse collections &rarr;</a></div>';
   document.querySelector("#paymentTotal").textContent = `$${cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0).toLocaleString()}`;
 }
