@@ -1,95 +1,4 @@
-const products = {
-  "presidential": {
-    "name": "Presidential Collection 1911",
-    "collection": "Presidential Collection",
-    "platform": ".45 ACP",
-    "finish": "Gold",
-    "price": "$5,000",
-    "availability": "Limited Availability",
-    "image": "image-presidential",
-    "description": "A collector-grade edition pairing stately American motifs with deeply cut scrollwork and considered gold accents. Created in a tightly limited series for the discerning private collection."
-  },
-  "heritage": {
-    "name": "Heritage Engraved 1911",
-    "collection": "Heritage 1911 Collection",
-    "platform": ".45 ACP",
-    "finish": "Blued Steel",
-    "price": "$3,500",
-    "availability": "Available",
-    "image": "image-heritage",
-    "description": "Classic 1911 proportions meet traditional scroll engraving and a rich blued-steel finish in this enduring American heritage edition."
-  },
-  "gold-inlay": {
-    "name": "Gold Inlay Commander",
-    "collection": "Gold Inlay Collection",
-    "platform": ".45 ACP",
-    "finish": "Two-Tone",
-    "price": "$4,800",
-    "availability": "Limited Availability",
-    "image": "image-gold",
-    "description": "A refined Commander distinguished by bright gold inlay, dimensional scrollwork, and a restrained two-tone presentation finish."
-  },
-  "wildlife": {
-    "name": "Wildlife Engraved Revolver",
-    "collection": "Wildlife Engraving Collection",
-    "platform": ".38 Special",
-    "finish": "Nickel",
-    "price": "$4,200",
-    "availability": "Available",
-    "image": "image-wildlife",
-    "description": "A polished revolver featuring a sculpted wildlife scene, fine ornamental borders, and luminous nickel presentation surfaces."
-  },
-  "legacy": {
-    "name": "Legacy Series Rifle",
-    "collection": "Legacy Collection",
-    "platform": ".45 ACP",
-    "finish": "Blued Steel",
-    "price": "$4,900",
-    "availability": "Limited Availability",
-    "image": "image-rifle",
-    "description": "A sporting rifle edition grounded in old-world gunmaking traditions, with engraved steel and warm presentation-grade furniture."
-  },
-  "silver": {
-    "name": "Silver Scroll 1911",
-    "collection": "Heritage Collection",
-    "platform": ".45 ACP",
-    "finish": "Silver",
-    "price": "$3,200",
-    "availability": "Available",
-    "image": "image-silver",
-    "description": "Bright silver surfaces and disciplined scrollwork give this 1911 a clean, architectural character."
-  },
-  "executive": {
-    "name": "Executive Gold Collection",
-    "collection": "Presidential Collection",
-    "platform": ".45 ACP",
-    "finish": "Gold",
-    "price": "$5,000",
-    "availability": "Limited Availability",
-    "image": "image-executive",
-    "description": "A formal gold-finished edition with deep contrast engraving, made for a commanding presentation."
-  },
-  "archive": {
-    "name": "Collector Archive Piece",
-    "collection": "Legacy Collection",
-    "platform": ".38 Special",
-    "finish": "Silver",
-    "price": "$3,000",
-    "availability": "Sold / Archive",
-    "image": "image-archive",
-    "description": "A documented archive edition retained as a reference to earlier GDE craftsmanship and collector provenance."
-  },
-  "payment-test": {
-    "name": "Payment Test Listing",
-    "collection": "Payment Test Collection",
-    "platform": ".45 ACP",
-    "finish": "Test Finish",
-    "price": "$1",
-    "availability": "Available",
-    "image": "image-gold",
-    "description": "Temporary one dollar listing for live Authorize.net payment testing."
-  }
-};
+const products = {};
 const priceNumber = value => Number(value.replace(/[$,]/g,""));
 const getCart = () => {
   try { return JSON.parse(localStorage.getItem("gdeRequestCart")) || []; }
@@ -126,14 +35,7 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="collections.html?platform=45-acp">.45 ACP</a>
         <a href="collections.html?platform=38-special">.38 Special</a>
         <p>Individual collections</p>
-        <a href="collections.html?item=presidential">Presidential Collection 1911</a>
-        <a href="collections.html?item=heritage">Heritage Engraved 1911</a>
-        <a href="collections.html?item=gold-inlay">Gold Inlay Commander</a>
-        <a href="collections.html?item=wildlife">Wildlife Engraved Revolver</a>
-        <a href="collections.html?item=legacy">Legacy Series Rifle</a>
-        <a href="collections.html?item=silver">Silver Scroll 1911</a>
-        <a href="collections.html?item=executive">Executive Gold Collection</a>
-        <a href="collections.html?item=payment-test">Payment Test Listing</a>
+
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
   }
@@ -272,15 +174,32 @@ if (cards.length) {
   applyFilters();
 }
 
-const key = new URLSearchParams(location.search).get("product") || "presidential";
-const product = products[key] || products.presidential;
+const key = new URLSearchParams(location.search).get("product");
+const product = (key && products[key]) || Object.values(products)[0];
 function setText(selector, text){ const el=document.querySelector(selector); if(el) el.textContent=text; }
-function setImage(selector){ const el=document.querySelector(selector); if(el){ Object.values(products).forEach(p=>el.classList.remove(p.image)); el.classList.add(product.image); } }
+function setImage(selector){ const el=document.querySelector(selector); if(el && product){ Object.values(products).forEach(p=>el.classList.remove(p.image)); el.classList.add(product.image); } }
 if (document.querySelector(".product-detail-page")) {
-  document.title = `${product.name} | GDE Collectibles`;
-  setText("#detailCollection",product.collection); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage");
-  const request=document.querySelector("#detailRequest"); request.dataset.product=key;
-  if(product.availability.includes("Archive")){request.textContent="Archive - Unavailable";request.disabled=true;}
+  const request=document.querySelector("#detailRequest");
+  if (!product) {
+    document.title = "No active listings | GDE Collectibles";
+    setText("#detailCollection", "Inventory update");
+    setText("#detailName", "No active listings");
+    setText("#detailPrice", "");
+    setText("#detailPlatform", "—");
+    setText("#detailFinish", "—");
+    setText("#detailAvailability", "Coming soon");
+    setText("#detailDescription", "Current listings have been cleared while GDE Collectibles prepares the next private release.");
+    if (request) {
+      request.textContent = "Contact Us";
+      request.classList.remove("add-to-cart");
+      request.addEventListener("click", () => location.href = "contact.html");
+    }
+  } else {
+    document.title = `${product.name} | GDE Collectibles`;
+    setText("#detailCollection",product.collection); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage");
+    if (request) request.dataset.product=key || Object.keys(products)[0];
+    if(product.availability.includes("Archive") && request){request.textContent="Archive - Unavailable";request.disabled=true;}
+  }
 }
 
 document.querySelectorAll('a[href^="checkout.html?product="]').forEach(link => {

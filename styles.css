@@ -113,7 +113,13 @@ body:has(.hero) .cta-section{margin-left:0;margin-right:0;padding-top:85px;paddi
 @media(max-width:900px){.hero-index{left:auto;right:18px;bottom:32px}}
 @media(max-width:760px){body:has(.hero) .featured-grid{grid-template-columns:1fr}}
 
-.site-footer>div:first-child{display:flex;align-items:center;justify-content:flex-start;min-height:100%}
+  .site-footer>div:first-child{display:flex;align-items:center;justify-content:flex-start;min-height:100%}
+
+  .inventory-empty-state{padding:42px;background:#fff;border:1px solid rgba(169,134,74,.16);box-shadow:0 18px 48px rgba(20,25,27,.08)}
+  .inventory-empty-state h3{font-size:2.2rem;margin:8px 0 12px}
+  .inventory-empty-state p:not(.card-number){max-width:720px;color:var(--muted)}
+  .inventory-empty-state .button,.inventory-empty-state .text-link{margin-top:14px}
+  .filter-empty{margin:0;color:var(--muted);font-size:.72rem}
 .site-footer .footer-brand{width:215px;height:82px;margin:0;flex-basis:215px}
 .site-footer .footer-links{grid-template-columns:repeat(2,minmax(110px,1fr));align-content:center}
 @media(max-width:760px){.site-footer>div:first-child{justify-content:center}.site-footer .footer-brand{width:220px;height:86px;flex-basis:220px}.site-footer .footer-links{grid-template-columns:repeat(2,1fr)}}
