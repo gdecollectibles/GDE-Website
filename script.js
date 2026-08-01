@@ -1,12 +1,84 @@
 const products = {
-  presidential:{name:"Presidential Collection 1911",collection:"Presidential Collection",platform:".45 ACP",finish:"Gold",price:"$5,000",availability:"Limited Availability",image:"image-presidential",description:"A collector-grade edition pairing stately American motifs with deeply cut scrollwork and considered gold accents. Created in a tightly limited series for the discerning private collection."},
-  heritage:{name:"Heritage Engraved 1911",collection:"Heritage 1911 Collection",platform:".45 ACP",finish:"Blued Steel",price:"$3,500",availability:"Available",image:"image-heritage",description:"Classic 1911 proportions meet traditional scroll engraving and a rich blued-steel finish in this enduring American heritage edition."},
-  "gold-inlay":{name:"Gold Inlay Commander",collection:"Gold Inlay Collection",platform:".45 ACP",finish:"Two-Tone",price:"$4,800",availability:"Limited Availability",image:"image-gold",description:"A refined Commander distinguished by bright gold inlay, dimensional scrollwork, and a restrained two-tone presentation finish."},
-  wildlife:{name:"Wildlife Engraved Revolver",collection:"Wildlife Engraving Collection",platform:".38 Special",finish:"Nickel",price:"$4,200",availability:"Available",image:"image-wildlife",description:"A polished revolver featuring a sculpted wildlife scene, fine ornamental borders, and luminous nickel presentation surfaces."},
-  legacy:{name:"Legacy Series Rifle",collection:"Legacy Collection",platform:".45 ACP",finish:"Blued Steel",price:"$4,900",availability:"Limited Availability",image:"image-rifle",description:"A sporting rifle edition grounded in old-world gunmaking traditions, with engraved steel and warm presentation-grade furniture."},
-  silver:{name:"Silver Scroll 1911",collection:"Heritage Collection",platform:".45 ACP",finish:"Silver",price:"$3,200",availability:"Available",image:"image-silver",description:"Bright silver surfaces and disciplined scrollwork give this 1911 a clean, architectural character."},
-  executive:{name:"Executive Gold Collection",collection:"Presidential Collection",platform:".45 ACP",finish:"Gold",price:"$5,000",availability:"Limited Availability",image:"image-executive",description:"A formal gold-finished edition with deep contrast engraving, made for a commanding presentation."},
-  archive:{name:"Collector Archive Piece",collection:"Legacy Collection",platform:".38 Special",finish:"Silver",price:"$3,000",availability:"Sold / Archive",image:"image-archive",description:"A documented archive edition retained as a reference to earlier GDE craftsmanship and collector provenance."}
+  "presidential": {
+    "name": "Presidential Collection 1911",
+    "collection": "Presidential Collection",
+    "platform": ".45 ACP",
+    "finish": "Gold",
+    "price": "$5,000",
+    "availability": "Limited Availability",
+    "image": "image-presidential",
+    "description": "A collector-grade edition pairing stately American motifs with deeply cut scrollwork and considered gold accents. Created in a tightly limited series for the discerning private collection."
+  },
+  "heritage": {
+    "name": "Heritage Engraved 1911",
+    "collection": "Heritage 1911 Collection",
+    "platform": ".45 ACP",
+    "finish": "Blued Steel",
+    "price": "$3,500",
+    "availability": "Available",
+    "image": "image-heritage",
+    "description": "Classic 1911 proportions meet traditional scroll engraving and a rich blued-steel finish in this enduring American heritage edition."
+  },
+  "gold-inlay": {
+    "name": "Gold Inlay Commander",
+    "collection": "Gold Inlay Collection",
+    "platform": ".45 ACP",
+    "finish": "Two-Tone",
+    "price": "$4,800",
+    "availability": "Limited Availability",
+    "image": "image-gold",
+    "description": "A refined Commander distinguished by bright gold inlay, dimensional scrollwork, and a restrained two-tone presentation finish."
+  },
+  "wildlife": {
+    "name": "Wildlife Engraved Revolver",
+    "collection": "Wildlife Engraving Collection",
+    "platform": ".38 Special",
+    "finish": "Nickel",
+    "price": "$4,200",
+    "availability": "Available",
+    "image": "image-wildlife",
+    "description": "A polished revolver featuring a sculpted wildlife scene, fine ornamental borders, and luminous nickel presentation surfaces."
+  },
+  "legacy": {
+    "name": "Legacy Series Rifle",
+    "collection": "Legacy Collection",
+    "platform": ".45 ACP",
+    "finish": "Blued Steel",
+    "price": "$4,900",
+    "availability": "Limited Availability",
+    "image": "image-rifle",
+    "description": "A sporting rifle edition grounded in old-world gunmaking traditions, with engraved steel and warm presentation-grade furniture."
+  },
+  "silver": {
+    "name": "Silver Scroll 1911",
+    "collection": "Heritage Collection",
+    "platform": ".45 ACP",
+    "finish": "Silver",
+    "price": "$3,200",
+    "availability": "Available",
+    "image": "image-silver",
+    "description": "Bright silver surfaces and disciplined scrollwork give this 1911 a clean, architectural character."
+  },
+  "executive": {
+    "name": "Executive Gold Collection",
+    "collection": "Presidential Collection",
+    "platform": ".45 ACP",
+    "finish": "Gold",
+    "price": "$5,000",
+    "availability": "Limited Availability",
+    "image": "image-executive",
+    "description": "A formal gold-finished edition with deep contrast engraving, made for a commanding presentation."
+  },
+  "archive": {
+    "name": "Collector Archive Piece",
+    "collection": "Legacy Collection",
+    "platform": ".38 Special",
+    "finish": "Silver",
+    "price": "$3,000",
+    "availability": "Sold / Archive",
+    "image": "image-archive",
+    "description": "A documented archive edition retained as a reference to earlier GDE craftsmanship and collector provenance."
+  }
 };
 const priceNumber = value => Number(value.replace(/[$,]/g,""));
 const getCart = () => {
@@ -44,7 +116,7 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="collections.html?platform=45-acp">.45 ACP</a>
         <a href="collections.html?platform=38-special">.38 Special</a>
         <p>Individual collections</p>
-        <a href="collections.html?item=presidential">Presidential Collection</a>
+        <a href="collections.html?item=presidential">Presidential Collection 1911</a>
         <a href="collections.html?item=heritage">Heritage Engraved 1911</a>
         <a href="collections.html?item=gold-inlay">Gold Inlay Commander</a>
         <a href="collections.html?item=wildlife">Wildlife Engraved Revolver</a>
@@ -180,7 +252,7 @@ if (cards.length) {
   document.querySelectorAll(".filters input").forEach(input => input.addEventListener("input", applyFilters));
   document.querySelector(".reset-filters").addEventListener("click", () => {
     document.querySelectorAll('.filters input[type="checkbox"]').forEach(input => input.checked = false);
-    priceRange.value = 5000;
+    priceRange.value = priceRange.max;
     if (requestedItem || requestedPlatform || requestedType) history.replaceState({}, "", "collections.html");
     location.reload();
   });
@@ -267,7 +339,13 @@ document.querySelector("#purchaseForm")?.addEventListener("submit", e => {
 if (document.querySelector("#proceedToPayment")) {
   const cart = getCart().filter(item => products[item]);
   const query = cart.length ? `?cart=${cart.join(",")}` : "";
-  document.querySelector("#proceedToPayment").href = `payment.html${query}`;
+  const paymentLink = document.querySelector("#proceedToPayment");
+  paymentLink.href = `payment.html${query}`;
+  paymentLink.addEventListener("click", () => {
+    const form = document.querySelector("#purchaseForm");
+    if (!form) return;
+    localStorage.setItem("gdeCheckoutDetails", JSON.stringify(Object.fromEntries(new FormData(form).entries())));
+  });
 }
 if (document.querySelector("#paymentSummaryItems")) {
   const paymentParams = new URLSearchParams(location.search).get("cart");
@@ -279,15 +357,78 @@ if (document.querySelector("#paymentSummaryItems")) {
   }).join("") : '<div class="checkout-empty"><p>No collection selected.</p><a class="text-link" href="collections.html">Browse collections →</a></div>';
   document.querySelector("#paymentTotal").textContent = `$${cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0).toLocaleString()}`;
 }
+document.querySelector("#authorizePayButton")?.addEventListener("click", async event => {
+  const button = event.currentTarget;
+  const status = document.querySelector("#paymentStatus");
+  const paymentParams = new URLSearchParams(location.search).get("cart");
+  const cart = (paymentParams ? paymentParams.split(",") : getCart()).filter(item => products[item] && !products[item].availability.includes("Archive"));
+  if (!cart.length) {
+    status.textContent = "Please add a collection to your cart before paying.";
+    return;
+  }
+  let customer = {};
+  try {
+    customer = JSON.parse(localStorage.getItem("gdeCheckoutDetails")) || {};
+  } catch {}
+  button.disabled = true;
+  button.textContent = "Creating secure payment...";
+  status.textContent = "Connecting to Authorize.net...";
+  try {
+    const response = await fetch("/api/create-authorize-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cart, customer })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.token || !result.paymentUrl) throw new Error(result.error || "Unable to start Authorize.net checkout.");
+    status.textContent = `Redirecting to Authorize.net for $${Number(result.amount).toLocaleString()}...`;
+    const form = document.createElement("form");
+    form.method = "post";
+    form.action = result.paymentUrl;
+    form.style.display = "none";
+    const token = document.createElement("input");
+    token.type = "hidden";
+    token.name = "token";
+    token.value = result.token;
+    form.appendChild(token);
+    document.body.appendChild(form);
+    form.submit();
+  } catch (error) {
+    status.textContent = error.message;
+    button.disabled = false;
+    button.textContent = "Pay Securely with Authorize.net";
+  }
+});
 document.querySelector("#inquiryForm")?.addEventListener("submit", e => {
   e.preventDefault();
   if (!e.currentTarget.reportValidity()) return;
   e.currentTarget.querySelector(".form-message").textContent="Thank you. Our collection team will be in touch.";
   e.currentTarget.reset();
 });
-document.querySelector("#contactForm")?.addEventListener("submit", e => {
+document.querySelector("#contactForm")?.addEventListener("submit", async e => {
   e.preventDefault();
-  if (!e.currentTarget.reportValidity()) return;
-  e.currentTarget.querySelector(".form-message").textContent="Thank you. Our collection team will contact you shortly.";
-  e.currentTarget.reset();
+  const form = e.currentTarget;
+  if (!form.reportValidity()) return;
+  const button = form.querySelector('button[type="submit"]');
+  const message = form.querySelector(".form-message");
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = "Sending...";
+  message.textContent = "";
+  try {
+    const response = await fetch(form.action, {
+      method: "POST",
+      headers: { "Accept": "application/json" },
+      body: new FormData(form)
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || result.errors?.[0]?.message || "Formspree did not accept the message.");
+    message.textContent = "Thank you. Your inquiry was submitted successfully.";
+    form.reset();
+  } catch (error) {
+    message.innerHTML = `The form service did not confirm delivery. Please try again, or email us directly at <a href="mailto:gdecollectibles@gmail.com">gdecollectibles@gmail.com</a>.`;
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
+  }
 });

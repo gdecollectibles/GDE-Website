@@ -10,18 +10,19 @@
 <body>
   <header class="site-header dark-header"><a class="brand" href="index.html"><span>GDE</span><span>Collectibles</span></a><button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button><nav class="site-nav"><a href="index.html">Home</a><a href="collections.html">Collections</a><a href="index.html#compliance">Compliance</a><a href="contact.html">Contact</a><a class="button button-small cart-nav" href="cart.html">Cart <span class="cart-count">0</span></a></nav></header>
   <main class="payment-page">
-    <section class="page-intro payment-intro"><p class="eyebrow">Secure payment</p><h1>Complete Checkout</h1><p>This page is prepared for an Authorize.Net Accept Hosted integration.</p></section>
+    <section class="page-intro payment-intro"><p class="eyebrow">Secure payment</p><h1>Complete Checkout</h1><p>Pay through Authorize.net's secure hosted payment page. Your card information is handled by Authorize.net.</p></section>
     <section class="payment-layout">
       <div class="payment-panel">
         <div class="payment-heading"><div><p class="eyebrow">Authorize.Net</p><h2>Payment details</h2></div><span class="secure-badge">Secure hosted form</span></div>
         <div class="authorize-placeholder" id="authorizeNetHostedForm">
           <div class="authorize-mark">A</div>
-          <h3>Authorize.Net integration ready</h3>
-          <p>Your hosted payment form will load here after a server-generated Accept Hosted token is configured.</p>
-          <div class="integration-steps"><span>1</span><p>Add your Authorize.Net API Login ID and Transaction Key to the server.</p><span>2</span><p>Request an Accept Hosted form token from the Authorize.Net API.</p><span>3</span><p>Load the token into this secure hosted payment container.</p></div>
+          <h3>Ready for secure payment</h3>
+          <p>When you continue, GDE Collectibles will create a locked Authorize.net payment session for the order total shown here.</p>
+          <div class="integration-steps"><span>1</span><p>Your cart total is verified by the secure Vercel function.</p><span>2</span><p>Authorize.net creates a hosted payment page for that exact amount.</p><span>3</span><p>You enter card details only on Authorize.net's secure page.</p></div>
         </div>
-        <div class="payment-security"><strong>No card data is collected by this website yet.</strong><p>When connected, Authorize.Net's hosted form can handle payment-card entry so sensitive card details do not pass through this static site.</p></div>
-        <button class="button full disabled" type="button" aria-disabled="true">Authorize.Net Not Connected</button>
+        <div class="payment-security"><strong>This website does not collect card numbers.</strong><p>Authorize.net handles payment-card entry on its hosted checkout page.</p></div>
+        <button class="button full" id="authorizePayButton" type="button">Pay Securely with Authorize.net</button>
+        <p class="form-message" id="paymentStatus" aria-live="polite"></p>
       </div>
       <aside class="payment-summary">
         <p class="eyebrow">Order summary</p><div id="paymentSummaryItems"></div>
