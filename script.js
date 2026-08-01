@@ -355,7 +355,7 @@ async function startAuthorizeCheckout({button, status, cart, customer, resetText
   button.disabled = true;
   button.classList.add("disabled");
   button.textContent = "Connecting to Authorize.net...";
-  status.textContent = "Creating secure payment session...";
+  status.textContent = "Emailing checkout details and creating secure payment session...";
   try {
     const response = await fetch("/api/create-authorize-payment", {
       method: "POST",
@@ -383,30 +383,6 @@ async function startAuthorizeCheckout({button, status, cart, customer, resetText
     button.innerHTML = resetText;
   }
 }
-async function sendCheckoutEmail({form, cart, status}) {
-  const items = cart.map(item => products[item]);
-  const total = cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0);
-  const cartItemsInput = document.querySelector("#checkoutCartItems");
-  const cartTotalInput = document.querySelector("#checkoutCartTotal");
-  if (cartItemsInput) cartItemsInput.value = items.map(item => `${item.name} | ${item.platform} | ${item.finish} | ${item.price}`).join("\n");
-  if (cartTotalInput) cartTotalInput.value = `$${total.toLocaleString()}`;
-  const data = new FormData(form);
-  data.set("cartItems", cartItemsInput?.value || "");
-  data.set("cartTotal", cartTotalInput?.value || "");
-  data.set("complianceEligible", "Yes - checked");
-  data.set("complianceFFLDealer", "Yes - checked");
-  data.set("complianceBackgroundChecks", "Yes - checked");
-  data.set("complianceRequestOnly", "Yes - checked");
-  data.set("complianceContactPermission", "Yes - checked");
-  status.textContent = "Sending checkout details to GDE Collectibles...";
-  const response = await fetch(form.action, {
-    method: "POST",
-    headers: { "Accept": "application/json" },
-    body: data
-  });
-  const result = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(result.error || result.errors?.[0]?.message || "Checkout details could not be emailed. Please try again.");
-}
 if (document.querySelector("#proceedToPayment")) {
   const paymentLink = document.querySelector("#proceedToPayment");
   const status = document.querySelector("#checkoutPaymentStatus");
@@ -421,15 +397,7 @@ if (document.querySelector("#proceedToPayment")) {
     const customer = form ? Object.fromEntries(new FormData(form).entries()) : {};
     localStorage.setItem("gdeCheckoutDetails", JSON.stringify(customer));
     const resetText = 'Proceed to Checkout <span>&rarr;</span>';
-    paymentLink.classList.add("disabled");
-    paymentLink.textContent = "Sending checkout details...";
-    sendCheckoutEmail({form, cart, status})
-      .then(() => startAuthorizeCheckout({button: paymentLink, status, cart, customer, resetText}))
-      .catch(error => {
-        status.textContent = error.message;
-        paymentLink.classList.remove("disabled");
-        paymentLink.innerHTML = resetText;
-      });
+    startAuthorizeCheckout({button: paymentLink, status, cart, customer, resetText});
   });
 }
 if (document.querySelector("#paymentSummaryItems")) {

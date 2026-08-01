@@ -5,6 +5,7 @@ const AUTHORIZE_ENDPOINTS = {
   sandbox: "https://apitest.authorize.net/xml/v1/request.api",
   production: "https://api.authorize.net/xml/v1/request.api"
 };
+const CHECKOUT_FORMSPREE_URL = "https://formspree.io/f/mrenwyyv";
 
 function readInventory() {
   return JSON.parse(fs.readFileSync(path.join(process.cwd(), "codex-inventory.json"), "utf8")).products;
@@ -16,6 +17,33 @@ function priceNumber(value) {
 
 function cleanText(value, maxLength = 255) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLength);
+}
+
+function buildCheckoutEmailPayload({ customer, items, amount, invoiceNumber }) {
+  const data = new URLSearchParams();
+  data.set("subject", "New GDE Collectibles Checkout");
+  data.set("invoiceNumber", invoiceNumber);
+  data.set("cartTotal", `$${amount.toLocaleString()}`);
+  data.set("cartItems", items.map(item => `${item.product.name} | ${item.product.platform} | ${item.product.finish} | ${item.product.price}`).join("\n"));
+  for (const [key, value] of Object.entries(customer || {})) data.set(key, cleanText(value, 1000));
+  data.set("complianceEligible", "Yes - checked");
+  data.set("complianceFFLDealer", "Yes - checked");
+  data.set("complianceBackgroundChecks", "Yes - checked");
+  data.set("complianceRequestOnly", "Yes - checked");
+  data.set("complianceContactPermission", "Yes - checked");
+  return data;
+}
+
+async function sendCheckoutEmail(payload) {
+  const response = await fetch(CHECKOUT_FORMSPREE_URL, {
+    method: "POST",
+    headers: { "Accept": "application/json" },
+    body: payload
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(result.error || result.errors?.[0]?.message || "Checkout details could not be emailed. Please try again.");
+  }
 }
 
 function siteOrigin(request) {
@@ -77,6 +105,7 @@ module.exports = async function handler(request, response) {
     const origin = siteOrigin(request);
     const customer = body.customer || {};
     const invoiceNumber = `GDE-${Date.now().toString().slice(-10)}`;
+    await sendCheckoutEmail(buildCheckoutEmailPayload({ customer, items, amount, invoiceNumber }));
     const authorizeRequest = {
       getHostedPaymentPageRequest: {
         merchantAuthentication: { name: loginId, transactionKey },
