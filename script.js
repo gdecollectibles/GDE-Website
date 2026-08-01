@@ -347,43 +347,15 @@ document.querySelector("#purchaseForm")?.addEventListener("submit", e => {
   confirmation.focus();
   confirmation.scrollIntoView({behavior:"smooth",block:"center"});
 });
-if (document.querySelector("#proceedToPayment")) {
-  const cart = getCart().filter(item => products[item]);
-  const query = cart.length ? `?cart=${cart.join(",")}` : "";
-  const paymentLink = document.querySelector("#proceedToPayment");
-  paymentLink.href = `payment.html${query}`;
-  paymentLink.addEventListener("click", () => {
-    const form = document.querySelector("#purchaseForm");
-    if (!form) return;
-    localStorage.setItem("gdeCheckoutDetails", JSON.stringify(Object.fromEntries(new FormData(form).entries())));
-  });
-}
-if (document.querySelector("#paymentSummaryItems")) {
-  const paymentParams = new URLSearchParams(location.search).get("cart");
-  const cart = (paymentParams ? paymentParams.split(",") : getCart()).filter(item => products[item]);
-  const container = document.querySelector("#paymentSummaryItems");
-  container.innerHTML = cart.length ? cart.map(item => {
-    const p = products[item];
-    return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"></div><div><h2>${p.name}</h2><p>${p.platform} · ${p.finish}</p><strong>${p.price}</strong></div></div>`;
-  }).join("") : '<div class="checkout-empty"><p>No collection selected.</p><a class="text-link" href="collections.html">Browse collections →</a></div>';
-  document.querySelector("#paymentTotal").textContent = `$${cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0).toLocaleString()}`;
-}
-document.querySelector("#authorizePayButton")?.addEventListener("click", async event => {
-  const button = event.currentTarget;
-  const status = document.querySelector("#paymentStatus");
-  const paymentParams = new URLSearchParams(location.search).get("cart");
-  const cart = (paymentParams ? paymentParams.split(",") : getCart()).filter(item => products[item] && !products[item].availability.includes("Archive"));
+async function startAuthorizeCheckout({button, status, cart, customer, resetText}) {
   if (!cart.length) {
     status.textContent = "Please add a collection to your cart before paying.";
     return;
   }
-  let customer = {};
-  try {
-    customer = JSON.parse(localStorage.getItem("gdeCheckoutDetails")) || {};
-  } catch {}
   button.disabled = true;
-  button.textContent = "Creating secure payment...";
-  status.textContent = "Connecting to Authorize.net...";
+  button.classList.add("disabled");
+  button.textContent = "Connecting to Authorize.net...";
+  status.textContent = "Creating secure payment session...";
   try {
     const response = await fetch("/api/create-authorize-payment", {
       method: "POST",
@@ -407,8 +379,42 @@ document.querySelector("#authorizePayButton")?.addEventListener("click", async e
   } catch (error) {
     status.textContent = error.message;
     button.disabled = false;
-    button.textContent = "Pay Securely with Authorize.net";
+    button.classList.remove("disabled");
+    button.innerHTML = resetText;
   }
+}
+if (document.querySelector("#proceedToPayment")) {
+  const paymentLink = document.querySelector("#proceedToPayment");
+  const status = document.querySelector("#checkoutPaymentStatus");
+  paymentLink.addEventListener("click", event => {
+    event.preventDefault();
+    const form = document.querySelector("#purchaseForm");
+    const cart = getCart().filter(item => products[item] && !products[item].availability.includes("Archive"));
+    const customer = form ? Object.fromEntries(new FormData(form).entries()) : {};
+    localStorage.setItem("gdeCheckoutDetails", JSON.stringify(customer));
+    startAuthorizeCheckout({button: paymentLink, status, cart, customer, resetText: 'Proceed to Checkout <span>→</span>'});
+  });
+}
+if (document.querySelector("#paymentSummaryItems")) {
+  const paymentParams = new URLSearchParams(location.search).get("cart");
+  const cart = (paymentParams ? paymentParams.split(",") : getCart()).filter(item => products[item]);
+  const container = document.querySelector("#paymentSummaryItems");
+  container.innerHTML = cart.length ? cart.map(item => {
+    const p = products[item];
+    return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"></div><div><h2>${p.name}</h2><p>${p.platform} · ${p.finish}</p><strong>${p.price}</strong></div></div>`;
+  }).join("") : '<div class="checkout-empty"><p>No collection selected.</p><a class="text-link" href="collections.html">Browse collections →</a></div>';
+  document.querySelector("#paymentTotal").textContent = `$${cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0).toLocaleString()}`;
+}
+document.querySelector("#authorizePayButton")?.addEventListener("click", event => {
+  const button = event.currentTarget;
+  const status = document.querySelector("#paymentStatus");
+  const paymentParams = new URLSearchParams(location.search).get("cart");
+  const cart = (paymentParams ? paymentParams.split(",") : getCart()).filter(item => products[item] && !products[item].availability.includes("Archive"));
+  let customer = {};
+  try {
+    customer = JSON.parse(localStorage.getItem("gdeCheckoutDetails")) || {};
+  } catch {}
+  startAuthorizeCheckout({button, status, cart, customer, resetText: "Pay Securely with Authorize.net"});
 });
 document.querySelector("#inquiryForm")?.addEventListener("submit", e => {
   e.preventDefault();
