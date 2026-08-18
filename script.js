@@ -332,6 +332,7 @@ if (document.querySelector(".product-detail-page")) {
     document.title = "No active listings | GDE Collectibles";
     setText("#detailCollection", "Inventory update");
     setText("#detailCollectionNumber", "");
+    setText("#detailHeaderAvailability", "Coming soon");
     setText("#detailName", "No active listings");
     setText("#detailPrice", "");
     setText("#detailPlatform", "—");
@@ -345,7 +346,7 @@ if (document.querySelector(".product-detail-page")) {
     }
   } else {
     document.title = `${product.name} | GDE Collectibles`;
-    setText("#detailCollection",product.collection); setText("#detailCollectionNumber",product.collectionNumber || ""); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage"); setProductGallery(product); setExtraSpecs(product);
+    setText("#detailCollection",product.collection); setText("#detailCollectionNumber",product.collectionNumber || ""); setText("#detailHeaderAvailability",product.availability); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage"); setProductGallery(product); setExtraSpecs(product);
     if (request) request.dataset.product=key || Object.keys(products)[0];
     if(product.availability.includes("Archive") && request){request.textContent="Archive - Unavailable";request.disabled=true;}
   }
