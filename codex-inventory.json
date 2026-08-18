@@ -144,7 +144,11 @@
     },
     "trump": {
       "name": "Trump",
-      "collection": "America's 250th Anniversary & Donald J. Trump Collection",
+      "collection": "America's 250th Anniversary",
+      "collections": [
+        "America's 250th Anniversary",
+        "The Donald J. Trump Collection"
+      ],
       "collectionNumber": "1 of 25",
       "type": "Pistol",
       "manufacturer": "Colt",

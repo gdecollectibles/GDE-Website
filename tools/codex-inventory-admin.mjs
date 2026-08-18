@@ -24,7 +24,17 @@ const platformSlug = value => value === ".38 Special" ? "38-special" : value ===
 const availabilitySlug = value => value.includes("Archive") || value.includes("Sold") ? "archive" : value.includes("Limited") ? "limited" : "available";
 const escapeHtml = value => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 const jsProducts = products => Object.fromEntries(Object.entries(products).map(([id, p]) => [id, p]));
-const labelsFor = (products, getter) => [...new Map(Object.values(products).map(getter).filter(Boolean).map(value => [value, value])).values()];
+const productCollections = product => {
+  if (Array.isArray(product?.collections) && product.collections.length) return product.collections;
+  if (Array.isArray(product?.collection)) return product.collection;
+  return product?.collection ? [product.collection] : [];
+};
+const displayCollections = product => productCollections(product).join(" · ");
+const collectionSlugs = product => productCollections(product).map(slug).join(" ");
+const labelsFor = (products, getter) => [...new Map(Object.values(products).flatMap(product => {
+  const value = getter(product);
+  return Array.isArray(value) ? value : value ? [value] : [];
+}).map(value => [value, value])).values()];
 const checkboxGroup = (title, name, values, valueGetter = slug) => `<div class="filter-group"><h3>${title}</h3>\n          ${values.length ? values.map(value => `<label><input type="checkbox" name="${name}" value="${valueGetter(value)}"> ${escapeHtml(value)}</label>`).join("") : `<p class="filter-empty">No active listings</p>`}\n        </div>`;
 
 function listingPhotos(id) {
@@ -49,7 +59,7 @@ const productCard = ([id, p]) => {
   const archived = availability === "archive";
   const photo = Array.isArray(p.photos) && p.photos[0] ? p.photos[0] : "";
   const imageStyle = photo ? ` style="background-image:url('${escapeHtml(photo)}')"` : "";
-  return `<article class="product-card" data-type="${slug(p.type)}" data-product="${id}" data-collection="${slug(p.collection)}" data-platform="${platformSlug(p.platform)}" data-finish="${slug(p.finish)}" data-price="${priceNumber(p.price)}" data-availability="${availability}"><a class="product-image ${p.image}" href="product.html?product=${id}"${imageStyle}><span class="status ${availability}">${escapeHtml(p.availability)}</span></a><div class="product-info"><p class="meta">${escapeHtml(p.collection)}${p.collectionNumber ? ` &middot; ${escapeHtml(p.collectionNumber)}` : ""}</p><p class="card-availability">${escapeHtml(p.availability)}</p><h2>${escapeHtml(p.name)}</h2><p class="price">${escapeHtml(p.price)}</p><div class="card-actions">${archived ? `<a class="button full disabled" aria-disabled="true">Contact Us</a>` : `<a class="button full add-to-cart-link" href="checkout.html?product=${id}" data-product="${id}">ADD TO CART</a>`}<a class="text-link" href="product.html?product=${id}">View Details &rarr;</a></div></div></article>`;
+  return `<article class="product-card" data-type="${slug(p.type)}" data-product="${id}" data-collection="${collectionSlugs(p)}" data-platform="${platformSlug(p.platform)}" data-finish="${slug(p.finish)}" data-price="${priceNumber(p.price)}" data-availability="${availability}"><a class="product-image ${p.image}" href="product.html?product=${id}"${imageStyle}><span class="status ${availability}">${escapeHtml(p.availability)}</span></a><div class="product-info"><p class="meta">${escapeHtml(displayCollections(p))}${p.collectionNumber ? ` &middot; ${escapeHtml(p.collectionNumber)}` : ""}</p><p class="card-availability">${escapeHtml(p.availability)}</p><h2>${escapeHtml(p.name)}</h2><p class="price">${escapeHtml(p.price)}</p><div class="card-actions">${archived ? `<a class="button full disabled" aria-disabled="true">Contact Us</a>` : `<a class="button full add-to-cart-link" href="checkout.html?product=${id}" data-product="${id}">ADD TO CART</a>`}<a class="text-link" href="product.html?product=${id}">View Details &rarr;</a></div></div></article>`;
 };
 
 function generate() {
@@ -61,7 +71,7 @@ function generate() {
 
   let script = read(scriptPath);
   script = script.replace(/^const products = [\s\S]*?;\r?\nconst priceNumber/m, `const products = ${JSON.stringify(jsProducts(products), null, 2)};\nconst priceNumber`);
-  const collectionNavLinks = labelsFor(products, p => p.collection)
+  const collectionNavLinks = labelsFor(products, productCollections)
     .map(collection => `        <a href="collections.html?collection=${slug(collection)}">${escapeHtml(collection)}</a>`)
     .join("\n");
   const platformNavLinks = labelsFor(products, p => p.platform)
@@ -78,7 +88,7 @@ function generate() {
   const prices = Object.values(products).map(p => priceNumber(p.price)).filter(Number.isFinite);
   const minPrice = prices.length ? Math.min(...prices) : 0;
   const maxPrice = prices.length ? Math.max(...prices) : 0;
-  const collectionFilters = checkboxGroup("Collection", "collection", labelsFor(products, p => p.collection));
+  const collectionFilters = checkboxGroup("Collection", "collection", labelsFor(products, productCollections));
   const productFilters = checkboxGroup("Listing", "product", entries.map(([, p]) => p.name), value => entries.find(([, p]) => p.name === value)?.[0] || slug(value));
   const typeFilters = checkboxGroup("Collection type", "type", labelsFor(products, p => p.type));
   const platformFilters = checkboxGroup("Firearm platform", "platform", labelsFor(products, p => p.platform), platformSlug);

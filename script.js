@@ -143,7 +143,11 @@ const products = {
   },
   "trump": {
     "name": "Trump",
-    "collection": "America's 250th Anniversary & Donald J. Trump Collection",
+    "collection": "America's 250th Anniversary",
+    "collections": [
+      "America's 250th Anniversary",
+      "The Donald J. Trump Collection"
+    ],
     "collectionNumber": "1 of 25",
     "type": "Pistol",
     "manufacturer": "Colt",
@@ -365,6 +369,13 @@ const products = {
 const priceNumber = value => Number(value.replace(/[$,]/g,""));
 const slug = value => String(value || "").trim().toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const platformSlug = value => value === ".38 Special" ? "38-special" : value === ".45 ACP" ? "45-acp" : slug(value);
+const productCollections = item => {
+  if (Array.isArray(item?.collections) && item.collections.length) return item.collections;
+  if (Array.isArray(item?.collection)) return item.collection;
+  return item?.collection ? [item.collection] : [];
+};
+const displayCollections = item => productCollections(item).join(" · ");
+const collectionSlugs = item => productCollections(item).map(slug).join(" ");
 const getCart = () => {
   try { return JSON.parse(localStorage.getItem("gdeRequestCart")) || []; }
   catch { return []; }
@@ -398,9 +409,8 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="collections.html">All Collections</a>
         <p>Collection</p>
         <a href="collections.html?collection=america-s-250th-anniversary">America's 250th Anniversary</a>
-        <a href="collections.html?collection=america-s-250th-anniversary-and-donald-j-trump-collection">America's 250th Anniversary &amp; Donald J. Trump Collection</a>
-        <a href="collections.html?collection=the-alamo-collection">The Alamo Collection</a>
         <a href="collections.html?collection=the-donald-j-trump-collection">The Donald J. Trump Collection</a>
+        <a href="collections.html?collection=the-alamo-collection">The Alamo Collection</a>
         <a href="collections.html?collection=the-movie-collection">The Movie Collection</a>
         <p>Platform</p>
         <a href="collections.html?platform=45-acp">.45 ACP</a>
@@ -514,10 +524,10 @@ cards.forEach(card => {
   const item = products[itemKey];
   if (!item) return;
   card.dataset.product = itemKey;
-  card.dataset.collection = slug(item.collection);
+  card.dataset.collection = collectionSlugs(item);
   card.dataset.platform = platformSlug(item.platform);
   const meta = card.querySelector(".meta");
-  if (meta) meta.textContent = `${item.collection}${item.collectionNumber ? ` · ${item.collectionNumber}` : ""}`;
+  if (meta) meta.textContent = `${displayCollections(item)}${item.collectionNumber ? ` · ${item.collectionNumber}` : ""}`;
 });
 const priceRange = document.querySelector("#priceRange");
 if (cards.length) {
@@ -536,7 +546,11 @@ if (cards.length) {
     const maxPrice = Number(priceRange.value);
     let visible = 0;
     cards.forEach(card => {
-      const matches = groups.every(group => !selected[group].length || selected[group].includes(card.dataset[group])) && Number(card.dataset.price) <= maxPrice;
+      const matches = groups.every(group => {
+        if (!selected[group].length) return true;
+        if (group === "collection") return selected[group].some(value => (card.dataset.collection || "").split(/\s+/).includes(value));
+        return selected[group].includes(card.dataset[group]);
+      }) && Number(card.dataset.price) <= maxPrice;
       card.classList.toggle("is-hidden", !matches);
       if (matches) visible++;
     });
@@ -649,7 +663,7 @@ if (document.querySelector(".product-detail-page")) {
     }
   } else {
     document.title = `${product.name} | GDE Collectibles`;
-    setText("#detailCollection",product.collection); setText("#detailCollectionNumber",product.collectionNumber || ""); setText("#detailHeaderAvailability",product.availability); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage"); setProductGallery(product); setExtraSpecs(product);
+    setText("#detailCollection",displayCollections(product)); setText("#detailCollectionNumber",product.collectionNumber || ""); setText("#detailHeaderAvailability",product.availability); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage"); setProductGallery(product); setExtraSpecs(product);
     if (request) request.dataset.product=key || Object.keys(products)[0];
     if(product.availability.includes("Archive") && request){request.textContent="Archive - Unavailable";request.disabled=true;}
   }
@@ -681,7 +695,7 @@ function renderCart() {
   document.querySelector("#emptyCart").classList.toggle("show", cart.length === 0);
   container.innerHTML = cart.map(item => {
     const p=products[item];
-    return `<article class="cart-item"><div class="cart-item-image ${p.image}"${productImageStyle(p)}></div><div class="cart-item-copy"><p class="meta">${p.collection}</p><h2>${p.name}</h2><p>${p.platform} · ${p.finish} · ${p.availability}</p><span>FFL Transfer Required</span></div><div class="cart-item-price"><strong>${p.price}</strong><button type="button" class="remove-cart-item" data-product="${item}">Remove</button></div></article>`;
+    return `<article class="cart-item"><div class="cart-item-image ${p.image}"${productImageStyle(p)}></div><div class="cart-item-copy"><p class="meta">${displayCollections(p)}</p><h2>${p.name}</h2><p>${p.platform} · ${p.finish} · ${p.availability}</p><span>FFL Transfer Required</span></div><div class="cart-item-price"><strong>${p.price}</strong><button type="button" class="remove-cart-item" data-product="${item}">Remove</button></div></article>`;
   }).join("");
   const total = cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0);
   document.querySelector("#cartTotal").textContent = `$${total.toLocaleString()}`;
