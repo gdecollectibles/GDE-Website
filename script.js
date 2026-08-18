@@ -308,7 +308,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "High Polish with 24K Gold Icons",
     "gripColor": "S.S. - Black with Picture of The World Is Yours",
-    "price": "$1",
+    "price": "$2,800",
     "availability": "Available",
     "image": "image-gold",
     "description": "Picture of Serial # or Sequence # on the gun is different from the one you are purchasing. If you are interested in a specific sequence number call us, if available we will work with you so you can obtain the number.",
