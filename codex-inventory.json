@@ -1,3 +1,41 @@
 {
-  "products": {}
+  "products": {
+    "the-capital": {
+      "name": "The Capital",
+      "collection": "America's 250th Anniversary",
+      "collectionNumber": "1 of 300",
+      "type": "Pistol",
+      "manufacturer": "Colt",
+      "model": "Colt M1911",
+      "caliber": ".45 ACP",
+      "platform": ".45 ACP",
+      "capacity": "7 + 1",
+      "action": "Semi-Automatic",
+      "slideMaterial": "Stainless Steel",
+      "frameMaterial": "Stainless Steel",
+      "finish": "High Polish & 24K Gold Electro plated icons",
+      "gripColor": "Composite - Pearl White with Colt Horse in gold",
+      "price": "$3,300",
+      "availability": "Available",
+      "image": "image-gold",
+      "description": "Picture of Serial # or Sequence # on the gun is different from the one you are purchasing. If you are interested in a specific sequence number call us, if available we will work with you so you can obtain the number.",
+      "photos": [
+        "assets/listings/the-capital/the-capital-01.jpeg",
+        "assets/listings/the-capital/the-capital-02.jpeg",
+        "assets/listings/the-capital/the-capital-03.jpeg",
+        "assets/listings/the-capital/the-capital-04.jpeg",
+        "assets/listings/the-capital/the-capital-05.jpeg",
+        "assets/listings/the-capital/the-capital-06.jpeg",
+        "assets/listings/the-capital/the-capital-07.jpeg",
+        "assets/listings/the-capital/the-capital-08.jpeg",
+        "assets/listings/the-capital/the-capital-09.jpeg",
+        "assets/listings/the-capital/the-capital-10.jpeg",
+        "assets/listings/the-capital/the-capital-11.jpeg",
+        "assets/listings/the-capital/the-capital-12.jpeg",
+        "assets/listings/the-capital/the-capital-13.jpeg",
+        "assets/listings/the-capital/the-capital-14.jpeg",
+        "assets/listings/the-capital/the-capital-15.jpeg"
+      ]
+    }
+  }
 }

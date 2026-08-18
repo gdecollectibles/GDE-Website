@@ -14,30 +14,33 @@
     <section class="shop-layout">
       <aside class="filters" id="filters">
         <div class="filter-title"><h2>Filters</h2><button class="filter-close" type="button" aria-label="Close filters">×</button></div>
-        <div class="filter-group"><h3>Collections</h3>
-          <p class="filter-empty">No active listings</p>
+        <div class="filter-group"><h3>Collection</h3>
+          <label><input type="checkbox" name="collection" value="america-s-250th-anniversary"> America's 250th Anniversary</label>
+        </div>
+        <div class="filter-group"><h3>Listing</h3>
+          <label><input type="checkbox" name="product" value="the-capital"> The Capital</label>
         </div>
         <div class="filter-group"><h3>Collection type</h3>
-          <p class="filter-empty">No active listings</p>
+          <label><input type="checkbox" name="type" value="pistol"> Pistol</label>
         </div>
         <div class="filter-group"><h3>Firearm platform</h3>
-          <p class="filter-empty">No active listings</p>
+          <label><input type="checkbox" name="platform" value="45-acp"> .45 ACP</label>
         </div>
         <div class="filter-group"><h3>Finish</h3>
-          <p class="filter-empty">No active listings</p>
+          <label><input type="checkbox" name="finish" value="high-polish-and-24k-gold-electro-plated-icons"> High Polish &amp; 24K Gold Electro plated icons</label>
         </div>
-        <div class="filter-group"><div class="range-heading"><h3>Maximum price</h3><strong id="priceValue">$0</strong></div><input id="priceRange" type="range" min="0" max="0" step="100" value="0"><div class="range-limits"><span>$0</span><span>$0</span></div></div>
+        <div class="filter-group"><div class="range-heading"><h3>Maximum price</h3><strong id="priceValue">$3,300</strong></div><input id="priceRange" type="range" min="3300" max="3300" step="100" value="3300"><div class="range-limits"><span>$3,300</span><span>$3,300</span></div></div>
         <div class="filter-group"><h3>Availability</h3>
-          <p class="filter-empty">No active listings</p>
+          <label><input type="checkbox" name="availability" value="available"> Available</label>
         </div>
         <button class="button secondary full reset-filters" type="button">Reset Filters</button>
       </aside>
       <div class="shop-results">
-        <div class="results-bar"><p id="resultsLabel">Showing all 0 collections</p><button class="mobile-filter-button" type="button">Filters <span>⌁</span></button></div>
+        <div class="results-bar"><p id="resultsLabel">Showing all 1 listings</p><button class="mobile-filter-button" type="button">Filters <span>⌁</span></button></div>
         <div class="product-grid" id="productGrid">
-          
+          <article class="product-card" data-type="pistol" data-product="the-capital" data-collection="america-s-250th-anniversary" data-platform="45-acp" data-finish="high-polish-and-24k-gold-electro-plated-icons" data-price="3300" data-availability="available"><a class="product-image image-gold" href="product.html?product=the-capital" style="background-image:url('assets/listings/the-capital/the-capital-01.jpeg')"><span class="status available">Available</span></a><div class="product-info"><p class="meta">America's 250th Anniversary &middot; 1 of 300</p><h2>The Capital</h2><p class="price">$3,300</p><div class="card-actions"><a class="button full add-to-cart-link" href="checkout.html?product=the-capital" data-product="the-capital">ADD TO CART</a><a class="text-link" href="product.html?product=the-capital">View Details &rarr;</a></div></div></article>
         </div>
-        <div class="no-results show" id="noResults"><h2>No active listings</h2><p>All listings have been cleared while GDE prepares the next release.</p><a class="button secondary" href="contact.html">Contact Us</a></div>
+        <div class="no-results" id="noResults"><h2>No collections match</h2><p>Try adjusting or resetting your filters.</p></div>
       </div>
     </section>
   </main>

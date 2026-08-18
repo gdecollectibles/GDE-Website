@@ -1,5 +1,45 @@
-const products = {};
+const products = {
+  "the-capital": {
+    "name": "The Capital",
+    "collection": "America's 250th Anniversary",
+    "collectionNumber": "1 of 300",
+    "type": "Pistol",
+    "manufacturer": "Colt",
+    "model": "Colt M1911",
+    "caliber": ".45 ACP",
+    "platform": ".45 ACP",
+    "capacity": "7 + 1",
+    "action": "Semi-Automatic",
+    "slideMaterial": "Stainless Steel",
+    "frameMaterial": "Stainless Steel",
+    "finish": "High Polish & 24K Gold Electro plated icons",
+    "gripColor": "Composite - Pearl White with Colt Horse in gold",
+    "price": "$3,300",
+    "availability": "Available",
+    "image": "image-gold",
+    "description": "Picture of Serial # or Sequence # on the gun is different from the one you are purchasing. If you are interested in a specific sequence number call us, if available we will work with you so you can obtain the number.",
+    "photos": [
+      "assets/listings/the-capital/the-capital-01.jpeg",
+      "assets/listings/the-capital/the-capital-02.jpeg",
+      "assets/listings/the-capital/the-capital-03.jpeg",
+      "assets/listings/the-capital/the-capital-04.jpeg",
+      "assets/listings/the-capital/the-capital-05.jpeg",
+      "assets/listings/the-capital/the-capital-06.jpeg",
+      "assets/listings/the-capital/the-capital-07.jpeg",
+      "assets/listings/the-capital/the-capital-08.jpeg",
+      "assets/listings/the-capital/the-capital-09.jpeg",
+      "assets/listings/the-capital/the-capital-10.jpeg",
+      "assets/listings/the-capital/the-capital-11.jpeg",
+      "assets/listings/the-capital/the-capital-12.jpeg",
+      "assets/listings/the-capital/the-capital-13.jpeg",
+      "assets/listings/the-capital/the-capital-14.jpeg",
+      "assets/listings/the-capital/the-capital-15.jpeg"
+    ]
+  }
+};
 const priceNumber = value => Number(value.replace(/[$,]/g,""));
+const slug = value => String(value || "").trim().toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const platformSlug = value => value === ".38 Special" ? "38-special" : value === ".45 ACP" ? "45-acp" : slug(value);
 const getCart = () => {
   try { return JSON.parse(localStorage.getItem("gdeRequestCart")) || []; }
   catch { return []; }
@@ -31,11 +71,12 @@ document.querySelectorAll(".site-nav").forEach(nav => {
     collectionMenu.innerHTML = `<button class="nav-dropdown-toggle" type="button" aria-expanded="false">Collections <span>&or;</span></button>
       <div class="nav-dropdown-panel">
         <a href="collections.html">All Collections</a>
+        <p>Collection</p>
+        <a href="collections.html?collection=america-s-250th-anniversary">America's 250th Anniversary</a>
         <p>Platform</p>
         <a href="collections.html?platform=45-acp">.45 ACP</a>
-        <a href="collections.html?platform=38-special">.38 Special</a>
-        <p>Individual collections</p>
-
+        <p>Individual listings</p>
+        <a href="collections.html?item=the-capital">The Capital</a>
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
   }
@@ -134,9 +175,10 @@ cards.forEach(card => {
   const item = products[itemKey];
   if (!item) return;
   card.dataset.product = itemKey;
-  card.dataset.platform = item.platform === ".38 Special" ? "38-special" : "45-acp";
+  card.dataset.collection = slug(item.collection);
+  card.dataset.platform = platformSlug(item.platform);
   const meta = card.querySelector(".meta");
-  if (meta) meta.textContent = `${item.collection.replace(" Collection","")} · ${item.platform} · ${item.finish}`;
+  if (meta) meta.textContent = `${item.collection}${item.collectionNumber ? ` · ${item.collectionNumber}` : ""}`;
 });
 const priceRange = document.querySelector("#priceRange");
 if (cards.length) {
@@ -144,11 +186,13 @@ if (cards.length) {
   const requestedPlatform = catalogParams.get("platform");
   const requestedType = catalogParams.get("type");
   const requestedItem = catalogParams.get("item");
+  const requestedCollection = catalogParams.get("collection");
   if (requestedPlatform) document.querySelector(`input[name="platform"][value="${requestedPlatform}"]`)?.setAttribute("checked","");
   if (requestedType) document.querySelector(`input[name="type"][value="${requestedType}"]`)?.setAttribute("checked","");
   if (requestedItem) document.querySelector(`input[name="product"][value="${requestedItem}"]`)?.setAttribute("checked","");
+  if (requestedCollection) document.querySelector(`input[name="collection"][value="${requestedCollection}"]`)?.setAttribute("checked","");
   const applyFilters = () => {
-    const groups = ["product","type","platform","finish","availability"];
+    const groups = ["collection","product","type","platform","finish","availability"];
     const selected = Object.fromEntries(groups.map(group => [group,[...document.querySelectorAll(`input[name="${group}"]:checked`)].map(el => el.value)]));
     const maxPrice = Number(priceRange.value);
     let visible = 0;
@@ -159,14 +203,15 @@ if (cards.length) {
     });
     document.querySelector("#priceValue").textContent = `$${maxPrice.toLocaleString()}`;
     const selectedProducts = selected.product.length;
-    document.querySelector("#resultsLabel").textContent = selectedProducts ? `Showing ${visible} selected collection${visible===1?"":"s"}` : maxPrice < 5000 ? `Showing ${visible} collection${visible===1?"":"s"} up to $${maxPrice.toLocaleString()}` : `Showing ${visible} of ${cards.length} collections`;
+    const selectedCollections = selected.collection.length;
+    document.querySelector("#resultsLabel").textContent = selectedProducts || selectedCollections ? `Showing ${visible} selected listing${visible===1?"":"s"}` : maxPrice < 5000 ? `Showing ${visible} listing${visible===1?"":"s"} up to $${maxPrice.toLocaleString()}` : `Showing ${visible} of ${cards.length} listings`;
     document.querySelector("#noResults").classList.toggle("show", visible === 0);
   };
   document.querySelectorAll(".filters input").forEach(input => input.addEventListener("input", applyFilters));
   document.querySelector(".reset-filters").addEventListener("click", () => {
     document.querySelectorAll('.filters input[type="checkbox"]').forEach(input => input.checked = false);
     priceRange.value = priceRange.max;
-    if (requestedItem || requestedPlatform || requestedType) history.replaceState({}, "", "collections.html");
+    if (requestedItem || requestedPlatform || requestedType || requestedCollection) history.replaceState({}, "", "collections.html");
     location.reload();
   });
   document.querySelector(".mobile-filter-button")?.addEventListener("click", () => document.querySelector(".filters").classList.add("open"));
@@ -232,33 +277,25 @@ function productImageStyle(item) {
 function setExtraSpecs(item) {
   const specList = document.querySelector(".spec-list");
   if (!specList || !item) return;
-  specList.querySelectorAll("[data-extra-spec]").forEach(row => row.remove());
   const specs = [
-    ["Manufacturer", item.manufacturer],
-    ["Model", item.model],
+    ["Availability", item.availability],
     ["Caliber", item.caliber],
-    ["Frame color", item.frameColor],
-    ["Grip color", item.gripColor],
-    ["Condition", item.condition],
-    ["Metal condition", item.metalCondition],
-    ["Engraving", item.engraving],
-    ["Case", item.case],
-    ["Action", item.action],
-    ["Adjustable sights", item.adjustableSights],
-    ["Barrel length", item.barrelLength],
     ["Capacity", item.capacity],
+    ["Manufacture", item.manufacturer],
+    ["Action", item.action],
+    ["Slide material", item.slideMaterial],
     ["Frame material", item.frameMaterial],
-    ["Grip material", item.gripMaterial]
+    ["Finish", item.finish],
+    ["Grip color", item.gripColor]
   ].filter(([, value]) => value);
-  specs.forEach(([label, value]) => {
-    specList.insertAdjacentHTML("beforeend", `<div data-extra-spec><dt>${label}</dt><dd>${value}</dd></div>`);
-  });
+  specList.innerHTML = specs.map(([label, value]) => `<div><dt>${label}</dt><dd>${value}</dd></div>`).join("");
 }
 if (document.querySelector(".product-detail-page")) {
   const request=document.querySelector("#detailRequest");
   if (!product) {
     document.title = "No active listings | GDE Collectibles";
     setText("#detailCollection", "Inventory update");
+    setText("#detailCollectionNumber", "");
     setText("#detailName", "No active listings");
     setText("#detailPrice", "");
     setText("#detailPlatform", "—");
@@ -272,7 +309,7 @@ if (document.querySelector(".product-detail-page")) {
     }
   } else {
     document.title = `${product.name} | GDE Collectibles`;
-    setText("#detailCollection",product.collection); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage"); setProductGallery(product); setExtraSpecs(product);
+    setText("#detailCollection",product.collection); setText("#detailCollectionNumber",product.collectionNumber || ""); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage"); setProductGallery(product); setExtraSpecs(product);
     if (request) request.dataset.product=key || Object.keys(products)[0];
     if(product.availability.includes("Archive") && request){request.textContent="Archive - Unavailable";request.disabled=true;}
   }
