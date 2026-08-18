@@ -531,6 +531,8 @@ cards.forEach(card => {
 });
 const priceRange = document.querySelector("#priceRange");
 if (cards.length) {
+  const productGrid = document.querySelector("#productGrid");
+  const sortSelect = document.querySelector("#sortSelect");
   const catalogParams = new URLSearchParams(location.search);
   const requestedPlatform = catalogParams.get("platform");
   const requestedType = catalogParams.get("type");
@@ -540,6 +542,20 @@ if (cards.length) {
   if (requestedType) document.querySelector(`input[name="type"][value="${requestedType}"]`)?.setAttribute("checked","");
   if (requestedItem) document.querySelector(`input[name="product"][value="${requestedItem}"]`)?.setAttribute("checked","");
   if (requestedCollection) document.querySelector(`input[name="collection"][value="${requestedCollection}"]`)?.setAttribute("checked","");
+  const sortCards = () => {
+    if (!productGrid) return;
+    const mode = sortSelect?.value || "featured";
+    const sorted = [...cards].sort((a, b) => {
+      if (mode === "price-low") return Number(a.dataset.price) - Number(b.dataset.price);
+      if (mode === "price-high") return Number(b.dataset.price) - Number(a.dataset.price);
+      const nameA = a.querySelector("h2")?.textContent.trim() || "";
+      const nameB = b.querySelector("h2")?.textContent.trim() || "";
+      if (mode === "name-az") return nameA.localeCompare(nameB);
+      if (mode === "name-za") return nameB.localeCompare(nameA);
+      return cards.indexOf(a) - cards.indexOf(b);
+    });
+    sorted.forEach(card => productGrid.appendChild(card));
+  };
   const applyFilters = () => {
     const groups = ["collection","product","type","platform","finish","availability"];
     const selected = Object.fromEntries(groups.map(group => [group,[...document.querySelectorAll(`input[name="${group}"]:checked`)].map(el => el.value)]));
@@ -559,8 +575,10 @@ if (cards.length) {
     const selectedCollections = selected.collection.length;
     document.querySelector("#resultsLabel").textContent = selectedProducts || selectedCollections ? `Showing ${visible} selected listing${visible===1?"":"s"}` : maxPrice < 5000 ? `Showing ${visible} listing${visible===1?"":"s"} up to $${maxPrice.toLocaleString()}` : `Showing ${visible} of ${cards.length} listings`;
     document.querySelector("#noResults").classList.toggle("show", visible === 0);
+    sortCards();
   };
   document.querySelectorAll(".filters input").forEach(input => input.addEventListener("input", applyFilters));
+  sortSelect?.addEventListener("input", applyFilters);
   document.querySelector(".reset-filters").addEventListener("click", () => {
     document.querySelectorAll('.filters input[type="checkbox"]').forEach(input => input.checked = false);
     priceRange.value = priceRange.max;
