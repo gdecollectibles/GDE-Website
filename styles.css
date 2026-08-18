@@ -143,4 +143,5 @@ body:has(.hero) .cta-section{margin-left:0;margin-right:0;padding-top:85px;paddi
 
 .product-card .price{font-size:1.65rem;line-height:1.1}.detail-price{font-size:1.85rem;line-height:1.15}
 .detail-gallery,.detail-copy{min-width:0}.detail-copy h1{font-size:clamp(4.2rem,7vw,7.8rem);letter-spacing:0;margin:0 0 .12em}.detail-collection,.detail-collection-number{margin:0;color:var(--muted);font-size:.95rem;text-transform:uppercase;letter-spacing:.12em}.detail-collection-number{margin-top:6px}.detail-price{margin:22px 0 0;font-size:2.25rem}.detail-divider{height:1px;background:var(--line);margin:28px 0 0}.detail-description-block{margin-top:28px;padding-top:24px;border-top:1px solid var(--line)}.detail-description-block h2{font-size:2rem;margin-bottom:12px}.detail-description-block p{color:var(--muted);font-size:.9rem;max-width:860px}.craft-block li ul{margin-top:8px}.product-detail-page .spec-list{border-top:0;margin-top:0}.product-detail-page .spec-list dd{text-align:right;max-width:58%}
+.product-image[style]:after,.detail-image.has-photo:after,.cart-item-image[style]:after,.mini-image[style]:after,.thumb[style]:after{display:none}
 
