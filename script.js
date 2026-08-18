@@ -35,6 +35,41 @@ const products = {
       "assets/listings/the-capital/the-capital-14.jpeg",
       "assets/listings/the-capital/the-capital-15.jpeg"
     ]
+  },
+  "signing-the-constitution": {
+    "name": "Signing the Constitution",
+    "collection": "America's 250th Anniversary",
+    "collectionNumber": "1 of 300",
+    "type": "Pistol",
+    "manufacturer": "Colt",
+    "model": "Colt M1911",
+    "caliber": ".45 ACP",
+    "platform": ".45 ACP",
+    "capacity": "7 + 1",
+    "action": "Semi-Automatic",
+    "slideMaterial": "Stainless Steel",
+    "frameMaterial": "Stainless Steel",
+    "finish": "High Polish & 24K Gold Electro plated icons",
+    "gripColor": "S.S. - Black with 24K Gold Presidential Seal",
+    "price": "$3,300",
+    "availability": "Available",
+    "image": "image-gold",
+    "description": "Picture of Serial # or Sequence # on the gun is different from the one you are purchasing. If you are interested in a specific sequence number call us, if available we will work with you so you can obtain the number.",
+    "photos": [
+      "assets/listings/signing-the-constitution/signing-the-constitution-01.jpeg",
+      "assets/listings/signing-the-constitution/signing-the-constitution-02.jpeg",
+      "assets/listings/signing-the-constitution/signing-the-constitution-03.jpeg",
+      "assets/listings/signing-the-constitution/signing-the-constitution-04.jpeg",
+      "assets/listings/signing-the-constitution/signing-the-constitution-05.jpeg",
+      "assets/listings/signing-the-constitution/signing-the-constitution-06.jpeg",
+      "assets/listings/signing-the-constitution/signing-the-constitution-07.jpeg",
+      "assets/listings/signing-the-constitution/signing-the-constitution-08.jpeg",
+      "assets/listings/signing-the-constitution/signing-the-constitution-09.jpeg",
+      "assets/listings/signing-the-constitution/signing-the-constitution-10.jpeg",
+      "assets/listings/signing-the-constitution/signing-the-constitution-11.jpeg",
+      "assets/listings/signing-the-constitution/signing-the-constitution-12.jpeg",
+      "assets/listings/signing-the-constitution/signing-the-constitution-13.jpeg"
+    ]
   }
 };
 const priceNumber = value => Number(value.replace(/[$,]/g,""));
@@ -77,6 +112,7 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="collections.html?platform=45-acp">.45 ACP</a>
         <p>Individual listings</p>
         <a href="collections.html?item=the-capital">The Capital</a>
+        <a href="collections.html?item=signing-the-constitution">Signing the Constitution</a>
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
   }
