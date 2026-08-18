@@ -1,85 +1,4 @@
-const products = {
-  "trump-250-anniversary": {
-    "name": "TRUMP 250 Anniversary",
-    "collection": "TRUMP 250 Anniversary",
-    "type": "Pistol",
-    "manufacturer": "Colt",
-    "model": "Colt M1911",
-    "caliber": ".45 ACP",
-    "platform": ".45 ACP",
-    "frameColor": "Silver/Gold",
-    "gripColor": "Gold",
-    "action": "Semi-Automatic",
-    "adjustableSights": "",
-    "barrelLength": "5 inches",
-    "capacity": "7+1",
-    "frameMaterial": "Stainless Steel",
-    "gripMaterial": "",
-    "finish": "Polished Stainless Steel",
-    "price": "$4,000",
-    "availability": "Available",
-    "image": "image-gold",
-    "description": "TRUMP 250 Anniversary Colt M1911 chambered in .45 ACP with polished stainless steel finish, silver and gold frame coloration, gold grips, and commemorative collector styling.",
-    "photos": [
-      "assets/listings/trump-250-anniversary/trump-250-01.jpeg",
-      "assets/listings/trump-250-anniversary/trump-250-02.jpeg",
-      "assets/listings/trump-250-anniversary/trump-250-03.jpeg",
-      "assets/listings/trump-250-anniversary/trump-250-04.jpeg",
-      "assets/listings/trump-250-anniversary/trump-250-05.jpeg",
-      "assets/listings/trump-250-anniversary/trump-250-06.jpeg",
-      "assets/listings/trump-250-anniversary/trump-250-07.jpeg",
-      "assets/listings/trump-250-anniversary/trump-250-08.jpeg",
-      "assets/listings/trump-250-anniversary/trump-250-09.jpeg",
-      "assets/listings/trump-250-anniversary/trump-250-10.jpeg",
-      "assets/listings/trump-250-anniversary/trump-250-11.jpeg",
-      "assets/listings/trump-250-anniversary/trump-250-12.jpeg",
-      "assets/listings/trump-250-anniversary/trump-250-13.jpeg"
-    ]
-  },
-  "remember-the-alamo": {
-    "name": "Remember the Alamo",
-    "collection": "Remember the Alamo",
-    "type": "Pistol",
-    "manufacturer": "Colt",
-    "model": "Colt M1911",
-    "caliber": ".45 ACP (.45 Auto)",
-    "platform": ".45 ACP",
-    "frameColor": "Stainless Steel",
-    "gripColor": "Composite Brown Pearl",
-    "action": "Semi-Automatic",
-    "adjustableSights": "",
-    "barrelLength": "5",
-    "capacity": "",
-    "frameMaterial": "Stainless Steel",
-    "gripMaterial": "Composite Brown Pearl with Colt gold Horse",
-    "condition": "NEW",
-    "metalCondition": "Stainless Steel",
-    "engraving": "Custom Collectibles",
-    "case": "Display Case Walnut",
-    "finish": "High Gloss Stainless Steel Polish & 24K Gold Icons",
-    "price": "$3,500",
-    "availability": "Available",
-    "image": "image-gold",
-    "description": "Remember the Alamo Colt M1911 chambered in .45 ACP (.45 Auto), presented in high gloss stainless steel polish with 24K gold icons, Custom Collectibles engraving, composite brown pearl grips with Colt gold Horse, and a walnut display case.",
-    "photos": [
-      "assets/listings/remember-the-alamo/remember-alamo-01.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-02.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-03.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-04.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-05.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-06.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-07.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-08.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-09.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-10.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-11.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-12.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-13.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-14.jpeg",
-      "assets/listings/remember-the-alamo/remember-alamo-15.jpeg"
-    ]
-  }
-};
+const products = {};
 const priceNumber = value => Number(value.replace(/[$,]/g,""));
 const getCart = () => {
   try { return JSON.parse(localStorage.getItem("gdeRequestCart")) || []; }
@@ -116,8 +35,7 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="collections.html?platform=45-acp">.45 ACP</a>
         <a href="collections.html?platform=38-special">.38 Special</a>
         <p>Individual collections</p>
-        <a href="collections.html?item=trump-250-anniversary">TRUMP 250 Anniversary</a>
-        <a href="collections.html?item=remember-the-alamo">Remember the Alamo</a>
+
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
   }
