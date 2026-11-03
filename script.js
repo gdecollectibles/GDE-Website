@@ -293,44 +293,6 @@ const products = {
       "assets/listings/donald-trump-47th/donald-trump-47th-15.jpeg"
     ]
   },
-  "scarface": {
-    "name": "SCARFACE",
-    "collection": "The Movie Collection",
-    "collectionNumber": "1 of 10",
-    "type": "Pistol",
-    "manufacturer": "Colt",
-    "model": "Colt M1911",
-    "caliber": ".45 ACP",
-    "platform": ".45 ACP",
-    "capacity": "7 + 1",
-    "action": "Semi-Automatic",
-    "slideMaterial": "Stainless Steel",
-    "frameMaterial": "Stainless Steel",
-    "finish": "High Polish with 24K Gold Icons",
-    "gripColor": "S.S. - Black with Picture of The World Is Yours",
-    "price": "$2,800",
-    "availability": "Available",
-    "image": "image-gold",
-    "description": "Picture of Serial # or Sequence # on the gun is different from the one you are purchasing. If you are interested in a specific sequence number call us, if available we will work with you so you can obtain the number.",
-    "photos": [
-      "assets/listings/scarface/scarface-01.jpeg",
-      "assets/listings/scarface/scarface-02.jpeg",
-      "assets/listings/scarface/scarface-03.jpeg",
-      "assets/listings/scarface/scarface-04.jpeg",
-      "assets/listings/scarface/scarface-05.jpeg",
-      "assets/listings/scarface/scarface-06.jpeg",
-      "assets/listings/scarface/scarface-07.jpeg",
-      "assets/listings/scarface/scarface-08.jpeg",
-      "assets/listings/scarface/scarface-09.jpeg",
-      "assets/listings/scarface/scarface-10.jpeg",
-      "assets/listings/scarface/scarface-11.jpeg",
-      "assets/listings/scarface/scarface-12.jpeg",
-      "assets/listings/scarface/scarface-13.jpeg",
-      "assets/listings/scarface/scarface-14.jpeg",
-      "assets/listings/scarface/scarface-15.jpeg",
-      "assets/listings/scarface/scarface-16.jpeg"
-    ]
-  },
   "the-godfather": {
     "name": "The Godfather",
     "collection": "The Movie Collection",
@@ -424,7 +386,6 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="collections.html?item=remember-the-alamo">Remember the Alamo</a>
         <a href="collections.html?item=el-alamo">El Alamo</a>
         <a href="collections.html?item=donald-trump-47th">Donald Trump 47th</a>
-        <a href="collections.html?item=scarface">SCARFACE</a>
         <a href="collections.html?item=the-godfather">The Godfather</a>
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
