@@ -292,40 +292,6 @@ const products = {
       "assets/listings/donald-trump-47th/donald-trump-47th-14.jpeg",
       "assets/listings/donald-trump-47th/donald-trump-47th-15.jpeg"
     ]
-  },
-  "the-godfather": {
-    "name": "The Godfather",
-    "collection": "The Movie Collection",
-    "collectionNumber": "1 of 10",
-    "type": "Pistol",
-    "manufacturer": "Colt",
-    "model": "Colt M1911",
-    "caliber": ".45 ACP",
-    "platform": ".45 ACP",
-    "capacity": "7 + 1",
-    "action": "Semi-Automatic",
-    "slideMaterial": "Stainless Steel",
-    "frameMaterial": "Stainless Steel",
-    "finish": "High Polish with 24K Gold Icons",
-    "gripColor": "S.S. - Black with Picture of the Godfather",
-    "price": "$2,800",
-    "availability": "Available",
-    "image": "image-gold",
-    "description": "Picture of Serial # or Sequence # on the gun is different from the one you are purchasing. If you are interested in a specific sequence number call us, if available we will work with you so you can obtain the number.",
-    "photos": [
-      "assets/listings/the-godfather/the-godfather-01.jpeg",
-      "assets/listings/the-godfather/the-godfather-02.jpeg",
-      "assets/listings/the-godfather/the-godfather-03.jpeg",
-      "assets/listings/the-godfather/the-godfather-04.jpeg",
-      "assets/listings/the-godfather/the-godfather-05.jpeg",
-      "assets/listings/the-godfather/the-godfather-06.jpeg",
-      "assets/listings/the-godfather/the-godfather-07.jpeg",
-      "assets/listings/the-godfather/the-godfather-08.jpeg",
-      "assets/listings/the-godfather/the-godfather-09.jpeg",
-      "assets/listings/the-godfather/the-godfather-10.jpeg",
-      "assets/listings/the-godfather/the-godfather-11.jpeg",
-      "assets/listings/the-godfather/the-godfather-12.jpeg"
-    ]
   }
 };
 const priceNumber = value => Number(value.replace(/[$,]/g,""));
@@ -373,7 +339,6 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="collections.html?collection=america-s-250th-anniversary">America's 250th Anniversary</a>
         <a href="collections.html?collection=the-donald-j-trump-collection">The Donald J. Trump Collection</a>
         <a href="collections.html?collection=the-alamo-collection">The Alamo Collection</a>
-        <a href="collections.html?collection=the-movie-collection">The Movie Collection</a>
         <p>Platform</p>
         <a href="collections.html?platform=45-acp">.45 ACP</a>
         <a href="collections.html?platform=38-super">.38 Super</a>
@@ -386,7 +351,6 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="collections.html?item=remember-the-alamo">Remember the Alamo</a>
         <a href="collections.html?item=el-alamo">El Alamo</a>
         <a href="collections.html?item=donald-trump-47th">Donald Trump 47th</a>
-        <a href="collections.html?item=the-godfather">The Godfather</a>
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
   }
@@ -420,9 +384,12 @@ document.querySelectorAll(".nav-dropdown-toggle").forEach(toggle => toggle.addEv
   const open = dropdown.classList.toggle("open");
   toggle.setAttribute("aria-expanded", String(open));
 }));
-document.addEventListener("click", () => document.querySelectorAll(".nav-dropdown.open").forEach(open => {
-  open.classList.remove("open"); open.querySelector(".nav-dropdown-toggle").setAttribute("aria-expanded","false");
-}));
+document.addEventListener("pointerdown", event => {
+  if (event.target.closest(".nav-dropdown")) return;
+  document.querySelectorAll(".nav-dropdown.open").forEach(open => {
+    open.classList.remove("open"); open.querySelector(".nav-dropdown-toggle").setAttribute("aria-expanded","false");
+  });
+});
 document.querySelectorAll('.site-nav a[href="#contact"], .site-nav a[href="index.html#contact"], .footer-links a[href="#contact"], .footer-links a[href="index.html#contact"], .site-nav a[href="#inquiry"]').forEach(link => link.href = "contact.html");
 document.querySelectorAll(".site-footer").forEach(footer => {
   const brandColumn = footer.querySelector(":scope > div:first-child");
@@ -468,6 +435,11 @@ document.querySelector(".nav-toggle")?.addEventListener("click", e => {
   const open = nav.classList.toggle("open");
   e.currentTarget.setAttribute("aria-expanded", open);
 });
+document.querySelectorAll(".site-nav").forEach(nav => nav.addEventListener("click", event => {
+  if (!event.target.closest("a")) return;
+  nav.classList.remove("open");
+  document.querySelector(".nav-toggle")?.setAttribute("aria-expanded", "false");
+}));
 
 const reveals = document.querySelectorAll(".reveal");
 if ("IntersectionObserver" in window) {
