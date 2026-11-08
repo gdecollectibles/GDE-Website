@@ -275,7 +275,7 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
   .hero-film{left:0;width:100%;transform:none;-webkit-mask-image:none;mask-image:none}
   .hero-caption{bottom:28px}
 }
-@media(prefers-reduced-motion:reduce){.hero-film{display:none}.hero.hero-video{background:#000 url("assets/hero/alamo-film-loop-steady-poster.jpg") center/contain no-repeat}}
+@media(prefers-reduced-motion:reduce){.hero-film{display:none}.hero.hero-video{background:#000 url("assets/hero/alamo-film-loop-color-poster.jpg") center/contain no-repeat}}
 
 /* Homepage header: faint over the film until hovered (desktop, mouse only); phones keep it fully visible. */
 @media(hover:hover) and (min-width:761px){
@@ -323,3 +323,55 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 @media(min-width:761px) and (max-width:1100px){.site-header .brand{width:160px;flex-basis:160px}}
 @media(max-width:760px){.site-header{justify-content:flex-end}.site-header .brand{width:150px;flex-basis:150px}}
 @media(max-width:760px){.site-nav{background:#0f0f10;border-bottom:1px solid var(--line)}}
+/* Wider film (user, Nov 8): panel 40.5vw -> 46vw, and a straight fade on the left and right edges instead of the oval,
+   so the footage shows across most of its width. Top and bottom keep a soft fade. */
+@media(min-width:761px){
+  .hero-film{left:9vw;width:46vw;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 13%,#000 87%,transparent 100%),linear-gradient(180deg,transparent 3%,#000 20%,#000 80%,transparent 97%);
+    -webkit-mask-composite:source-in;
+    mask-image:linear-gradient(90deg,transparent 0,#000 13%,#000 87%,transparent 100%),linear-gradient(180deg,transparent 3%,#000 20%,#000 80%,transparent 97%);
+    mask-composite:intersect}
+}
+
+/* Circular film (user, Nov 8): the film shows in a circle with a hairline ring, centered in the left area on desktop
+   and above the title on phones. Overrides the earlier panel, fades and masks. */
+.hero-film{--d:min(42vw,78vh);top:50%;left:30vw;width:var(--d);height:var(--d);transform:translate(-50%,-50%);border-radius:50%;
+  object-fit:cover;object-position:50% 49%;background:#050505;-webkit-mask-image:none;mask-image:none;
+  box-shadow:0 0 0 1px rgba(255,255,255,.14),0 30px 90px rgba(0,0,0,.65)}
+@media(min-width:761px){.hero-film{left:30vw;width:var(--d);height:var(--d);transform:translate(-50%,-50%);-webkit-mask-image:none;mask-image:none}}
+@media(max-width:760px){.hero-film{--d:min(80vw,52svh);left:50%;top:40%;width:var(--d);height:var(--d);transform:translate(-50%,-50%);-webkit-mask-image:none;mask-image:none}}
+@media(max-width:760px){.hero-film{top:46%}}
+
+/* Listing cards (user, Nov 8): bigger guns, smaller Add to Cart, smaller title and price, price to the right of the title. */
+.product-image[style],.card-image[style]{background-size:122% auto!important;background-position:50% 50%!important}
+.product-image,.card-image{box-shadow:inset 0 0 34px 18px #000}
+.product-info{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:18px;align-items:baseline;min-height:0}
+.product-info>*{grid-column:1/-1}
+.product-info h2{grid-column:1;font-size:1.4rem;margin:6px 0 0}
+.product-info .price{grid-column:2;font-size:1.05rem;margin:0;white-space:nowrap}
+.card-body h3{font-size:1.4rem}
+.card-actions{grid-template-columns:auto;justify-items:start;gap:12px;margin-top:16px}
+.card-actions .button,.card-actions .button.full{width:auto;min-height:38px;padding:0 22px;font-size:.62rem;letter-spacing:.17em}
+
+/* Film back to the wide panel (user: "keep the video the same, I meant the fade"): same size and place as before,
+   no circle frame or ring; only the fade around it is now round. */
+.hero-film{border-radius:0;box-shadow:none;background:#000;object-position:50% 48%;
+  -webkit-mask-image:radial-gradient(circle closest-side at 50% 49%,#000 58%,transparent 100%);mask-image:radial-gradient(circle closest-side at 50% 49%,#000 58%,transparent 100%);
+  -webkit-mask-composite:source-over;mask-composite:add}
+@media(min-width:761px){.hero-film{top:0;left:9vw;width:46vw;height:100%;transform:translateZ(0);object-fit:cover}}
+@media(max-width:760px){.hero-film{top:0;left:16.25%;width:67.5%;height:100%;transform:translateZ(0);object-fit:contain}}
+.hero-film{-webkit-mask-image:radial-gradient(circle closest-side at 50% 49%,#000 76%,transparent 100%);mask-image:radial-gradient(circle closest-side at 50% 49%,#000 76%,transparent 100%)}
+/* Add to Cart on the right, transparent with an outline (user, Nov 8); View Details on the left of the same row. */
+.card-actions{display:flex;flex-direction:row-reverse;justify-content:space-between;align-items:center;gap:16px}
+.card-actions .button,.card-actions .button.full{background:transparent;border:1px solid rgba(255,255,255,.55);color:var(--text)}
+.card-actions .button:hover{background:var(--text);border-color:var(--text);color:#0a0a0a}
+.card-actions .text-link{justify-self:auto}
+/* Listing filter hidden (user, Nov 8); kept in the page so menu links to a single gun (?item=) still filter. */
+.filter-group:has(input[name="product"]){display:none}
+/* Dropdown menus in the gray theme (user, Nov 8): was navy. */
+.nav-dropdown-panel{background:#111112;border-color:var(--line-strong);box-shadow:0 22px 50px rgba(0,0,0,.6)}
+.nav-dropdown-panel a{color:#d6d6d9}
+.nav-dropdown-panel a:hover{background:#1d1d1f;border-left-color:var(--text);color:#fff}
+.nav-dropdown-panel p{color:var(--muted)}
+.age-gate{background:rgba(0,0,0,.9)}
+@media(hover:hover) and (min-width:761px){.home-page .site-header:has(.nav-dropdown.open){background:rgba(10,10,10,.78);border-bottom-color:var(--line)}.home-page .site-header:has(.nav-dropdown.open)>*{opacity:1}}

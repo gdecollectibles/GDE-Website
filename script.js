@@ -1,7 +1,7 @@
 const products = {
   "the-capital": {
     "name": "The Capital",
-    "collection": "America's 250th Anniversary",
+    "collection": "The Capital",
     "collectionNumber": "1 of 300",
     "type": "Pistol",
     "manufacturer": "Colt",
@@ -31,7 +31,7 @@ const products = {
   },
   "signing-the-constitution": {
     "name": "Signing the Constitution",
-    "collection": "America's 250th Anniversary",
+    "collection": "US Constitution",
     "collectionNumber": "1 of 300",
     "type": "Pistol",
     "manufacturer": "Colt",
@@ -61,7 +61,7 @@ const products = {
   },
   "mount-rushmore-with-trump": {
     "name": "Mount Rushmore with Trump",
-    "collection": "America's 250th Anniversary",
+    "collection": "Mt. Rushmore",
     "collectionNumber": "1 of 300",
     "type": "Pistol",
     "manufacturer": "Colt",
@@ -91,7 +91,7 @@ const products = {
   },
   "uss-constitution": {
     "name": "USS Constitution",
-    "collection": "America's 250th Anniversary",
+    "collection": "USS Constitution",
     "collectionNumber": "1 of 300",
     "type": "Pistol",
     "manufacturer": "Colt",
@@ -121,11 +121,7 @@ const products = {
   },
   "trump": {
     "name": "Trump",
-    "collection": "America's 250th Anniversary",
-    "collections": [
-      "America's 250th Anniversary",
-      "The Donald J. Trump Collection"
-    ],
+    "collection": "America's 250 Anniversary Donald J Trump",
     "collectionNumber": "1 of 25",
     "type": "Pistol",
     "manufacturer": "Colt",
@@ -155,7 +151,7 @@ const products = {
   },
   "remember-the-alamo": {
     "name": "Remember the Alamo",
-    "collection": "The Alamo Collection",
+    "collection": "Remember the Alamo",
     "collectionNumber": "1 of 300",
     "type": "Pistol",
     "manufacturer": "Colt",
@@ -185,7 +181,7 @@ const products = {
   },
   "donald-trump-47th": {
     "name": "Donald Trump 47th",
-    "collection": "The Donald J. Trump Collection",
+    "collection": "Donald J Trump",
     "collectionNumber": "1 of 300",
     "type": "Pistol",
     "manufacturer": "Colt",
@@ -256,9 +252,13 @@ document.querySelectorAll(".site-nav").forEach(nav => {
       <div class="nav-dropdown-panel">
         <a href="collections.html">All Collections</a>
         <p>Collection</p>
-        <a href="collections.html?collection=america-s-250th-anniversary">America's 250th Anniversary</a>
-        <a href="collections.html?collection=the-donald-j-trump-collection">The Donald J. Trump Collection</a>
-        <a href="collections.html?collection=the-alamo-collection">The Alamo Collection</a>
+        <a href="collections.html?collection=the-capital">The Capital</a>
+        <a href="collections.html?collection=us-constitution">US Constitution</a>
+        <a href="collections.html?collection=mt-rushmore">Mt. Rushmore</a>
+        <a href="collections.html?collection=uss-constitution">USS Constitution</a>
+        <a href="collections.html?collection=america-s-250-anniversary-donald-j-trump">America's 250 Anniversary Donald J Trump</a>
+        <a href="collections.html?collection=remember-the-alamo">Remember the Alamo</a>
+        <a href="collections.html?collection=donald-j-trump">Donald J Trump</a>
         <p>Platform</p>
         <a href="collections.html?platform=45-acp">.45 ACP</a>
         <p>Individual listings</p>
