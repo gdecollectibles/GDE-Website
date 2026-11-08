@@ -131,6 +131,7 @@ module.exports = async function handler(request, response) {
 
     const origin = siteOrigin(request);
     const customer = body.customer || {};
+    const embedded = body.embedded === true;
     const invoiceNumber = `GDE-${Date.now().toString().slice(-10)}`;
     await sendCheckoutEmail(buildCheckoutEmailPayload({ customer, items, amount, invoiceNumber }));
     // Saved for the inventory app, which checks the payment and files the buyer. A store hiccup never blocks the sale:
@@ -180,7 +181,22 @@ module.exports = async function handler(request, response) {
           }
         },
         hostedPaymentSettings: {
-          setting: [
+          // Embedded (the checkout page shows Authorize.net's form in a frame): only the card fields show, since the
+          // page already has the buyer's details and order (they are still sent above, for the address check and receipt);
+          // the result comes back through iframe-communicator.html. Otherwise the full page opens on its own, as before.
+          setting: embedded ? [
+            {
+              settingName: "hostedPaymentReturnOptions",
+              settingValue: JSON.stringify({ showReceipt: false, url: `${origin}/payment-success.html`, urlText: "Continue", cancelUrl: `${origin}/payment-cancel.html`, cancelUrlText: "Cancel" })
+            },
+            { settingName: "hostedPaymentIFrameCommunicatorUrl", settingValue: JSON.stringify({ url: `${origin}/iframe-communicator.html` }) },
+            { settingName: "hostedPaymentButtonOptions", settingValue: JSON.stringify({ text: `Pay $${amount.toLocaleString("en-US")}` }) },
+            { settingName: "hostedPaymentStyleOptions", settingValue: JSON.stringify({ bgColor: "#0a0a0a" }) },
+            { settingName: "hostedPaymentOrderOptions", settingValue: JSON.stringify({ show: false, merchantName: "GDE Collectibles" }) },
+            { settingName: "hostedPaymentBillingAddressOptions", settingValue: JSON.stringify({ show: false, required: false }) },
+            { settingName: "hostedPaymentCustomerOptions", settingValue: JSON.stringify({ showEmail: false, requiredEmail: false }) },
+            { settingName: "hostedPaymentSecurityOptions", settingValue: JSON.stringify({ captcha: false }) }
+          ] : [
             {
               settingName: "hostedPaymentReturnOptions",
               settingValue: JSON.stringify({

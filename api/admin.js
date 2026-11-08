@@ -3,6 +3,7 @@
 //   GET  /api/admin?action=ping      is everything set up?
 //   POST /api/admin?action=catalog   the app sends prices and sold-out flags: { listings: { <listing>: { price, soldOut } } }
 //   GET  /api/admin?action=orders    every saved checkout; recent unpaid or paid ones are first checked against Authorize.net
+//   POST /api/admin?action=delete-order  { invoice }: removes one saved order (test orders); the payment itself is untouched
 const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -153,6 +154,12 @@ module.exports = async function handler(request, response) {
       let payments;
       try { payments = await refreshPayments(orders); } catch (error) { payments = { error: error.message }; }
       return response.status(200).json({ orders, payments, environment: authorizeSetup().environment });
+    }
+    if (action === "delete-order" && request.method === "POST") {
+      const invoice = String((await readBody(request)).invoice || "");
+      if (!/^GDE-\d{6,16}$/.test(invoice)) return response.status(400).json({ error: "That is not an order number." });
+      const [removed] = await store.pipeline([["DEL", `gde:order:${invoice}`], ["LREM", "gde:orders", 0, invoice]]);
+      return response.status(200).json({ ok: true, removed: removed > 0 });
     }
     return response.status(404).json({ error: "Unknown action." });
   } catch (error) {

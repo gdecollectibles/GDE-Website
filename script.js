@@ -671,7 +671,7 @@ document.querySelector("#purchaseForm")?.addEventListener("submit", e => {
   confirmation.focus();
   confirmation.scrollIntoView({behavior:"smooth",block:"center"});
 });
-async function startAuthorizeCheckout({button, status, cart, customer, resetText}) {
+async function startAuthorizeCheckout({button, status, cart, customer, resetText, embedded = false}) {
   if (!cart.length) {
     status.textContent = "Please add a collection to your cart before paying.";
     return;
@@ -684,11 +684,10 @@ async function startAuthorizeCheckout({button, status, cart, customer, resetText
     const response = await fetch("/api/create-authorize-payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cart, customer })
+      body: JSON.stringify({ cart, customer, embedded })
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok || !result.token || !result.paymentUrl) throw new Error(result.error || "Unable to start Authorize.net checkout.");
-    status.textContent = `Redirecting to Authorize.net for $${Number(result.amount).toLocaleString()}...`;
     const form = document.createElement("form");
     form.method = "post";
     form.action = result.paymentUrl;
@@ -699,7 +698,15 @@ async function startAuthorizeCheckout({button, status, cart, customer, resetText
     token.value = result.token;
     form.appendChild(token);
     document.body.appendChild(form);
+    if (embedded) {
+      showPaymentStep(result, () => { button.disabled = false; button.classList.remove("disabled"); button.innerHTML = resetText; });
+      status.textContent = "";
+      form.target = "gdePaymentFrame";
+    } else {
+      status.textContent = `Redirecting to Authorize.net for $${Number(result.amount).toLocaleString()}...`;
+    }
     form.submit();
+    form.remove();
   } catch (error) {
     status.textContent = error.message;
     button.disabled = false;
@@ -721,8 +728,60 @@ if (document.querySelector("#proceedToPayment")) {
     const customer = form ? Object.fromEntries(new FormData(form).entries()) : {};
     localStorage.setItem("gdeCheckoutDetails", JSON.stringify(customer));
     const resetText = 'Proceed to Checkout <span>&rarr;</span>';
-    startAuthorizeCheckout({button: paymentLink, status, cart, customer, resetText});
+    startAuthorizeCheckout({button: paymentLink, status, cart, customer, resetText, embedded: !!document.querySelector("#paymentStep")});
   });
+}
+// Step 04 of checkout: Authorize.net's card form inside the page (Accept Hosted in a frame). The frame reports its
+// height, a cancel or the result through iframe-communicator.html, which calls CommunicationHandler below.
+function showPaymentStep(session, onBack) {
+  const step = document.querySelector("#paymentStep");
+  const details = document.querySelector("#purchaseForm .form-column:not(.payment-step)");
+  const frame = document.querySelector("#paymentFrame");
+  const stepStatus = document.querySelector("#paymentStepStatus");
+  const compliance = document.querySelector(".summary-compliance");
+  const proceed = document.querySelector("#proceedToPayment");
+  let paid = false;
+  details.hidden = true; compliance.hidden = true; proceed.hidden = true;
+  step.hidden = false;
+  document.querySelector("#paymentLoading").hidden = false;
+  stepStatus.textContent = "";
+  frame.style.height = "420px";
+  frame.onload = () => { document.querySelector("#paymentLoading").hidden = true; };
+  step.scrollIntoView({ behavior: "smooth", block: "start" });
+  const back = () => {
+    if (paid) return;
+    step.hidden = true; details.hidden = false; compliance.hidden = false; proceed.hidden = false;
+    frame.removeAttribute("src"); frame.src = "about:blank";
+    onBack();
+  };
+  document.querySelector("#paymentBack").onclick = back;
+  window.CommunicationHandler = {
+    onReceiveCommunication(message) {
+      const params = new URLSearchParams(String(message?.qstr || ""));
+      const action = params.get("action");
+      if (action === "resizeWindow") {
+        const height = Number(params.get("height"));
+        if (height > 100 && height < 3000) frame.style.height = `${Math.ceil(height) + 4}px`;
+      } else if (action === "cancel") {
+        back();
+      } else if (action === "transactResponse") {
+        let r = {};
+        try { r = JSON.parse(params.get("response") || "{}"); } catch {}
+        if (String(r.responseCode) === "1" || String(r.responseCode) === "4") { // approved, or held for review
+          paid = true;
+          localStorage.removeItem("gdeRequestCart");
+          localStorage.removeItem("gdeCheckoutDetails");
+          location.href = `payment-success.html?order=${encodeURIComponent(session.invoiceNumber || r.orderInvoiceNumber || "")}`;
+        } else {
+          stepStatus.textContent = "The card was not accepted. Please check the details or try another card.";
+        }
+      }
+    }
+  };
+}
+if (document.querySelector(".payment-success-order")) {
+  const order = new URLSearchParams(location.search).get("order");
+  if (order && /^GDE-\d+$/.test(order)) document.querySelector(".payment-success-order").textContent = `Order ${order}`;
 }
 renderPaymentSummary();
 function renderPaymentSummary() {

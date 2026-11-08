@@ -375,3 +375,18 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 .nav-dropdown-panel p{color:var(--muted)}
 .age-gate{background:rgba(0,0,0,.9)}
 @media(hover:hover) and (min-width:761px){.home-page .site-header:has(.nav-dropdown.open){background:rgba(10,10,10,.78);border-bottom-color:var(--line)}.home-page .site-header:has(.nav-dropdown.open)>*{opacity:1}}
+
+/* Checkout step 04: Authorize.net's card form embedded in the page (Nov 8, 2026) */
+.payment-step[hidden],.form-column[hidden],.summary-compliance[hidden],#proceedToPayment[hidden]{display:none!important}
+.payment-step{grid-column:1;min-width:0}
+.payment-step fieldset{margin-bottom:0}
+.payment-step-note{color:var(--muted);font-size:.86rem;line-height:1.6;margin:0 0 22px}
+.payment-back{background:none;border:0;border-bottom:1px solid var(--line-strong);padding:0 0 2px;margin-left:8px;color:var(--text,#f2f2f3);font:inherit;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.payment-back:hover{border-bottom-color:var(--text,#f2f2f3)}
+.payment-frame{position:relative;background:#fff;border:1px solid var(--line-strong);padding:18px 10px 6px;box-shadow:0 30px 60px rgba(0,0,0,.45)}
+.payment-frame iframe{display:block;width:100%;height:420px;border:0;background:#fff;transition:height .2s ease}
+.payment-loading{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:#55595d;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;background:#fff}
+.payment-loading[hidden]{display:none}
+#paymentStepStatus{margin-top:16px}
+.payment-success-order{color:var(--muted);letter-spacing:.14em;text-transform:uppercase;font-size:.78rem}
+@media (max-width:760px){.payment-frame{padding:10px 2px 2px}}

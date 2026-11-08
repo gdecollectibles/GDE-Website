@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Checkout | GDE Collectibles</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Gloock&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css?v=20261108z4">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Gloock&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css?v=20261108pay">
 </head>
 <body>
   <header class="site-header dark-header"><a class="brand" href="index.html"><span class="brand-mark">GDE</span><span>Collectibles</span></a><button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button><nav class="site-nav"><a href="index.html">Home</a><a href="collections.html">Collections</a><a href="index.html#compliance">Compliance</a><a href="#inquiry">Contact</a><a class="button button-small active" href="checkout.html">Request Availability</a></nav></header>
@@ -29,6 +29,16 @@
         </div></fieldset>
         <p class="privacy-note">We do not collect Social Security numbers, driver's license numbers, payment card information, or sensitive identity documents through this form.</p>
       </div>
+      <div class="form-column payment-step" id="paymentStep" hidden>
+        <fieldset><legend><span>04</span> Payment</legend>
+          <p class="payment-step-note">Card details are entered into Authorize.net's secure form below and never touch our site. <button type="button" class="text-link payment-back" id="paymentBack">Edit your details</button></p>
+          <div class="payment-frame" id="paymentFrameWrap">
+            <p class="payment-loading" id="paymentLoading">Loading secure payment form&hellip;</p>
+            <iframe id="paymentFrame" name="gdePaymentFrame" title="Secure card payment by Authorize.net" scrolling="no"></iframe>
+          </div>
+          <p class="form-message" id="paymentStepStatus" aria-live="polite"></p>
+        </fieldset>
+      </div>
       <aside class="order-summary">
         <p class="eyebrow">Request summary</p><div id="checkoutSummaryItems" class="checkout-summary-items"></div><dl><div class="summary-price"><dt>Collection total</dt><dd id="summaryPrice">$0</dd></div></dl>
         <fieldset class="summary-compliance"><legend>Compliance confirmation</legend><div class="check-list compact-checks">
@@ -54,6 +64,6 @@
     </div></section>
   </main>
   <footer class="site-footer"><div><a class="brand footer-brand" href="index.html"><span class="brand-mark">GDE</span><span>Collectibles</span></a><p>Limited engraved firearm collections for serious collectors.</p></div><div class="footer-links"><a href="index.html">Home</a><a href="collections.html">Collections</a><a href="checkout.html">Checkout</a><a href="index.html#compliance">Compliance</a><a href="#inquiry">Contact</a></div><div class="footer-legal"><p>All firearm transactions must comply with federal, state, and local laws.</p><span>© 2026 GDE Collectibles</span></div></footer>
-  <script src="script.js?v=20261108live"></script>
+  <script src="script.js?v=20261108pay"></script>
 </body>
 </html>

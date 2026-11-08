@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>GDE Collectibles</title>
+  <meta name="robots" content="noindex">
+</head>
+<body>
+<script>
+  // Authorize.net's embedded payment form (Accept Hosted) loads this page inside itself to tell the checkout page
+  // its height, a cancel, or the payment result. It only passes the message up to checkout.html, on this same site.
+  function passUp(text) {
+    try {
+      var page = window.parent && window.parent.parent;
+      if (text && page && page.CommunicationHandler && page.CommunicationHandler.onReceiveCommunication) {
+        page.CommunicationHandler.onReceiveCommunication({ qstr: text, parent: document.referrer });
+      }
+    } catch (e) {}
+  }
+  window.addEventListener("message", function (event) { if (event && typeof event.data === "string") passUp(event.data); }, false);
+  if (window.location.hash && window.location.hash.length > 1) passUp(window.location.hash.substring(1));
+</script>
+</body>
+</html>
