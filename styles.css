@@ -153,11 +153,11 @@ body:has(.hero) .cta-section{margin-left:0;margin-right:0;padding-top:85px;paddi
 
 /* ===== Monochrome minimal theme (Nov 8, 2026) =====
    Near-black page, stepped grays for sections and cards, white text, no gold.
-   Inter for text, Instrument Serif for headings. Gun photos keep their color; decorative images go grayscale. */
+   Inter for text, Gloock for headings. Gun photos keep their color; decorative images go grayscale. */
 :root{
   --ink:#0a0a0a;--charcoal:#141415;--ivory:#0e0e0f;--paper:#151516;--raised:#1d1d1f;--line:#2a2a2d;--line-strong:#3a3a3e;
   --muted:#8e8e93;--text:#f2f2f3;--gold:#e8e8ea;--gold-light:#ffffff;
-  --serif:"Instrument Serif",Georgia,"Times New Roman",serif;--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"Gloock",Georgia,"Times New Roman",serif;--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
   color-scheme:dark}
 body{background:var(--ivory);color:var(--text);font:400 14px/1.65 var(--sans);-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
 h1,h2,h3,.form-column legend,.summary-compliance legend,.faq-list summary,.footer-contact strong,.contact-method a,.brand-mark,.authorize-mark{font-family:var(--serif);font-weight:400;letter-spacing:-.015em;line-height:1}
@@ -249,3 +249,72 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 .eyebrow,.hero .eyebrow{letter-spacing:.25em}
 .nav-dropdown-panel a{letter-spacing:.08em}
 .process-grid span{letter-spacing:.04em}.cart-item-copy span,.summary-notice strong{letter-spacing:.15em}
+/* Gloock is wide: product titles sized to their column so long words like "Constitution" fit. */
+.detail-copy h1{font-size:clamp(2.4rem,4vw,4.2rem);overflow-wrap:break-word}
+@media(max-width:760px){.detail-copy h1{font-size:clamp(2.2rem,11vw,3.1rem)}}
+@media(min-width:761px) and (max-width:1180px){.site-nav{gap:14px}.site-nav>a,.site-nav>a:not(.button),.nav-dropdown-toggle{letter-spacing:.08em}}
+@media(max-width:400px){.results-actions{flex-wrap:wrap}.sort-control select{min-width:0;width:100%}.sort-control{flex:1 1 auto;min-width:0}}
+
+/* Homepage video hero (Nov 8, 2026), in the style of luxury-brand homepages: the Remember the Alamo film loops
+   full height and centered, its sides fading into black; the collection name sits at the bottom center. */
+.hero.hero-video{display:block;position:relative;height:100vh;height:100svh;min-height:600px;padding:0;background:#000;overflow:hidden}
+.hero-film{position:absolute;top:0;left:50%;height:100%;width:auto;max-width:none;transform:translateX(-50%);object-fit:contain;background:#000;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 16%,#000 84%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 16%,#000 84%,transparent 100%)}
+.hero-video::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(180deg,transparent,rgba(0,0,0,.82));pointer-events:none;z-index:1}
+.hero-caption{position:absolute;left:0;right:0;bottom:clamp(34px,7vh,70px);z-index:2;text-align:center;padding:0 20px}
+.hero-caption .eyebrow{color:#cfcfd3;margin:0}
+.hero-caption h1{font-size:clamp(2.2rem,3.6vw,3.4rem);margin:.32em 0 .6em;color:var(--text)}
+.hero-caption .text-link{justify-content:center}
+@media(max-width:760px){
+  .hero.hero-video{min-height:0}
+  .hero-film{left:0;width:100%;transform:none;-webkit-mask-image:none;mask-image:none}
+  .hero-caption{bottom:28px}
+}
+@media(prefers-reduced-motion:reduce){.hero-film{display:none}.hero.hero-video{background:#000 url("assets/hero/alamo-film-loop-steady-poster.jpg") center/contain no-repeat}}
+
+/* Homepage header: faint over the film until hovered (desktop, mouse only); phones keep it fully visible. */
+@media(hover:hover) and (min-width:761px){
+  .home-page .site-header{background:transparent;border-bottom-color:transparent;box-shadow:none;transition:background .35s ease,border-color .35s ease}
+  .home-page .site-header>*{opacity:.32;transition:opacity .35s ease}
+  .home-page .site-header:hover,.home-page .site-header:focus-within{background:rgba(10,10,10,.78);border-bottom-color:var(--line)}
+  .home-page .site-header:hover>*,.home-page .site-header:focus-within>*{opacity:1}
+}
+@media(min-width:761px){.hero-film{height:calc(100% - 140px)}.hero-video::after{height:22%}}
+
+/* Hero v2 (Nov 8): caption-free film, bigger, cropped to the film area; title on the right. */
+.hero-film{-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 62%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 62%,transparent 100%)}
+@media(min-width:761px){
+  .hero-film{left:2vw;top:0;width:62vw;height:100%;transform:none;object-fit:cover;object-position:50% 48%}
+  .hero-video::after{display:none}
+  .hero-caption{left:auto;right:6vw;top:50%;bottom:auto;transform:translateY(-50%);width:min(30vw,440px);text-align:left;padding:0}
+  .hero-caption h1{font-size:clamp(2.6rem,4.4vw,4.6rem);line-height:1.02;margin:.3em 0 .7em}
+  .hero-caption .text-link{justify-content:flex-start}
+}
+@media(max-width:760px){
+  .hero-film{object-fit:cover;object-position:50% 48%;-webkit-mask-image:none;mask-image:none}
+  .hero-caption{left:auto;right:20px;width:calc(100% - 40px);text-align:right}
+  .hero-caption .text-link{justify-content:flex-end}
+}
+@media(max-width:760px){.hero-film{object-fit:contain}}
+@media(max-width:760px){.hero-film{-webkit-mask-image:linear-gradient(180deg,transparent 15%,#000 27%,#000 72%,transparent 86%);mask-image:linear-gradient(180deg,transparent 15%,#000 27%,#000 72%,transparent 86%)}}
+@media(max-width:760px){.hero-film{-webkit-mask-image:linear-gradient(180deg,transparent 25%,#000 39%,#000 73%,transparent 87%);mask-image:linear-gradient(180deg,transparent 25%,#000 39%,#000 73%,transparent 87%)}}
+/* Slightly smaller film (user, Nov 8), on its own drawing layer so masked video edges render cleanly. */
+.hero-film{will-change:transform}
+@media(min-width:761px){.hero-film{left:5vw;width:54vw;transform:translateZ(0)}}
+@media(max-width:760px){.hero-film{left:5%;width:90%;transform:translateZ(0)}}
+@media(max-width:760px){.hero-film{-webkit-mask-image:radial-gradient(ellipse 50% 32% at 50% 49%,#000 58%,transparent 100%);mask-image:radial-gradient(ellipse 50% 32% at 50% 49%,#000 58%,transparent 100%)}}
+/* 25% smaller again (user, Nov 8): desktop panel 54vw -> 40.5vw, kept centered in the left area; phones 90% -> 67.5%. */
+@media(min-width:761px){.hero-film{left:11.75vw;width:40.5vw}}
+@media(max-width:760px){.hero-film{left:16.25%;width:67.5%}}
+
+/* Centered logo (user, Nov 8): logo in the middle of the header; Home, Collections, Marketplaces on the left,
+   Compliance, Contact and the cart on the right. Phones: logo centered, menu button on the right. */
+.site-header .brand{position:absolute;left:50%;transform:translateX(-50%);z-index:2}
+@media(min-width:761px){
+  .site-nav{flex:1;justify-content:flex-start}
+  .site-nav>:nth-child(3){margin-right:auto}
+  .site-nav .cart-nav{margin-left:0}
+}
+@media(min-width:761px) and (max-width:1100px){.site-header .brand{width:160px;flex-basis:160px}}
+@media(max-width:760px){.site-header{justify-content:flex-end}.site-header .brand{width:150px;flex-basis:150px}}
+@media(max-width:760px){.site-nav{background:#0f0f10;border-bottom:1px solid var(--line)}}
