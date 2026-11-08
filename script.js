@@ -728,7 +728,8 @@ if (document.querySelector("#proceedToPayment")) {
     const customer = form ? Object.fromEntries(new FormData(form).entries()) : {};
     localStorage.setItem("gdeCheckoutDetails", JSON.stringify(customer));
     const resetText = 'Proceed to Checkout <span>&rarr;</span>';
-    startAuthorizeCheckout({button: paymentLink, status, cart, customer, resetText, embedded: !!document.querySelector("#paymentStep")});
+    // Full Authorize.net page, not the embedded step 04: the user preferred it, since the embedded form can't be black (Nov 8, 2026).
+    startAuthorizeCheckout({button: paymentLink, status, cart, customer, resetText, embedded: false});
   });
 }
 // Step 04 of checkout: Authorize.net's card form inside the page (Accept Hosted in a frame). The frame reports its
