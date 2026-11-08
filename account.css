@@ -1,0 +1,83 @@
+/* Customer account page and the email-list popup (gde-account.js). Uses the site's own colours from styles.css. */
+
+/* Account link in the menu: the word on wide screens and in the phone menu, a person icon on tablets, where the
+   header has no room left beside the centered logo. */
+.account-nav{display:inline-flex;align-items:center;gap:8px}
+.account-icon{display:none;width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6}
+@media(min-width:761px) and (max-width:1180px){
+  .account-nav span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .account-icon{display:block}
+}
+
+/* Email list popup */
+.gde-signup{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);opacity:0;transition:opacity .35s ease}
+.gde-signup.open{opacity:1}
+.gde-signup-panel{position:relative;width:min(470px,100%);padding:46px 42px 34px;background:var(--paper,#0f0f10);border:1px solid var(--line-strong,#333336);color:var(--text,#f2f2f3);text-align:center;transform:translateY(14px);transition:transform .35s ease;box-shadow:0 40px 120px rgba(0,0,0,.6)}
+.gde-signup.open .gde-signup-panel{transform:none}
+.gde-signup-panel .eyebrow{margin:0 0 12px}
+.gde-signup-panel h2{font-size:clamp(1.9rem,4vw,2.4rem);margin:0 0 14px}
+.gde-signup-panel>p{color:var(--muted,#8e8e93);margin:0 auto 24px;max-width:34ch;line-height:1.6}
+.gde-signup-close{position:absolute;top:10px;right:12px;width:40px;height:40px;border:0;background:transparent;color:var(--muted,#8e8e93);font-size:1.6rem;line-height:1}
+.gde-signup-close:hover{color:#fff}
+.gde-signup form,.gde-account-form{display:grid;gap:10px;text-align:left}
+.gde-field{display:grid;gap:6px;font-size:.62rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted,#8e8e93)}
+.gde-field input{width:100%;height:48px;padding:0 14px;border:1px solid var(--line-strong,#333336);background:var(--ivory,#000);color:var(--text,#f2f2f3);font-size:.95rem;letter-spacing:0;text-transform:none;border-radius:0}
+.gde-field input:focus{outline:0;border-color:var(--text,#f2f2f3)}
+.gde-signup .button,.gde-account .button{width:100%;min-height:48px;margin-top:6px}
+.gde-fine{font-size:.72rem;color:var(--muted,#8e8e93);line-height:1.5;margin:12px 0 0;text-align:center}
+.gde-fine a{text-decoration:underline}
+.gde-msg{min-height:1.2em;margin:4px 0 0;font-size:.85rem;text-align:center}
+.gde-msg.error{color:#ff8b8b}
+.gde-signup-later{display:block;margin:16px auto 0;border:0;background:transparent;color:var(--muted,#8e8e93);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;text-decoration:underline;text-underline-offset:4px}
+.gde-signup-later:hover{color:#fff}
+.gde-hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
+.gde-done h2{margin-bottom:10px}
+@media(max-width:560px){
+  .gde-signup{place-items:end stretch;padding:0}
+  .gde-signup-panel{width:100%;padding:40px 22px 26px;border-width:1px 0 0}
+}
+
+/* Account page */
+.gde-account{background:var(--ivory,#000);min-height:70vh;padding:150px clamp(20px,7vw,110px) 120px}
+.gde-account-head{max-width:1100px;margin:0 auto 50px}
+.gde-account-head h1{font-size:clamp(2.6rem,6vw,4.6rem);margin:.1em 0 .2em}
+.gde-account-head p{color:var(--muted,#8e8e93);max-width:60ch}
+.gde-account-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.gde-card{background:var(--paper,#0f0f10);border:1px solid var(--line,#242427);padding:36px}
+.gde-card h2{font-size:1.75rem;margin:0 0 10px}
+.gde-card>p{color:var(--muted,#8e8e93);margin:0 0 22px}
+.gde-google{min-height:44px;display:flex;justify-content:flex-start}
+.gde-note{color:var(--muted,#8e8e93);font-size:.85rem}
+.gde-user{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.gde-user img{width:52px;height:52px;border-radius:50%;object-fit:cover;background:var(--raised,#18181a)}
+.gde-user div{flex:1;min-width:180px}
+.gde-user strong{display:block;font-size:1.05rem;font-weight:500}
+.gde-user span{color:var(--muted,#8e8e93);font-size:.85rem;word-break:break-all}
+.gde-link-button{border:0;background:transparent;color:var(--text,#f2f2f3);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;text-decoration:underline;text-underline-offset:4px;padding:6px 0}
+.gde-orders{max-width:1100px;margin:28px auto 0;display:grid;gap:16px}
+.gde-orders>h2{font-size:1.9rem;margin:20px 0 4px}
+.gde-order{background:var(--paper,#0f0f10);border:1px solid var(--line,#242427);padding:26px 28px;display:grid;gap:16px}
+.gde-order-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+.gde-order-top strong{font-size:1rem;font-weight:500;letter-spacing:.04em}
+.gde-order-top span{color:var(--muted,#8e8e93);font-size:.85rem}
+.gde-status{display:inline-block;padding:5px 10px;border:1px solid var(--line-strong,#333336);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase}
+.gde-status.paid{border-color:#e8e8ea;color:#fff}
+.gde-status.bad{border-color:#7a3a3a;color:#ffb0b0}
+.gde-order-item{display:grid;grid-template-columns:96px 1fr auto;gap:18px;align-items:center}
+.gde-order-item .thumb-img{width:96px;aspect-ratio:4/3;background:var(--ivory,#000) center/contain no-repeat;border:1px solid var(--line,#242427)}
+.gde-order-item a{font-weight:500}
+.gde-order-item b{font-weight:500}
+.gde-order-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line,#242427);padding-top:14px;color:var(--muted,#8e8e93);font-size:.85rem}
+.gde-order-foot strong{color:var(--text,#f2f2f3);font-weight:500}
+.gde-empty{color:var(--muted,#8e8e93)}
+.gde-alerts{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
+.gde-alerts .button{width:auto;min-width:200px;margin:0}
+@media(max-width:860px){
+  .gde-account{padding-top:120px}
+  .gde-account-grid{grid-template-columns:1fr}
+  .gde-card{padding:28px 22px}
+  .gde-order{padding:22px 18px}
+  .gde-order-item{grid-template-columns:72px 1fr;gap:14px}
+  .gde-order-item .thumb-img{width:72px}
+  .gde-order-item>b{grid-column:2}
+}

@@ -4,6 +4,7 @@
 //   POST /api/admin?action=catalog   the app sends prices and sold-out flags: { listings: { <listing>: { price, soldOut } } }
 //   GET  /api/admin?action=orders    every saved checkout; recent unpaid or paid ones are first checked against Authorize.net
 //   POST /api/admin?action=delete-order  { invoice }: removes one saved order (test orders); the payment itself is untouched
+//   GET  /api/admin?action=subscribers&since=<ms>  email-list sign-ups and leavers changed since then (api/account.js saves them)
 const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -154,6 +155,15 @@ module.exports = async function handler(request, response) {
       let payments;
       try { payments = await refreshPayments(orders); } catch (error) { payments = { error: error.message }; }
       return response.status(200).json({ orders, payments, environment: authorizeSetup().environment });
+    }
+    if (action === "subscribers" && request.method === "GET") {
+      // Everyone on the email list (or who left it) changed at or after ?since= (ms), oldest change first.
+      const since = Math.max(0, Number(new URL(request.url, "http://x").searchParams.get("since")) || 0);
+      const now = Date.now();
+      const emails = await store.cmd("ZRANGEBYSCORE", "gde:subscribers", since, "+inf");
+      const values = emails.length ? await store.cmd("MGET", ...emails.map((e) => `gde:subscriber:${e}`)) : [];
+      const subscribers = values.map((v) => { try { return JSON.parse(v); } catch { return null; } }).filter(Boolean);
+      return response.status(200).json({ subscribers, now });
     }
     if (action === "delete-order" && request.method === "POST") {
       const invoice = String((await readBody(request)).invoice || "");
