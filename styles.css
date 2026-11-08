@@ -153,19 +153,19 @@ body:has(.hero) .cta-section{margin-left:0;margin-right:0;padding-top:85px;paddi
 
 /* ===== Monochrome minimal theme (Nov 8, 2026) =====
    Near-black page, stepped grays for sections and cards, white text, no gold.
-   Inter for text, Inter Tight for headings. Gun photos keep their color; decorative images go grayscale. */
+   Inter for text, Instrument Serif for headings. Gun photos keep their color; decorative images go grayscale. */
 :root{
   --ink:#0a0a0a;--charcoal:#141415;--ivory:#0e0e0f;--paper:#151516;--raised:#1d1d1f;--line:#2a2a2d;--line-strong:#3a3a3e;
   --muted:#8e8e93;--text:#f2f2f3;--gold:#e8e8ea;--gold-light:#ffffff;
-  --serif:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"Instrument Serif",Georgia,"Times New Roman",serif;--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
   color-scheme:dark}
 body{background:var(--ivory);color:var(--text);font:400 14px/1.65 var(--sans);-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
-h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:-.035em;line-height:1.02}
-h1{font-size:clamp(2.8rem,6vw,6rem)}
-h2{font-size:clamp(2rem,3.6vw,3.5rem)}
-h3{font-size:1.4rem;letter-spacing:-.02em}
-.page-intro h1{font-size:clamp(2.6rem,5.2vw,5rem)}
-.product-info h2{font-size:1.35rem;letter-spacing:-.02em;font-weight:500}
+h1,h2,h3,.form-column legend,.summary-compliance legend,.faq-list summary,.footer-contact strong,.contact-method a,.brand-mark,.authorize-mark{font-family:var(--serif);font-weight:400;letter-spacing:-.015em;line-height:1}
+h1{font-size:clamp(3.2rem,7vw,7rem)}
+h2{font-size:clamp(2.3rem,4.2vw,4rem)}
+h3{font-size:1.7rem}
+.page-intro h1{font-size:clamp(3rem,6vw,5.8rem)}
+.product-info h2{font-size:1.75rem;font-weight:400}
 .eyebrow,.hero .eyebrow{font:500 .68rem/1.4 var(--sans);font-style:normal;text-transform:uppercase;letter-spacing:.22em;color:var(--muted)}
 .meta,.card-number,.card-availability,.detail-collection,.detail-collection-number,.detail-availability{color:var(--muted);letter-spacing:.14em}
 
@@ -188,7 +188,7 @@ h3{font-size:1.4rem;letter-spacing:-.02em}
 .hero h1,.story-copy h2,.cta-section h2,.footer-brand,.footer-contact strong{color:var(--text)}
 .hero-copy,.story-copy>p:not(.eyebrow),.cta-section p:not(.eyebrow),.inquiry-section>div>p:last-child,.site-footer,.footer-legal span,.hero-index{color:#a9a9ae}
 .hero-index i{background:var(--line-strong)}
-.price,.detail-price,.summary-price dd,.cart-total strong,.cart-item-price strong,.checkout-summary-item strong,.process-grid span{color:var(--text);font-family:var(--sans);font-weight:500;letter-spacing:-.01em}
+.price,.detail-price,.summary-price dd,.cart-total strong,.cart-item-price strong,.checkout-summary-item strong,.payment-total strong,.process-grid span,.gallery-arrow{color:var(--text);font-family:var(--sans);font-weight:500;letter-spacing:-.01em}
 .important-note p,.check-list label,.consent,.filter-group label,.inquiry-form .consent{color:var(--muted)}
 .button.secondary,.sort-control select,.field-grid input,.field-grid select,.field-grid textarea,.inquiry-form input,.inquiry-form select,.inquiry-form textarea,.contact-form .form-message,.age-panel,.age-panel .button.secondary{color:var(--text)}
 .nav-dropdown-panel a{color:#c9c9cd}
@@ -223,3 +223,29 @@ input[type=range]{accent-color:var(--text)}
 .story-image,.image-detail,.image-presidential,.image-heritage,.image-wildlife,.image-silver,.image-rifle{filter:grayscale(1)}
 .card-image[style],.product-image[style],.detail-image.has-photo,.thumb[style]{filter:none}
 .product-image,.card-image,.product-detail-page .detail-image.has-photo,.product-detail-page .thumb[style]{background-color:#000}
+.gallery-arrow{border-color:rgba(255,255,255,.28);background:rgba(10,10,10,.6);color:var(--text)}
+.gallery-arrow:hover{background:var(--text);border-color:var(--text);color:#0a0a0a}
+.site-header,.site-header:not(.dark-header),.dark-header{background:#0a0a0a;border-bottom-color:var(--line);box-shadow:none}
+
+/* Listings blend into the page (Nov 8, 2026): black page so the photos' black edges disappear,
+   no card boxes or outlines, and a soft black fade at each photo's edge. */
+:root{--ivory:#000;--paper:#0f0f10;--raised:#18181a;--line:#242427;--line-strong:#333336}
+.collection-card,.card-body,.product-card,.product-info{background:transparent;border:0;box-shadow:none}
+.card-footer,.product-card{border:0}
+.product-image:before{display:none}
+.product-image,.card-image,.product-detail-page .detail-image.has-photo{background-color:#000;border:0;outline:0;box-shadow:inset 0 0 48px 28px #000}
+
+/* Wider letter spacing (Nov 8, 2026): every text style opened by about .025-.03em. */
+body,p,li,dd,input,select,textarea,option{letter-spacing:.02em}
+h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-compliance legend,.faq-list summary,.footer-contact strong,.contact-method a,.brand-mark{letter-spacing:.005em}
+.price,.detail-price,.summary-price dd,.cart-total strong,.cart-item-price strong,.checkout-summary-item strong,.payment-total strong,.range-heading strong{letter-spacing:.01em}
+.footer-links a,.results-bar p,dt,.spec-list dt,.summary-price dt,.order-summary dt,.remove-cart-item,.cart-total span{letter-spacing:.13em}
+.field-grid label,.inquiry-form label{letter-spacing:.14em}
+.text-link,.sort-control,.back-link,.compliance-callout strong,.cart-heading span{letter-spacing:.15em}
+.site-nav>a,.site-nav>a:not(.button),.nav-dropdown-toggle,.important-note span,.contact-method span{letter-spacing:.16em}
+.card-number,.filter-group h3,.range-heading h3,.meta,.card-availability,.detail-collection,.detail-collection-number,.detail-availability{letter-spacing:.17em}
+.button,.filter-title h2,.nav-dropdown-panel p,.cart-label{letter-spacing:.19em}
+.hero-index{letter-spacing:.2em}
+.eyebrow,.hero .eyebrow{letter-spacing:.25em}
+.nav-dropdown-panel a{letter-spacing:.08em}
+.process-grid span{letter-spacing:.04em}.cart-item-copy span,.summary-notice strong{letter-spacing:.15em}
