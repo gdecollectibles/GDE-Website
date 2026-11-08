@@ -249,6 +249,11 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 .eyebrow,.hero .eyebrow{letter-spacing:.25em}
 .nav-dropdown-panel a{letter-spacing:.08em}
 .process-grid span{letter-spacing:.04em}.cart-item-copy span,.summary-notice strong{letter-spacing:.15em}
+/* 360 spin: a gallery button that swaps the big picture for the drag-to-spin viewer. */
+.product-detail-page .thumb-360{display:grid;place-content:center;background:#000;border:1px solid rgba(255,255,255,.28);color:var(--text);font:600 .82rem/1 var(--sans);letter-spacing:.06em}
+.product-detail-page .thumb-360.active{border-color:var(--text)}
+.detail-image .spin-frame{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3;background:#000;display:block}
+.detail-image.show-spin .gallery-arrow{display:none}
 /* Gloock is wide: product titles sized to their column so long words like "Constitution" fit. */
 .detail-copy h1{font-size:clamp(2.4rem,4vw,4.2rem);overflow-wrap:break-word}
 @media(max-width:760px){.detail-copy h1{font-size:clamp(2.2rem,11vw,3.1rem)}}

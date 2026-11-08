@@ -57,7 +57,8 @@ const products = {
       "assets/listings/signing-the-constitution/signing-the-constitution-06.jpg",
       "assets/listings/signing-the-constitution/signing-the-constitution-07.jpg",
       "assets/listings/signing-the-constitution/signing-the-constitution-08.jpg"
-    ]
+    ],
+    "spin": "assets/spin/signing-the-constitution/index.html"
   },
   "mount-rushmore-with-trump": {
     "name": "Mount Rushmore with Trump",
@@ -472,16 +473,37 @@ function setProductGallery(item) {
     return;
   }
   let activeIndex = 0;
+  // 360 spin: a separate viewer page (assets/spin/<listing>/), loaded into the big picture only when asked for.
+  const closeSpin = () => {
+    detailImage.querySelector(".spin-frame")?.remove();
+    detailImage.classList.remove("show-spin");
+  };
+  const showSpin = () => {
+    if (!detailImage.querySelector(".spin-frame")) {
+      const frame = document.createElement("iframe");
+      frame.className = "spin-frame";
+      frame.src = item.spin;
+      frame.title = `${item.name}: drag to spin in 360 degrees`;
+      frame.allow = "fullscreen";
+      detailImage.append(frame);
+    }
+    detailImage.classList.add("show-spin");
+    row.querySelectorAll(".thumb").forEach(thumb => thumb.classList.toggle("active", thumb.classList.contains("thumb-360")));
+  };
   const showPhoto = index => {
+    closeSpin();
     activeIndex = (index + photos.length) % photos.length;
     applyProductPhoto(detailImage, item, activeIndex);
-    row.querySelectorAll(".thumb").forEach((thumb, thumbIndex) => thumb.classList.toggle("active", thumbIndex === activeIndex));
+    row.querySelectorAll(".thumb:not(.thumb-360)").forEach((thumb, thumbIndex) => thumb.classList.toggle("active", thumbIndex === activeIndex));
+    row.querySelectorAll(".thumb-360").forEach(thumb => thumb.classList.remove("active"));
     row.querySelector(".thumb.active")?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
   };
-  row.innerHTML = photos.map((photo, index) => `<button class="thumb${index === 0 ? " active" : ""}" type="button" aria-label="View product photo ${index + 1}" style="background-image:url('${photo}')"></button>`).join("");
-  row.querySelectorAll(".thumb").forEach((button, index) => {
+  row.innerHTML = photos.map((photo, index) => `<button class="thumb${index === 0 ? " active" : ""}" type="button" aria-label="View product photo ${index + 1}" style="background-image:url('${photo}')"></button>`).join("")
+    + (item.spin ? `<button class="thumb thumb-360" type="button" aria-label="View in 360 degrees, drag to spin"><span>360°</span></button>` : "");
+  row.querySelectorAll(".thumb:not(.thumb-360)").forEach((button, index) => {
     button.addEventListener("click", () => showPhoto(index));
   });
+  row.querySelector(".thumb-360")?.addEventListener("click", showSpin);
   if (photos.length < 2) {
     prev?.classList.add("is-hidden");
     next?.classList.add("is-hidden");
