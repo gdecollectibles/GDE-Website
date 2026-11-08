@@ -150,3 +150,76 @@ body:has(.hero) .cta-section{margin-left:0;margin-right:0;padding-top:85px;paddi
 
 /* Phones: the filter drawer fills the screen (the desktop sticky height left a gap and cut off the last filters on iPhone) */
 @media(max-width:760px){.filters{top:0;max-height:none;height:100%;height:100dvh;padding-right:25px;padding-bottom:calc(25px + env(safe-area-inset-bottom))}}
+
+/* ===== Monochrome minimal theme (Nov 8, 2026) =====
+   Near-black page, stepped grays for sections and cards, white text, no gold.
+   Inter for text, Inter Tight for headings. Gun photos keep their color; decorative images go grayscale. */
+:root{
+  --ink:#0a0a0a;--charcoal:#141415;--ivory:#0e0e0f;--paper:#151516;--raised:#1d1d1f;--line:#2a2a2d;--line-strong:#3a3a3e;
+  --muted:#8e8e93;--text:#f2f2f3;--gold:#e8e8ea;--gold-light:#ffffff;
+  --serif:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark}
+body{background:var(--ivory);color:var(--text);font:400 14px/1.65 var(--sans);-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
+h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:-.035em;line-height:1.02}
+h1{font-size:clamp(2.8rem,6vw,6rem)}
+h2{font-size:clamp(2rem,3.6vw,3.5rem)}
+h3{font-size:1.4rem;letter-spacing:-.02em}
+.page-intro h1{font-size:clamp(2.6rem,5.2vw,5rem)}
+.product-info h2{font-size:1.35rem;letter-spacing:-.02em;font-weight:500}
+.eyebrow,.hero .eyebrow{font:500 .68rem/1.4 var(--sans);font-style:normal;text-transform:uppercase;letter-spacing:.22em;color:var(--muted)}
+.meta,.card-number,.card-availability,.detail-collection,.detail-collection-number,.detail-availability{color:var(--muted);letter-spacing:.14em}
+
+/* Surfaces */
+.site-header{border-bottom-color:var(--line)}
+.dark-header,.hero,.split-story,.cta-section,.inquiry-section,.site-footer{background:var(--ink)}
+.hero{background:radial-gradient(ellipse at 70% 45%,#1f1f21 0,#0a0a0a 62%)}
+.page-intro,.contact-hero,.compliance-section,.cart-summary,.order-summary,.contact-form,.confirmation-panel,.payment-summary,.secure-badge{background:var(--paper)}
+.shop-layout,.product-detail-page,.checkout-layout,.cart-layout,.faq-section,.contact-layout,.contact-page,.payment-page,.filters{background:var(--ivory)}
+.collection-card,.card-body,.payment-panel,.inventory-empty-state,.authorize-placeholder{background:var(--paper)}
+.important-note,.compliance-callout,.summary-notice{background:var(--raised)}
+.product-image,.card-image{background-color:#2a2c2f}
+.product-detail-page .detail-image.has-photo,.product-detail-page .thumb[style]{background-color:var(--paper)}
+.page-intro,.filter-group,.results-bar,.spec-list,.product-card,.card-footer,.process-grid,.process-grid>div,.cart-item,.faq-list details,.legal-page section,.contact-method,.detail-description-block,.order-summary dl,.cart-total,.payment-total,.payment-heading,.form-column fieldset,.checkout-summary-item,.ffl-note,.legal-updated,.summary-compliance,.footer-legal{border-color:var(--line)}
+.detail-divider{background:var(--line)}
+.filter-title,.cart-heading{border-color:var(--line-strong)}
+.footer-legal{border-left-color:var(--line)}
+
+/* Text */
+.hero h1,.story-copy h2,.cta-section h2,.footer-brand,.footer-contact strong{color:var(--text)}
+.hero-copy,.story-copy>p:not(.eyebrow),.cta-section p:not(.eyebrow),.inquiry-section>div>p:last-child,.site-footer,.footer-legal span,.hero-index{color:#a9a9ae}
+.hero-index i{background:var(--line-strong)}
+.price,.detail-price,.summary-price dd,.cart-total strong,.cart-item-price strong,.checkout-summary-item strong,.process-grid span{color:var(--text);font-family:var(--sans);font-weight:500;letter-spacing:-.01em}
+.important-note p,.check-list label,.consent,.filter-group label,.inquiry-form .consent{color:var(--muted)}
+.button.secondary,.sort-control select,.field-grid input,.field-grid select,.field-grid textarea,.inquiry-form input,.inquiry-form select,.inquiry-form textarea,.contact-form .form-message,.age-panel,.age-panel .button.secondary{color:var(--text)}
+.nav-dropdown-panel a{color:#c9c9cd}
+.nav-dropdown-panel a:hover{color:#fff}
+
+/* Buttons and controls */
+.button{background:var(--text);border-color:var(--text);color:#0a0a0a;box-shadow:none;font:500 .7rem var(--sans);letter-spacing:.16em;border-radius:0}
+.button:hover{background:#fff;border-color:#fff;color:#0a0a0a;transform:none}
+.button.secondary{background:transparent;border-color:var(--line-strong);color:var(--text)}
+.button.secondary:hover{background:var(--text);border-color:var(--text);color:#0a0a0a}
+.add-to-cart.added{background:#c7c7cb;border-color:#c7c7cb;color:#0a0a0a}
+.text-link{border-bottom-color:var(--line-strong)}
+.text-link span{color:var(--muted)}
+.sort-control select,.field-grid input,.field-grid select,.field-grid textarea,.inquiry-form input,.inquiry-form select,.inquiry-form textarea,.mobile-filter-button{border-color:var(--line-strong);background:transparent}
+.field-grid input:focus,.field-grid select:focus,.field-grid textarea:focus,.inquiry-form input:focus,.inquiry-form select:focus,.inquiry-form textarea:focus{border-color:var(--text)}
+.sort-control select option,.field-grid select option,.inquiry-form select option{background:var(--paper);color:var(--text)}
+.filter-group input[type=checkbox],.check-list input,.consent input{border-color:#5a5a5f}
+.filter-group input[type=checkbox]:checked,.check-list input:checked,.consent input:checked{background:var(--text);border-color:var(--text)}
+.filter-group input[type=checkbox]:checked:after,.check-list input:checked:after,.consent input:checked:after{color:#0a0a0a}
+input[type=range]{accent-color:var(--text)}
+.range-heading strong{color:var(--text)}
+.status.available{background:var(--raised);color:var(--text)}
+.cart-count,.dark-header .cart-count{background:var(--text);color:#0a0a0a}
+.site-nav .cart-nav .cart-count{background:transparent;color:var(--text)}
+.site-nav>a.active:not(.button),.site-nav>a:not(.button):hover{border-color:var(--text)}
+
+/* Age gate */
+.age-panel{background:var(--paper);border:1px solid var(--line)}
+.age-logo{filter:invert(1)}
+
+/* Decorative images in grayscale (gun photos keep their color) */
+.story-image,.image-detail,.image-presidential,.image-heritage,.image-wildlife,.image-silver,.image-rifle{filter:grayscale(1)}
+.card-image[style],.product-image[style],.detail-image.has-photo,.thumb[style]{filter:none}
+.product-image,.card-image,.product-detail-page .detail-image.has-photo,.product-detail-page .thumb[style]{background-color:#000}
