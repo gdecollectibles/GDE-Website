@@ -211,6 +211,21 @@ const products = {
   }
 };
 const priceNumber = value => Number(value.replace(/[$,]/g,""));
+// Live prices and sold-out flags from the GDE inventory app (through /api/catalog). The last copy is kept for this
+// visit so pages open with it; the built-in prices above are used until one has arrived.
+const builtInAvailability = Object.fromEntries(Object.entries(products).map(([k, p]) => [k, p.availability]));
+const applyLive = live => {
+  for (const [k, l] of Object.entries(live?.listings || {})) {
+    const p = products[k];
+    if (!p) continue;
+    if (Number.isFinite(l.price) && l.price > 0) p.price = `$${l.price.toLocaleString("en-US")}`;
+    p.soldOut = !!l.soldOut;
+    p.availability = p.soldOut ? "Sold Out" : builtInAvailability[k];
+  }
+};
+const isBuyable = p => !!p && !p.availability.includes("Archive") && !p.soldOut;
+let liveCatalogText = null;
+try { liveCatalogText = sessionStorage.getItem("gdeLiveCatalog"); applyLive(JSON.parse(liveCatalogText || "null")); } catch {}
 const slug = value => String(value || "").trim().toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const platformSlug = value => value === ".38 Special" ? "38-special" : value === ".45 ACP" ? "45-acp" : slug(value);
 const productCollections = item => {
@@ -233,13 +248,13 @@ const updateCartCount = () => document.querySelectorAll(".cart-count").forEach(e
 const cartIconMarkup = '<svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.1 10.1a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L21 8H7"/><circle cx="10" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/></svg><span class="cart-label">Cart</span><span class="cart-count">0</span>';
 const addToCart = itemKey => {
   const cart = getCart();
-  if (!cart.includes(itemKey) && products[itemKey] && !products[itemKey].availability.includes("Archive")) cart.push(itemKey);
+  if (!cart.includes(itemKey) && isBuyable(products[itemKey])) cart.push(itemKey);
   saveCart(cart);
   return cart.includes(itemKey);
 };
 const incomingCart = new URLSearchParams(location.search).get("cart");
 if (incomingCart) {
-  const validIncoming = incomingCart.split(",").filter(item => products[item] && !products[item].availability.includes("Archive"));
+  const validIncoming = incomingCart.split(",").filter(item => isBuyable(products[item]));
   localStorage.setItem("gdeRequestCart", JSON.stringify([...new Set(validIncoming)]));
 }
 updateCartCount();
@@ -555,16 +570,44 @@ if (document.querySelector(".product-detail-page")) {
     document.title = `${product.name} | GDE Collectibles`;
     setText("#detailCollection",displayCollections(product)); setText("#detailCollectionNumber",product.collectionNumber || ""); setText("#detailHeaderAvailability",product.availability); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage"); setProductGallery(product); setExtraSpecs(product);
     if (request) request.dataset.product=key || Object.keys(products)[0];
-    if(product.availability.includes("Archive") && request){request.textContent="Archive - Unavailable";request.disabled=true;}
+    paintDetail();
   }
 }
+function paintDetail() {
+  const request=document.querySelector("#detailRequest");
+  if (!document.querySelector(".product-detail-page") || !product) return;
+  setText("#detailPrice", product.soldOut ? "Sold Out" : product.price); setText("#detailAvailability",product.availability); setText("#detailHeaderAvailability",product.availability);
+  if (!request) return;
+  if (product.availability.includes("Archive")) { request.textContent="Archive - Unavailable"; request.disabled=true; }
+  else if (product.soldOut) { request.textContent="Sold Out"; request.disabled=true; }
+  else if (request.disabled) { request.textContent="ADD TO CART"; request.disabled=false; }
+}
+// Listing cards (collections page and homepage): price and button follow the live sold-out flag.
+function paintCards() {
+  document.querySelectorAll(".add-to-cart-link[data-product]").forEach(link => {
+    const p = products[link.dataset.product];
+    if (!p) return;
+    const card = link.closest(".product-card") || link.closest("article") || link.parentElement;
+    const price = card?.querySelector(".price");
+    if (price) price.textContent = p.soldOut ? "Sold Out" : p.price;
+    const tag = card?.querySelector(".card-availability");
+    if (tag) tag.textContent = p.availability;
+    if (card?.dataset.price) card.dataset.price = String(priceNumber(p.price));
+    if (card?.dataset.availability) card.dataset.availability = slug(p.availability);
+    if (link.textContent.startsWith("Added")) return;
+    link.textContent = p.soldOut ? "SOLD OUT" : "ADD TO CART";
+    link.classList.toggle("disabled", !!p.soldOut);
+    link.setAttribute("aria-disabled", p.soldOut ? "true" : "false");
+  });
+}
+paintCards();
 
 document.querySelectorAll('a[href^="checkout.html?product="]').forEach(link => {
   const itemKey = new URL(link.href).searchParams.get("product");
-  link.textContent = "ADD TO CART";
+  link.textContent = products[itemKey]?.soldOut ? "SOLD OUT" : "ADD TO CART";
   link.addEventListener("click", event => {
     event.preventDefault();
-    addToCart(itemKey);
+    if (!addToCart(itemKey)) return;
     link.textContent = "Added - View Cart";
     link.href = "cart.html";
     link.addEventListener("click", () => location.href="cart.html", {once:true});
@@ -585,14 +628,15 @@ function renderCart() {
   document.querySelector("#emptyCart").classList.toggle("show", cart.length === 0);
   container.innerHTML = cart.map(item => {
     const p=products[item];
-    return `<article class="cart-item"><div class="cart-item-image ${p.image}"${productImageStyle(p)}></div><div class="cart-item-copy"><p class="meta">${displayCollections(p)}</p><h2>${p.name}</h2><p>${p.platform} · ${p.finish} · ${p.availability}</p><span>FFL Transfer Required</span></div><div class="cart-item-price"><strong>${p.price}</strong><button type="button" class="remove-cart-item" data-product="${item}">Remove</button></div></article>`;
+    return `<article class="cart-item"><div class="cart-item-image ${p.image}"${productImageStyle(p)}></div><div class="cart-item-copy"><p class="meta">${displayCollections(p)}</p><h2>${p.name}</h2><p>${p.platform} · ${p.finish} · ${p.availability}</p><span>FFL Transfer Required</span></div><div class="cart-item-price"><strong>${p.soldOut ? "Sold Out" : p.price}</strong><button type="button" class="remove-cart-item" data-product="${item}">Remove</button></div></article>`;
   }).join("");
-  const total = cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0);
+  const buyable = cart.filter(item => isBuyable(products[item]));
+  const total = buyable.reduce((sum,item)=>sum+priceNumber(products[item].price),0);
   document.querySelector("#cartTotal").textContent = `$${total.toLocaleString()}`;
   const checkoutButton=document.querySelector("#checkoutButton");
-  checkoutButton.classList.toggle("disabled",cart.length===0);
-  checkoutButton.setAttribute("aria-disabled",cart.length===0);
-  checkoutButton.href=cart.length ? `checkout.html?cart=${cart.join(",")}` : "checkout.html";
+  checkoutButton.classList.toggle("disabled",buyable.length===0);
+  checkoutButton.setAttribute("aria-disabled",buyable.length===0);
+  checkoutButton.href=buyable.length ? `checkout.html?cart=${buyable.join(",")}` : "checkout.html";
   container.querySelectorAll(".remove-cart-item").forEach(button=>button.addEventListener("click",()=>{
     saveCart(getCart().filter(item=>item!==button.dataset.product)); renderCart();
   }));
@@ -602,8 +646,12 @@ renderCart();
 if (document.querySelector("#checkoutSummaryItems")) {
   const queryProduct = new URLSearchParams(location.search).get("product");
   if (queryProduct && products[queryProduct]) addToCart(queryProduct);
-  const cart = getCart().filter(item => products[item]);
+  renderCheckoutSummary();
+}
+function renderCheckoutSummary() {
   const summary = document.querySelector("#checkoutSummaryItems");
+  if (!summary) return;
+  const cart = getCart().filter(item => isBuyable(products[item]));
   if (cart.length) {
     summary.innerHTML=cart.map(item=>{const p=products[item];return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"${productImageStyle(p)}></div><div><h2>${p.name}</h2><p>${p.platform} · ${p.finish}</p><strong>${p.price}</strong></div></div>`}).join("");
     setText("#summaryPrice",`$${cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0).toLocaleString()}`);
@@ -669,17 +717,19 @@ if (document.querySelector("#proceedToPayment")) {
       status.textContent = "Please complete every checkout field and compliance confirmation before continuing.";
       return;
     }
-    const cart = getCart().filter(item => products[item] && !products[item].availability.includes("Archive"));
+    const cart = getCart().filter(item => isBuyable(products[item]));
     const customer = form ? Object.fromEntries(new FormData(form).entries()) : {};
     localStorage.setItem("gdeCheckoutDetails", JSON.stringify(customer));
     const resetText = 'Proceed to Checkout <span>&rarr;</span>';
     startAuthorizeCheckout({button: paymentLink, status, cart, customer, resetText});
   });
 }
-if (document.querySelector("#paymentSummaryItems")) {
-  const paymentParams = new URLSearchParams(location.search).get("cart");
-  const cart = (paymentParams ? paymentParams.split(",") : getCart()).filter(item => products[item]);
+renderPaymentSummary();
+function renderPaymentSummary() {
   const container = document.querySelector("#paymentSummaryItems");
+  if (!container) return;
+  const paymentParams = new URLSearchParams(location.search).get("cart");
+  const cart = (paymentParams ? paymentParams.split(",") : getCart()).filter(item => isBuyable(products[item]));
   container.innerHTML = cart.length ? cart.map(item => {
     const p = products[item];
     return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"${productImageStyle(p)}></div><div><h2>${p.name}</h2><p>${p.platform} · ${p.finish}</p><strong>${p.price}</strong></div></div>`;
@@ -690,7 +740,7 @@ document.querySelector("#authorizePayButton")?.addEventListener("click", event =
   const button = event.currentTarget;
   const status = document.querySelector("#paymentStatus");
   const paymentParams = new URLSearchParams(location.search).get("cart");
-  const cart = (paymentParams ? paymentParams.split(",") : getCart()).filter(item => products[item] && !products[item].availability.includes("Archive"));
+  const cart = (paymentParams ? paymentParams.split(",") : getCart()).filter(item => isBuyable(products[item]));
   let customer = {};
   try {
     customer = JSON.parse(localStorage.getItem("gdeCheckoutDetails")) || {};
@@ -730,3 +780,14 @@ document.querySelector("#contactForm")?.addEventListener("submit", async e => {
     button.textContent = originalText;
   }
 });
+
+// Fetches the live prices and sold-out flags; repaints only when they differ from what the page opened with.
+fetch("/api/catalog", { headers: { Accept: "application/json" } })
+  .then(response => response.ok ? response.text() : null)
+  .then(text => {
+    if (!text || text === liveCatalogText) return;
+    applyLive(JSON.parse(text));
+    try { sessionStorage.setItem("gdeLiveCatalog", text); } catch {}
+    paintCards(); paintDetail(); renderCart(); renderCheckoutSummary(); renderPaymentSummary();
+  })
+  .catch(() => {});

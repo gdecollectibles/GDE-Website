@@ -1,5 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
+const store = require("./_store");
 
 const AUTHORIZE_ENDPOINTS = {
   sandbox: "https://apitest.authorize.net/xml/v1/request.api",
@@ -9,6 +10,28 @@ const CHECKOUT_FORMSPREE_URL = "https://formspree.io/f/mrenwyyv";
 
 function readInventory() {
   return JSON.parse(fs.readFileSync(path.join(process.cwd(), "codex-inventory.json"), "utf8")).products;
+}
+
+// The listings with the prices and sold-out flags the inventory app last sent (the built-in ones if it never has).
+async function liveInventory() {
+  const inventory = readInventory();
+  let catalog = null;
+  try { catalog = await store.getCatalog(); } catch (error) { console.error(error); }
+  for (const [id, live] of Object.entries(catalog?.listings || {})) {
+    if (!inventory[id]) continue;
+    if (Number.isFinite(live.price) && live.price > 0) inventory[id].price = `$${live.price.toLocaleString("en-US")}`;
+    inventory[id].soldOut = !!live.soldOut;
+  }
+  return inventory;
+}
+
+// Everything the buyer typed at checkout, kept for the order in the inventory app.
+function cleanForm(customer) {
+  const form = {};
+  for (const [key, value] of Object.entries(customer || {}).slice(0, 60)) {
+    if (/^[A-Za-z][A-Za-z0-9_]{0,40}$/.test(key)) form[key] = String(value ?? "").trim().slice(0, 2000);
+  }
+  return form;
 }
 
 function priceNumber(value) {
@@ -88,9 +111,13 @@ module.exports = async function handler(request, response) {
 
   try {
     const body = await readBody(request);
-    const inventory = readInventory();
+    const inventory = await liveInventory();
     const cart = [...new Set(Array.isArray(body.cart) ? body.cart : [])]
       .filter(id => inventory[id] && !inventory[id].availability.includes("Archive"));
+    const soldOut = cart.filter(id => inventory[id].soldOut);
+    if (soldOut.length) {
+      return response.status(409).json({ error: `Sorry, ${soldOut.map(id => inventory[id].name).join(" and ")} just sold out. Please remove it from your cart.` });
+    }
 
     if (!cart.length) {
       return response.status(400).json({ error: "No valid cart items were provided." });
@@ -106,6 +133,22 @@ module.exports = async function handler(request, response) {
     const customer = body.customer || {};
     const invoiceNumber = `GDE-${Date.now().toString().slice(-10)}`;
     await sendCheckoutEmail(buildCheckoutEmailPayload({ customer, items, amount, invoiceNumber }));
+    // Saved for the inventory app, which checks the payment and files the buyer. A store hiccup never blocks the sale:
+    // the email above still has every detail.
+    const order = {
+      invoice: invoiceNumber,
+      createdAt: new Date().toISOString(),
+      status: "awaiting_payment",
+      environment,
+      amount,
+      items: items.map(item => ({ listing: item.id, name: item.product.name, price: item.unitPrice })),
+      form: cleanForm(customer)
+    };
+    const saveOrder = async (changes, isNew) => {
+      if (!store.configured()) return;
+      try { await store.saveOrder(Object.assign(order, changes), isNew); } catch (error) { console.error(error); }
+    };
+    await saveOrder({}, true);
     const authorizeRequest = {
       getHostedPaymentPageRequest: {
         merchantAuthentication: { name: loginId, transactionKey },
@@ -167,6 +210,7 @@ module.exports = async function handler(request, response) {
 
     if (!authorizeResponse.ok || messages?.resultCode !== "Ok" || !result.token) {
       const errorText = messages?.message?.map(message => message.text).join(" ") || "Authorize.net did not return a payment token.";
+      await saveOrder({ status: "payment_error", error: errorText.slice(0, 500) });
       return response.status(502).json({ error: errorText, code: messages?.message?.[0]?.code });
     }
 
