@@ -6,8 +6,10 @@
 //   POST /api/account?action=lookup     { email, invoice }: one order, for people who don't sign in with Google
 //   POST /api/account?action=subscribe  { email, firstName?, source }: joins the email list (new collections, deals)
 //   POST /api/account?action=unsubscribe  signed in: leaves the email list
-// Stored next to the orders (see _store.js):
-//   gde:subscriber:<email>  { email, firstName, status: subscribed|unsubscribed, source, verified, createdAt, updatedAt, consent }
+//   POST /api/account?action=decline      signed in: "no thanks" to the list question asked after the first sign-in
+// Stored next to the orders (see _store.js), one record per person, whether they joined the list, signed in, or both:
+//   gde:subscriber:<email>  { email, firstName, lastName, status: none|declined|subscribed|unsubscribed, account (signed in
+//                             with Google), source, verified, signedInAt, createdAt, updatedAt, consent }
 //   gde:subscribers         sorted set of emails, by last change (the inventory app pulls them through /api/admin)
 //   gde:rl:<what>:<ip>      short-lived counters against abuse
 // Needs in Vercel: GOOGLE_CLIENT_ID (Google Cloud, OAuth client, "Web application"). The session cookie is signed with
@@ -105,7 +107,10 @@ async function verifyGoogle(credential) {
   if (!response.ok || info.aud !== clientId || !okIssuer || !fresh || String(info.email_verified) !== "true" || !info.email) {
     throw Object.assign(new Error("Google could not confirm this sign-in. Please try again."), { status: 401 });
   }
-  return { email: normEmail(info.email), name: cleanName(info.name || info.given_name), picture: String(info.picture || "").slice(0, 500), via: "google" };
+  return {
+    email: normEmail(info.email), name: cleanName(info.name || info.given_name), picture: String(info.picture || "").slice(0, 500), via: "google",
+    firstName: cleanName(info.given_name), lastName: cleanName(info.family_name)
+  };
 }
 
 // The part of an order a customer may see: no address, phone, birth date or card details.
@@ -160,10 +165,15 @@ module.exports = async function handler(request, response) {
 
     if (action === "google" && post) {
       if (!(await allowed(request, "signin", 30))) return response.status(429).json({ error: "Too many tries. Please wait a while." });
-      const user = await verifyGoogle((await readBody(request)).credential);
+      const { firstName, lastName, ...user } = await verifyGoogle((await readBody(request)).credential);
       setCookie(request, response, makeSession(user), SESSION_DAYS * 86400);
-      const sub = await getSubscriber(user.email);
-      if (sub && !sub.verified) await saveSubscriber(user.email, { verified: true });
+      // Every account is kept (the inventory app files it in Customers); "none" means not asked about the list yet.
+      const old = await getSubscriber(user.email);
+      await saveSubscriber(user.email, {
+        account: true, verified: true, signedInAt: new Date().toISOString(),
+        firstName: old?.firstName || firstName, lastName: old?.lastName || lastName,
+        status: old?.status || "none", source: old?.source || "account"
+      });
       return response.status(200).json({ ok: true, user: { email: user.email, name: user.name, picture: user.picture } });
     }
 
@@ -174,7 +184,8 @@ module.exports = async function handler(request, response) {
       return response.status(200).json({
         user: { email: user.email, name: user.name, picture: user.picture },
         orders,
-        subscribed: sub?.status === "subscribed"
+        subscribed: sub?.status === "subscribed",
+        listStatus: sub?.status || "none"
       });
     }
 
@@ -207,7 +218,7 @@ module.exports = async function handler(request, response) {
       const email = user ? user.email : normEmail(body.email);
       if (!EMAIL_RE.test(email)) return response.status(400).json({ error: "Please enter a valid email address." });
       if (!user && !(await allowed(request, "subscribe", 8))) return response.status(429).json({ error: "Too many sign-ups from here. Please try later." });
-      const source = ["popup", "account", "footer", "checkout"].includes(body.source) ? body.source : "website";
+      const source = ["popup", "account", "footer", "checkout", "signup"].includes(body.source) ? body.source : "website";
       const old = await getSubscriber(email);
       await saveSubscriber(email, {
         status: "subscribed",
@@ -217,6 +228,15 @@ module.exports = async function handler(request, response) {
         consent: { text: CONSENT, at: new Date().toISOString(), page: String(body.page || "").slice(0, 200) }
       });
       return response.status(200).json({ ok: true, already: old?.status === "subscribed" });
+    }
+
+    if (action === "decline" && post) {
+      // "No thanks" to the list question after signing up: remembered so it isn't asked again.
+      const user = readSession(request);
+      if (!user) return response.status(401).json({ error: "Please sign in first." });
+      const old = await getSubscriber(user.email);
+      if (!old || old.status === "none") await saveSubscriber(user.email, { status: "declined" });
+      return response.status(200).json({ ok: true });
     }
 
     if (action === "unsubscribe" && post) {
