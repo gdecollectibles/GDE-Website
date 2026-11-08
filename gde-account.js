@@ -11,7 +11,7 @@
   const NO_POPUP = ["checkout.html", "payment-success.html", "payment-cancel.html", "cart.html", "account.html", "iframe-communicator.html"];
 
   const css = document.createElement("link");
-  css.rel = "stylesheet"; css.href = "account.css?v=20261108acct4";
+  css.rel = "stylesheet"; css.href = "account.css?v=20261108acct5";
   document.head.append(css);
 
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -153,17 +153,6 @@
     </article>`;
   }
 
-  const lookupHtml = `<div class="gde-card" id="gdeLookupCard">
-      <h2>Find an order</h2>
-      <p>No Google account? Use the email you checked out with and your order number (it starts with GDE- and is in your confirmation).</p>
-      <form class="gde-account-form" id="gdeLookup" novalidate>
-        <label class="gde-field">Email used at checkout<input type="email" name="email" autocomplete="email" required></label>
-        <label class="gde-field">Order number<input name="invoice" placeholder="GDE-0000000000" autocomplete="off" required></label>
-        <button class="button" type="submit">Find my order</button>
-        <p class="gde-msg" aria-live="polite"></p>
-      </form>
-    </div>`;
-
   function bindLookup() {
     const form = root.querySelector("#gdeLookup");
     if (!form) return;
@@ -183,6 +172,7 @@
   // Signed out: a single centered column (user, Nov 8: like Gymshark's login, in the site's own look), with no menu
   // or footer; the logo goes back to the shop.
   function renderSignedOut(config) {
+    document.body.classList.remove("gde-signed-in");
     document.body.classList.add("gde-auth-mode");
     root.innerHTML = `<div class="gde-auth">
         <a class="gde-auth-logo" href="index.html" aria-label="GDE Collectibles home"></a>
@@ -229,26 +219,55 @@
     document.head.append(s);
   }
 
+  // Signed in (user, Nov 8: same clean look as the login): one centered column with the site's menu back on top.
   function renderSignedIn(data) {
     document.body.classList.remove("gde-auth-mode");
+    document.body.classList.add("gde-signed-in");
     const u = data.user;
+    const first = (u.name || "").split(" ")[0];
+    const initial = esc((first || u.email || "?").charAt(0).toUpperCase());
     const orders = data.orders.length
       ? data.orders.map(orderHtml).join("")
-      : `<p class="gde-empty">No orders under ${esc(u.email)} yet. Checked out with a different email? Use Find an order below.</p>`;
-    root.innerHTML = `<div class="gde-account-grid">
-        <div class="gde-card">
-          <div class="gde-user">${u.picture ? `<img src="${esc(u.picture)}" alt="" referrerpolicy="no-referrer">` : ""}<div><strong>${esc(u.name || "Welcome")}</strong><span>${esc(u.email)}</span></div>
-          <button class="gde-link-button" id="gdeSignOut" type="button">Sign out</button></div>
-        </div>
-        <div class="gde-card">
-          <div class="gde-alerts"><div><h2>Email alerts</h2><p class="gde-note" style="margin:0">${data.subscribed ? "You get emails about new collections and offers." : "New collections, limited releases and collector offers."}</p></div>
-          <button class="button${data.subscribed ? " secondary" : ""}" id="gdeAlerts" type="button">${data.subscribed ? "Stop emails" : "Get email alerts"}</button></div>
+      : `<div class="gde-acct-empty"><p>No orders under ${esc(u.email)} yet.</p><a class="button secondary" href="collections.html">Browse Collections</a></div>`;
+    root.innerHTML = `<div class="gde-acct">
+        <header class="gde-acct-top">
+          <div class="gde-avatar" aria-hidden="true">${u.picture ? `<img src="${esc(u.picture)}" alt="" referrerpolicy="no-referrer">` : ""}<span>${initial}</span></div>
+          <p class="eyebrow">Collector account</p>
+          <h1>${first ? `Welcome, ${esc(first)}` : "Welcome"}</h1>
+          <p class="gde-acct-email">${esc(u.email)}<span aria-hidden="true">·</span><button class="gde-link-button" id="gdeSignOut" type="button">Sign out</button></p>
+        </header>
+        <section class="gde-acct-section">
+          <h2 class="gde-acct-label">Your orders</h2>
+          ${orders}
+        </section>
+        <section class="gde-acct-section">
+          <h2 class="gde-acct-label">Email alerts</h2>
+          <div class="gde-acct-row">
+            <p>${data.subscribed ? "You're on the collector list: new collections, limited releases and collector offers." : "Get emails about new collections, limited releases and collector offers."}</p>
+            <button class="button${data.subscribed ? " secondary" : ""}" id="gdeAlerts" type="button">${data.subscribed ? "Stop Emails" : "Get Email Alerts"}</button>
+          </div>
           <p class="gde-msg" id="gdeAlertsMsg" aria-live="polite"></p>
-        </div>
-      </div>
-      <section class="gde-orders"><h2>Your orders</h2>${orders}</section>
-      <section class="gde-orders"><div class="gde-account-grid">${lookupHtml}</div></section>
-      <section class="gde-orders" id="gdeLookupResult"></section>`;
+        </section>
+        <details class="gde-acct-find">
+          <summary>Ordered with a different email? Find an order</summary>
+          <form class="gde-auth-form" id="gdeLookup" novalidate>
+            <label class="gde-sr" for="gdeLookupEmail">Email used at checkout</label>
+            <input id="gdeLookupEmail" type="email" name="email" autocomplete="email" placeholder="Email used at checkout*" required>
+            <label class="gde-sr" for="gdeLookupInvoice">Order number</label>
+            <input id="gdeLookupInvoice" name="invoice" autocomplete="off" placeholder="Order number* (GDE-0000000000)" required>
+            <button class="button secondary" type="submit">Find My Order</button>
+            <p class="gde-msg" aria-live="polite"></p>
+          </form>
+        </details>
+        <section class="gde-orders" id="gdeLookupResult"></section>
+      </div>`;
+    // Google's picture sometimes doesn't load (blocked or expired): the initial shows instead.
+    const img = root.querySelector(".gde-avatar img");
+    if (img) {
+      const ok = () => img.closest(".gde-avatar").classList.add("has-photo");
+      img.addEventListener("error", () => img.remove());
+      img.complete && img.naturalWidth ? ok() : img.addEventListener("load", ok);
+    }
     root.querySelector("#gdeSignOut").addEventListener("click", async () => {
       try { await api("logout", {}); window.google?.accounts?.id?.disableAutoSelect(); } catch {}
       load();

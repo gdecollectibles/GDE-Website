@@ -65,6 +65,45 @@
 .gde-auth-mode #gdeLookupResult:empty{display:none}
 @media(max-width:560px){.gde-auth-logo{width:190px;height:72px;margin-bottom:28px}.gde-auth-mode .gde-account{padding-top:48px}}
 
+/* Signed-in account page: the same clean single column as the login, with the menu on top (user, Nov 8). */
+.gde-signed-in .gde-account-head{display:none}
+.gde-signed-in .gde-account{padding-top:140px}
+.gde-acct{max-width:720px;margin:0 auto}
+.gde-acct-top{text-align:center;margin-bottom:56px}
+.gde-avatar{position:relative;width:76px;height:76px;margin:0 auto 22px;border-radius:50%;overflow:hidden;background:var(--raised,#18181a);border:1px solid var(--line-strong,#333336);display:grid;place-items:center}
+.gde-avatar span{font:400 2rem/1 var(--serif,Georgia,serif);color:var(--text,#f2f2f3)}
+.gde-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}
+.gde-avatar.has-photo img{opacity:1}
+.gde-acct-top .eyebrow{margin:0 0 10px}
+.gde-acct-top h1{font-size:clamp(2.4rem,5vw,3.6rem);margin:0 0 14px}
+.gde-acct-email{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;margin:0;color:var(--muted,#8e8e93);font-size:.92rem;word-break:break-all}
+.gde-acct-email .gde-link-button{padding:0}
+.gde-acct-section{border-top:1px solid var(--line,#242427);padding:30px 0 34px}
+.gde-acct-label{font:600 .78rem/1.3 var(--sans,Inter,Arial,sans-serif);letter-spacing:.22em;text-transform:uppercase;margin:0 0 20px;color:var(--text,#f2f2f3)}
+.gde-acct-section .gde-order+.gde-order{margin-top:14px}
+.gde-acct-empty{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;padding:26px 28px;border:1px solid var(--line,#242427);background:var(--paper,#0f0f10)}
+.gde-acct-empty p{margin:0;color:var(--muted,#8e8e93);word-break:break-word}
+.gde-acct-row{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.gde-acct-row p{margin:0;color:var(--muted,#8e8e93);max-width:42ch;line-height:1.6}
+.gde-acct .button{min-height:48px;padding:0 26px;width:auto}
+.gde-acct .button.secondary{background:transparent;border:1px solid var(--text,#f2f2f3);color:var(--text,#f2f2f3)}
+.gde-acct .button.secondary:hover{background:var(--text,#f2f2f3);color:#0a0a0a}
+.gde-acct-find{border-top:1px solid var(--line,#242427);padding-top:24px}
+.gde-acct-find summary{cursor:pointer;list-style:none;text-align:center;color:var(--muted,#8e8e93);font-size:.88rem}
+.gde-acct-find summary::-webkit-details-marker{display:none}
+.gde-acct-find summary:hover,.gde-acct-find[open] summary{color:var(--text,#f2f2f3)}
+.gde-acct-find summary{text-decoration:underline;text-underline-offset:4px}
+.gde-acct-find .gde-auth-form{max-width:380px;margin:22px auto 0}
+.gde-acct-find .gde-auth-form .button{width:100%}
+.gde-acct #gdeLookupResult:empty{display:none}
+.gde-acct #gdeLookupResult{margin-top:30px}
+@media(max-width:560px){
+  .gde-signed-in .gde-account{padding-top:110px}
+  .gde-acct-empty,.gde-acct-row{flex-direction:column;align-items:stretch;text-align:center}
+  .gde-acct-row p{max-width:none}
+  .gde-acct .button{width:100%}
+}
+
 /* Account page */
 .gde-account{background:var(--ivory,#000);min-height:70vh;padding:150px clamp(20px,7vw,110px) 120px}
 .gde-account-head{max-width:1100px;margin:0 auto 50px}
