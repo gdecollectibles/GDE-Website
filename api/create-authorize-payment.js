@@ -57,16 +57,54 @@ function buildCheckoutEmailPayload({ customer, items, amount, invoiceNumber }) {
   return data;
 }
 
-async function sendCheckoutEmail(payload) {
+// Formspree checks some fields itself (an "email" field must look like an email) and answers only "Validation errors",
+// which stopped phone checkouts (Nov 8, 2026). The email is a backup copy for GDE: the order is saved in the store
+// first, so a Formspree refusal is retried once with the flagged fields renamed, and never blocks the payment.
+async function postCheckoutEmail(payload) {
   const response = await fetch(CHECKOUT_FORMSPREE_URL, {
     method: "POST",
     headers: { "Accept": "application/json" },
     body: payload
   });
   const result = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(result.error || result.errors?.[0]?.message || "Checkout details could not be emailed. Please try again.");
+  if (response.ok) return null;
+  const details = (result.errors || []).map(e => `${e.field || "form"}: ${e.message || e.code || "invalid"}`).join("; ");
+  return { status: response.status, fields: (result.errors || []).map(e => e.field).filter(Boolean), text: [result.error, details].filter(Boolean).join(" - ") || `HTTP ${response.status}` };
+}
+
+async function sendCheckoutEmail(payload) {
+  try {
+    let failure = await postCheckoutEmail(payload);
+    if (!failure) return null;
+    console.error("Checkout email refused:", failure.text);
+    if (failure.fields.length) {
+      for (const field of failure.fields) {
+        if (!payload.has(field)) continue;
+        payload.set(`${field}Given`, payload.get(field));
+        payload.delete(field);
+      }
+      failure = await postCheckoutEmail(payload);
+      if (!failure) return null;
+      console.error("Checkout email refused again:", failure.text);
+    }
+    return failure.text;
+  } catch (error) {
+    console.error("Checkout email failed:", error);
+    return error.message || "network error";
   }
+}
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@.]{2,}$/;
+
+// The buyer's details, trimmed, and a plain message for anything that would stop the checkout further on.
+function checkCustomer(customer) {
+  const clean = {};
+  for (const [key, value] of Object.entries(customer || {})) clean[key] = String(value ?? "").trim();
+  if (clean.email) clean.email = clean.email.replace(/\s+/g, "");
+  if (!EMAIL_PATTERN.test(clean.email || "")) {
+    return { error: "Please check your email address. It should look like name@example.com." };
+  }
+  return { customer: clean };
 }
 
 function siteOrigin(request) {
@@ -130,12 +168,13 @@ module.exports = async function handler(request, response) {
     }
 
     const origin = siteOrigin(request);
-    const customer = body.customer || {};
+    const checked = checkCustomer(body.customer);
+    if (checked.error) return response.status(400).json({ error: checked.error });
+    const customer = checked.customer;
     const embedded = body.embedded === true;
     const invoiceNumber = `GDE-${Date.now().toString().slice(-10)}`;
-    await sendCheckoutEmail(buildCheckoutEmailPayload({ customer, items, amount, invoiceNumber }));
-    // Saved for the inventory app, which checks the payment and files the buyer. A store hiccup never blocks the sale:
-    // the email above still has every detail.
+    // Saved for the inventory app, which checks the payment and files the buyer. A store hiccup never blocks the sale
+    // while the email below still goes out with every detail.
     const order = {
       invoice: invoiceNumber,
       createdAt: new Date().toISOString(),
@@ -146,10 +185,16 @@ module.exports = async function handler(request, response) {
       form: cleanForm(customer)
     };
     const saveOrder = async (changes, isNew) => {
-      if (!store.configured()) return;
-      try { await store.saveOrder(Object.assign(order, changes), isNew); } catch (error) { console.error(error); }
+      if (!store.configured()) return false;
+      try { await store.saveOrder(Object.assign(order, changes), isNew); return true; } catch (error) { console.error(error); return false; }
     };
-    await saveOrder({}, true);
+    const saved = await saveOrder({}, true);
+    const emailError = await sendCheckoutEmail(buildCheckoutEmailPayload({ customer, items, amount, invoiceNumber }));
+    if (emailError) {
+      // With no saved order the email is GDE's only copy, so stop; otherwise note it on the order and carry on.
+      if (!saved) return response.status(502).json({ error: "Your checkout details could not be sent. Please try again in a minute." });
+      await saveOrder({ emailError: emailError.slice(0, 300) });
+    }
     const authorizeRequest = {
       getHostedPaymentPageRequest: {
         merchantAuthentication: { name: loginId, transactionKey },

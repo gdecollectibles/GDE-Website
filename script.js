@@ -720,6 +720,8 @@ if (document.querySelector("#proceedToPayment")) {
   paymentLink.addEventListener("click", event => {
     event.preventDefault();
     const form = document.querySelector("#purchaseForm");
+    // Phones' keyboards and autofill can leave spaces around what was typed; trim before the form is checked.
+    form?.querySelectorAll("input:not([type=checkbox]):not([type=hidden]), textarea").forEach(field => { field.value = field.value.trim(); });
     if (form && !form.reportValidity()) {
       status.textContent = "Please complete every checkout field and compliance confirmation before continuing.";
       return;
