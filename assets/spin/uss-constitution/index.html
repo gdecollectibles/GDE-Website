@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>USS Constitution 360</title>
+<style>
+html,body{height:100%;margin:0;overflow:hidden;color:#a79c84;font:14px/1.3 system-ui,sans-serif}
+/* Dark grey glow on black, the same grey (#343539) as the centre of the website's listing pictures (user, Nov 8). */
+/* Fully black well before the edges (radius under half the box), so the viewer never shows as a box on the black page. */
+body{background:#000 radial-gradient(ellipse 40% 40% at 50% 48%,#343539 0%,#2b2c2f 25%,#1c1d1f 52%,#0c0c0d 78%,#000 100%) fixed}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab;outline:none}
+canvas.drag{cursor:grabbing}
+#hint{position:fixed;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom));text-align:center;pointer-events:none;transition:opacity .6s}
+</style></head><body>
+<canvas id="c" tabindex="0" aria-label="USS Constitution, filmed all the way round. Drag left or right to turn it, or use the arrow keys."></canvas>
+<div id="hint">Loading...</div>
+<script>
+// Frame-by-frame 360: every picture is a real filmed frame (cut out), no 3D. A small sheet of every angle loads first so
+// it turns at once; the full frames load in the background, nearest angle first, and are decoded off the main thread.
+const M={"n": 284, "w": 1100, "h": 936, "sheet": {"cols": 16, "cw": 255, "ch": 217}, "start": 215}, V="ea1b6d1d65";
+const N=M.n, cv=document.getElementById('c'), g=cv.getContext('2d'), hint=document.getElementById('hint');
+const MOB=/Mobi|Android|iPhone|iPad/.test(navigator.userAgent), KEEP=MOB?70:160; // decoded frames kept in memory
+let cur=M.start, sheet=null, drawn=-1, dirty=true;
+const blobs=new Array(N), bmp=new Map(), decoding=new Set(), fetching=new Set(), queue=[];
+const url=i=>`f/${String(i).padStart(3,'0')}.webp?v=${V}`;
+const wrap=i=>((i%N)+N)%N;
+
+function size(){const d=Math.min(devicePixelRatio||1,2);cv.width=Math.round(innerWidth*d);cv.height=Math.round(innerHeight*d);dirty=true}
+addEventListener('resize',size);size();
+
+function draw(){
+  dirty=false;
+  // the sharpest picture we have for this angle: its own frame, else a neighbour within 2 steps, else the sheet
+  let src=null,sx=0,sy=0,sw=M.w,sh=M.h,use=cur;
+  for(const d of [0,1,-1,2,-2]){const b=bmp.get(wrap(cur+d));if(b){src=b;use=wrap(cur+d);break}}
+  if(!src&&sheet){src=sheet;const c=M.sheet;sx=(cur%c.cols)*c.cw;sy=Math.floor(cur/c.cols)*c.ch;sw=c.cw;sh=c.ch}
+  if(!src)return;
+  if(src===bmp.get(use))touch(use);
+  const k=Math.min(cv.width/M.w,cv.height/M.h)*0.94,w=M.w*k,h=M.h*k;
+  g.clearRect(0,0,cv.width,cv.height);
+  g.imageSmoothingQuality='high';
+  g.drawImage(src,sx,sy,sw,sh,(cv.width-w)/2,(cv.height-h)/2,w,h);
+  drawn=cur;
+}
+function loop(){if(dirty||drawn!==cur)draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+
+// LRU of decoded frames
+function touch(i){const b=bmp.get(i);if(b){bmp.delete(i);bmp.set(i,b)}}
+function evict(){while(bmp.size>KEEP){const[i,b]=bmp.entries().next().value;if(Math.abs(wrap(i-cur+N/2)-N/2)<6){touch(i);break}bmp.delete(i);b.close&&b.close()}}
+function decode(i){
+  if(bmp.has(i)||decoding.has(i)||!blobs[i])return;
+  decoding.add(i);
+  createImageBitmap(blobs[i]).then(b=>{decoding.delete(i);bmp.set(i,b);evict();if(Math.abs(wrap(i-cur+N/2)-N/2)<=2)dirty=true}).catch(()=>decoding.delete(i));
+}
+function want(){ // decode around where we are, more ahead in the direction of turning
+  for(let d=0;d<=10;d++){decode(wrap(cur+d*dir));if(d<5)decode(wrap(cur-d*dir))}
+}
+
+// fetch every full frame once, nearest to the current angle first, 6 at a time
+function order(){const o=[];for(let d=0;d<=N/2;d++){o.push(wrap(cur+d));if(d)o.push(wrap(cur-d))}return [...new Set(o)]}
+function pump(){
+  while(fetching.size<6){
+    const i=order().find(i=>!blobs[i]&&!fetching.has(i));if(i===undefined)return;
+    fetching.add(i);
+    fetch(url(i)).then(r=>r.ok?r.blob():Promise.reject(r.status)).then(b=>{blobs[i]=b;fetching.delete(i);if(Math.abs(wrap(i-cur+N/2)-N/2)<=10)decode(i);pump()})
+      .catch(()=>{fetching.delete(i);setTimeout(pump,1000)});
+  }
+}
+fetch(`sheet.webp?v=${V}`).then(r=>r.blob()).then(createImageBitmap).then(b=>{sheet=b;dirty=true;ready()});
+pump();
+
+// turning: dragging across the whole picture turns it half way round; stops dead where you let go
+let dir=1,drag=null;
+function set(i){i=wrap(Math.round(i));if(i!==cur){dir=wrap(i-cur)<N/2?1:-1;cur=i;want()}}
+cv.addEventListener('pointerdown',e=>{if(e.button)return;drag={x:e.clientX,y:e.clientY,start:cur,on:e.pointerType==='mouse'};cv.setPointerCapture(e.pointerId);if(drag.on)cv.classList.add('drag')});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x;
+  if(!drag.on){if(Math.abs(dx)<6&&Math.abs(e.clientY-drag.y)<6)return;if(Math.abs(e.clientY-drag.y)>Math.abs(dx)){drag=null;return}drag.on=true} // touch: vertical moves scroll the page
+  set(drag.start-dx/(cv.clientWidth)*N*0.5);hide()});
+const end=()=>{drag=null;cv.classList.remove('drag')};
+cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+cv.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'){set(cur+2);hide();e.preventDefault()}if(e.key==='ArrowRight'){set(cur-2);hide();e.preventDefault()}});
+let hidden=false;function hide(){if(!hidden){hidden=true;hint.style.opacity=0}}
+function ready(){hint.textContent=MOB?'Drag to turn.':'Drag to turn.'}
+window.__spin={set:i=>{set(i);draw()},get cur(){return cur},get loaded(){return blobs.filter(Boolean).length},get decoded(){return bmp.size},get sharp(){return bmp.has(cur)}};
+</script></body></html>
