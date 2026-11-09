@@ -27,8 +27,7 @@ const products = {
       "assets/listings/the-capital/the-capital-06.jpg",
       "assets/listings/the-capital/the-capital-07.jpg",
       "assets/listings/the-capital/the-capital-08.jpg"
-    ],
-    "spin": "assets/spin/the-capital/index.html"
+    ]
   },
   "signing-the-constitution": {
     "name": "Signing the Constitution",
@@ -58,8 +57,7 @@ const products = {
       "assets/listings/signing-the-constitution/signing-the-constitution-06.jpg",
       "assets/listings/signing-the-constitution/signing-the-constitution-07.jpg",
       "assets/listings/signing-the-constitution/signing-the-constitution-08.jpg"
-    ],
-    "spin": "assets/spin/signing-the-constitution/index.html"
+    ]
   },
   "mount-rushmore-with-trump": {
     "name": "Mount Rushmore with Trump",
@@ -89,8 +87,7 @@ const products = {
       "assets/listings/mount-rushmore-with-trump/mount-rushmore-with-trump-06.jpg",
       "assets/listings/mount-rushmore-with-trump/mount-rushmore-with-trump-07.jpg",
       "assets/listings/mount-rushmore-with-trump/mount-rushmore-with-trump-08.jpg"
-    ],
-    "spin": "assets/spin/mount-rushmore-with-trump/index.html"
+    ]
   },
   "uss-constitution": {
     "name": "USS Constitution",
@@ -120,8 +117,7 @@ const products = {
       "assets/listings/uss-constitution/uss-constitution-06.jpg",
       "assets/listings/uss-constitution/uss-constitution-07.jpg",
       "assets/listings/uss-constitution/uss-constitution-08.jpg"
-    ],
-    "spin": "assets/spin/uss-constitution/index.html"
+    ]
   },
   "trump": {
     "name": "Trump",
@@ -151,8 +147,7 @@ const products = {
       "assets/listings/trump/trump-06.jpg",
       "assets/listings/trump/trump-07.jpg",
       "assets/listings/trump/trump-08.jpg"
-    ],
-    "spin": "assets/spin/trump/index.html"
+    ]
   },
   "remember-the-alamo": {
     "name": "Remember the Alamo",
@@ -182,8 +177,7 @@ const products = {
       "assets/listings/remember-the-alamo/remember-the-alamo-06.jpg",
       "assets/listings/remember-the-alamo/remember-the-alamo-07.jpg",
       "assets/listings/remember-the-alamo/remember-the-alamo-08.jpg"
-    ],
-    "spin": "assets/spin/remember-the-alamo/index.html"
+    ]
   },
   "donald-trump-47th": {
     "name": "Donald Trump 47th",
@@ -213,8 +207,7 @@ const products = {
       "assets/listings/donald-trump-47th/donald-trump-47th-06.jpg",
       "assets/listings/donald-trump-47th/donald-trump-47th-07.jpg",
       "assets/listings/donald-trump-47th/donald-trump-47th-08.jpg"
-    ],
-    "spin": "assets/spin/donald-trump-47th/index.html"
+    ]
   }
 };
 const priceNumber = value => Number(value.replace(/[$,]/g,""));
