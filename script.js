@@ -12,7 +12,7 @@ const products = {
     "action": "Semi-Automatic",
     "slideMaterial": "Stainless Steel",
     "frameMaterial": "Stainless Steel",
-    "finish": "High Polish & 24K Gold Electro plated icons",
+    "finish": "Hand Polished & Hand 24K Gold Plated",
     "gripColor": "Composite - Pearl White with Colt Horse in gold",
     "price": "$3,300",
     "availability": "Available",
@@ -42,7 +42,7 @@ const products = {
     "action": "Semi-Automatic",
     "slideMaterial": "Stainless Steel",
     "frameMaterial": "Stainless Steel",
-    "finish": "High Polish & 24K Gold Electro plated icons",
+    "finish": "Hand Polished & Hand 24K Gold Plated",
     "gripColor": "S.S. - Black with 24K Gold Presidential Seal",
     "price": "$3,300",
     "availability": "Available",
@@ -73,7 +73,7 @@ const products = {
     "action": "Semi-Automatic",
     "slideMaterial": "Stainless Steel",
     "frameMaterial": "Stainless Steel",
-    "finish": "High Polish & 24K Gold Electro plated icons",
+    "finish": "Hand Polished & Hand 24K Gold Plated",
     "gripColor": "S.S. - 24K Gold with Nickel Presidential Seal",
     "price": "$3,300",
     "availability": "Available",
@@ -104,7 +104,7 @@ const products = {
     "action": "Semi-Automatic",
     "slideMaterial": "Stainless Steel",
     "frameMaterial": "Stainless Steel",
-    "finish": "High Polish & 24K Gold Electro plated icons",
+    "finish": "Hand Polished & Hand 24K Gold Plated",
     "gripColor": "Composite - Pearl Blue with Colt Horse in gold",
     "price": "$3,300",
     "availability": "Available",
@@ -135,8 +135,8 @@ const products = {
     "action": "Semi-Automatic",
     "slideMaterial": "Stainless Steel",
     "frameMaterial": "Stainless Steel",
-    "finish": "High Polish & 24K Gold Electro plated icons",
-    "gripColor": "24K gold Electro plated with Nickel Icons",
+    "finish": "Hand Polished & Hand 24K Gold Plated",
+    "gripColor": "Hand 24K gold plated with Nickel",
     "price": "$3,500",
     "availability": "Available",
     "image": "image-gold",
@@ -166,7 +166,7 @@ const products = {
     "action": "Semi-Automatic",
     "slideMaterial": "Stainless Steel",
     "frameMaterial": "Stainless Steel",
-    "finish": "High Polish & 24K Gold Electro plated icons also on the frame",
+    "finish": "Hand Polished & Hand 24K Gold Plated also on the frame",
     "gripColor": "Composite - Pearl Brown with Colt Horse in gold",
     "price": "$3,500",
     "availability": "Available",
@@ -197,7 +197,7 @@ const products = {
     "action": "Semi-Automatic",
     "slideMaterial": "Stainless Steel",
     "frameMaterial": "Stainless Steel",
-    "finish": "High Polish & 24K Gold Electro plated icons",
+    "finish": "Hand Polished & Hand 24K Gold Plated",
     "gripColor": "S.S. - Black & Gold edges with Colorful, American FLAG",
     "price": "$3,000",
     "availability": "Available",
@@ -399,7 +399,7 @@ cards.forEach(card => {
   card.dataset.collection = collectionSlugs(item);
   card.dataset.platform = platformSlug(item.platform);
   const meta = card.querySelector(".meta");
-  if (meta) meta.textContent = `${displayCollections(item)}${item.collectionNumber ? ` · ${item.collectionNumber}` : ""}`;
+  if (meta) meta.textContent = item.collectionNumber || displayCollections(item);
 });
 const priceRange = document.querySelector("#priceRange");
 if (cards.length) {
@@ -412,7 +412,6 @@ if (cards.length) {
   const requestedCollection = catalogParams.get("collection");
   if (requestedPlatform) document.querySelector(`input[name="platform"][value="${requestedPlatform}"]`)?.setAttribute("checked","");
   if (requestedType) document.querySelector(`input[name="type"][value="${requestedType}"]`)?.setAttribute("checked","");
-  if (requestedItem) document.querySelector(`input[name="product"][value="${requestedItem}"]`)?.setAttribute("checked","");
   if (requestedCollection) document.querySelector(`input[name="collection"][value="${requestedCollection}"]`)?.setAttribute("checked","");
   const sortCards = () => {
     if (!productGrid) return;
@@ -431,6 +430,7 @@ if (cards.length) {
   const applyFilters = () => {
     const groups = ["collection","product","type","platform","finish","availability"];
     const selected = Object.fromEntries(groups.map(group => [group,[...document.querySelectorAll(`input[name="${group}"]:checked`)].map(el => el.value)]));
+    if (requestedItem) selected.product = [requestedItem]; // menu links to one listing: collections.html?item=<id>
     const maxPrice = Number(priceRange.value);
     let visible = 0;
     cards.forEach(card => {
@@ -566,7 +566,7 @@ if (document.querySelector(".product-detail-page")) {
     setText("#detailPlatform", "—");
     setText("#detailFinish", "—");
     setText("#detailAvailability", "Coming soon");
-    setText("#detailDescription", "Current listings have been cleared while GDE Collectibles prepares the next private release.");
+    document.querySelector("#serialCallout")?.classList.add("is-hidden");
     if (request) {
       request.textContent = "Contact Us";
       request.classList.remove("add-to-cart");
@@ -634,7 +634,7 @@ function renderCart() {
   document.querySelector("#emptyCart").classList.toggle("show", cart.length === 0);
   container.innerHTML = cart.map(item => {
     const p=products[item];
-    return `<article class="cart-item"><div class="cart-item-image ${p.image}"${productImageStyle(p)}></div><div class="cart-item-copy"><p class="meta">${displayCollections(p)}</p><h2>${p.name}</h2><p>${p.platform} · ${p.finish} · ${p.availability}</p><span>FFL Transfer Required</span></div><div class="cart-item-price"><strong>${p.soldOut ? "Sold Out" : p.price}</strong><button type="button" class="remove-cart-item" data-product="${item}">Remove</button></div></article>`;
+    return `<article class="cart-item"><div class="cart-item-image ${p.image}"${productImageStyle(p)}></div><div class="cart-item-copy"><p class="meta">${p.collectionNumber || displayCollections(p)}</p><h2>${p.name}</h2><p>${p.platform} · ${p.finish} · ${p.availability}</p><span>FFL Transfer Required</span></div><div class="cart-item-price"><strong>${p.soldOut ? "Sold Out" : p.price}</strong><button type="button" class="remove-cart-item" data-product="${item}">Remove</button></div></article>`;
   }).join("");
   const buyable = cart.filter(item => isBuyable(products[item]));
   const total = buyable.reduce((sum,item)=>sum+priceNumber(products[item].price),0);
