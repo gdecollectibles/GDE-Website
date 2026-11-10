@@ -411,3 +411,9 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
   .site-header .brand{width:120px;flex-basis:120px}
 }
 @media(min-width:1181px) and (max-width:1320px){.site-nav{gap:16px}}
+
+/* Add to Cart option C (user, Nov 10): full-width dark gray bar, View Details underneath. */
+.card-actions{flex-direction:column;justify-content:flex-start;align-items:stretch;gap:14px}
+.card-actions .button,.card-actions .button.full{width:100%;min-height:48px;background:var(--raised);border:1px solid var(--line-strong);color:var(--text);font-size:.66rem}
+.card-actions .button:hover{background:var(--text);border-color:var(--text);color:#0a0a0a}
+.card-actions .text-link{align-self:flex-start}
