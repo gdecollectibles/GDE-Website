@@ -390,3 +390,24 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 #paymentStepStatus{margin-top:16px}
 .payment-success-order{color:var(--muted);letter-spacing:.14em;text-transform:uppercase;font-size:.78rem}
 @media (max-width:760px){.payment-frame{padding:10px 2px 2px}}
+.footer-social{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+.footer-social a{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid #3a3a3e;border-radius:50%;color:#d6d6da;transition:color .2s,border-color .2s,background .2s}
+.footer-social a:hover,.footer-social a:focus-visible{color:#fff;border-color:#fff;background:rgba(255,255,255,.06)}
+.footer-social svg{width:17px;height:17px}
+@media(max-width:760px){.footer-social{justify-content:flex-start}}
+/* Socials dropdown next to Marketplaces (user, Nov 10): it is now the last item on the left of the logo. */
+@media(min-width:761px){
+  .site-nav>:nth-child(3){margin-right:0}
+  .site-nav>.socials-menu{margin-right:auto}
+}
+.socials-menu .nav-dropdown-panel{width:190px}
+@media(max-width:760px){.socials-menu .nav-dropdown-panel{width:100%}}
+/* Narrow desktops (761–980px): with Socials added the left links ran under the logo, so tighten the header there. */
+@media(min-width:761px) and (max-width:980px){
+  .site-header{padding-left:20px;padding-right:20px}
+  .site-nav{gap:10px}
+  .site-nav>a,.site-nav .nav-dropdown-toggle{font-size:.62rem;letter-spacing:.07em}
+  .site-nav .nav-dropdown-toggle span{display:none}
+  .site-header .brand{width:120px;flex-basis:120px}
+}
+@media(min-width:1181px) and (max-width:1320px){.site-nav{gap:16px}}

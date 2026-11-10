@@ -294,13 +294,26 @@ document.querySelectorAll(".site-nav").forEach(nav => {
     const action = nav.querySelector(".button");
     action ? nav.insertBefore(marketplaceMenu, action) : nav.appendChild(marketplaceMenu);
   }
+  if (!nav.querySelector(".socials-menu")) {
+    const socialMenu = document.createElement("div");
+    socialMenu.className = "nav-dropdown socials-menu";
+    socialMenu.innerHTML = `<button class="nav-dropdown-toggle" type="button" aria-expanded="false">Socials <span>&or;</span></button>
+      <div class="nav-dropdown-panel external-panel">
+        <a href="https://www.instagram.com/gdecollectibles/" target="_blank" rel="noopener">INSTAGRAM <span>&nearr;</span></a>
+        <a href="https://www.facebook.com/gdecollectibles" target="_blank" rel="noopener">FACEBOOK <span>&nearr;</span></a>
+        <a href="https://www.youtube.com/@GDE-Collectibles" target="_blank" rel="noopener">YOUTUBE <span>&nearr;</span></a>
+        <a href="https://x.com/GDECollectibles" target="_blank" rel="noopener">X <span>&nearr;</span></a>
+      </div>`;
+    nav.appendChild(socialMenu);
+  }
   const homeLink = nav.querySelector('a[href="index.html"]');
   const collectionsMenu = nav.querySelector(".collections-menu");
   const marketplacesMenu = nav.querySelector(".marketplaces-menu");
+  const socialsMenu = nav.querySelector(".socials-menu");
   const complianceLink = nav.querySelector('a[href="#compliance"], a[href="index.html#compliance"]');
   const contactLink = nav.querySelector('a[href="contact.html"], a[href="#contact"], a[href="index.html#contact"], a[href="#inquiry"]');
   const headerAction = nav.querySelector(".button");
-  [homeLink, collectionsMenu, marketplacesMenu, complianceLink, contactLink, headerAction].forEach(item => {
+  [homeLink, collectionsMenu, marketplacesMenu, socialsMenu, complianceLink, contactLink, headerAction].forEach(item => {
     if (item) nav.appendChild(item);
   });
 });
