@@ -372,6 +372,14 @@ if (!document.querySelector(".cart-page")) {
     updateCartCount();
   }
 }
+// Phones (user, Nov 10): a cart icon in the header, left of the menu button, so the cart is one tap away.
+// Hidden on desktop by CSS, where the cart is already in the top bar.
+document.querySelectorAll(".site-header .nav-toggle").forEach(toggle => {
+  if (toggle.parentElement.querySelector(".header-cart")) return;
+  const cart = getCart();
+  toggle.insertAdjacentHTML("beforebegin", `<a class="cart-nav header-cart" href="${cart.length ? `cart.html?cart=${cart.join(",")}` : "cart.html"}" aria-label="Cart">${cartIconMarkup}</a>`);
+  updateCartCount();
+});
 document.querySelector(".nav-toggle")?.addEventListener("click", e => {
   const nav = document.querySelector(".site-nav");
   const open = nav.classList.toggle("open");
@@ -723,6 +731,26 @@ async function startAuthorizeCheckout({button, status, cart, customer, resetText
     button.innerHTML = resetText;
   }
 }
+// Checkout on phones (user, Nov 10): the request summary and collection total stay at the top; the compliance
+// confirmation and Proceed to Checkout move under the FFL dealer section, so they come after the form is filled in.
+// Wider screens keep them in the summary beside the form. The parts are only moved, so the ids and checks still work.
+(() => {
+  const summary = document.querySelector("#purchaseForm .order-summary");
+  const details = document.querySelector("#purchaseForm .form-column:not(.payment-step)");
+  const parts = ["#purchaseForm .summary-compliance", "#proceedToPayment", "#checkoutPaymentStatus"].map(s => document.querySelector(s)).filter(Boolean);
+  if (!summary || !details || !parts.length) return;
+  const box = document.createElement("div");
+  box.className = "checkout-confirm";
+  details.after(box);
+  const phone = window.matchMedia("(max-width: 760px)");
+  const place = () => {
+    const home = phone.matches ? box : summary;
+    if (parts[0].parentElement !== home) parts.forEach(part => home.appendChild(part));
+  };
+  place();
+  phone.addEventListener?.("change", place);
+  window.addEventListener("resize", place);
+})();
 if (document.querySelector("#proceedToPayment")) {
   const paymentLink = document.querySelector("#proceedToPayment");
   const status = document.querySelector("#checkoutPaymentStatus");

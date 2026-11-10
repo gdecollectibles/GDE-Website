@@ -275,7 +275,7 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
   .hero-film{left:0;width:100%;transform:none;-webkit-mask-image:none;mask-image:none}
   .hero-caption{bottom:28px}
 }
-@media(prefers-reduced-motion:reduce){.hero-film{display:none}.hero.hero-video{background:#000 url("assets/hero/alamo-film-loop-color-poster.jpg") center/contain no-repeat}}
+@media(prefers-reduced-motion:reduce){.hero-film{display:none}.hero.hero-video{background:#000 url("assets/hero/alamo-film-loop-4k-poster.jpg") center/contain no-repeat}}
 
 /* Homepage header: faint over the film until hovered (desktop, mouse only); phones keep it fully visible. */
 @media(hover:hover) and (min-width:761px){
@@ -425,3 +425,83 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 .collection-card .card-actions{margin-top:auto;padding-top:16px}
 .product-card .product-info{grid-template-rows:auto auto auto 1fr}
 .product-card .card-actions{align-self:end}
+
+/* iPhone hero (user, Nov 10): Alamo film bigger and higher; Collection / title / Discover the edition centered and raised.
+   The footage's brown backdrop only fills 31%-70% of the frame height (black above and below, hard top edge), and the
+   gun's spin reaches 8%-92% of the frame width and 32%-68% of its height. So no oval: the film is 96% of the screen width
+   and its sides fade from 8% in, just outside the gun tips (user, Nov 10: "cropped in a little") and only the backdrop's top and bottom edges fade. Band center at 41% of the
+   screen height. */
+@media(max-width:760px){
+  /* Faded edges with slightly rounded corners (user, Nov 10: "round the edges a tiny bit"): one soft rounded rectangle,
+     drawn as a blurred SVG shape over the backdrop band (sides fade over 8% of the width, top and bottom as before). */
+  .hero-film{left:2%;width:96%;height:auto;aspect-ratio:1080/1920;top:41svh;transform:translateY(-50.5%) translateZ(0);
+    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cfilter id='b' x='-.2' y='-.2' width='1.4' height='1.4'%3E%3CfeGaussianBlur stdDeviation='2 1.15'/%3E%3C/filter%3E%3Crect x='4' y='31.75' width='92' height='36.25' rx='16' ry='9' filter='url(%23b)'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cfilter id='b' x='-.2' y='-.2' width='1.4' height='1.4'%3E%3CfeGaussianBlur stdDeviation='2 1.15'/%3E%3C/filter%3E%3Crect x='4' y='31.75' width='92' height='36.25' rx='16' ry='9' filter='url(%23b)'/%3E%3C/svg%3E");
+    -webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+    -webkit-mask-composite:source-over;mask-composite:add}
+  .hero-caption{left:0;right:0;width:auto;padding:0 20px;text-align:center;bottom:14svh}
+  .hero-caption .text-link{justify-content:center}
+  /* The caption shade (.hero:after / .hero-video::after) drew a dark box with a hard edge across the raised film on
+     iPhone Safari. The caption sits on plain black on phones, so the shade is off there. */
+  .hero.hero-video::after{content:none;display:none}
+}
+/* Desktop hero caption (user, Nov 10): Collection / Remember the Alamo / Discover the edition moved slightly left (right 6vw -> 12vw; user asked for a bit more). */
+@media(min-width:761px){.hero-caption{right:12vw}}
+
+/* Browse Collections cards on phones (user, Nov 10): two columns with room between the rows. Left: the title, then
+   View Details. Right: the price, then a small Add to Cart (was a full-width button right under the title, no gap). */
+@media(max-width:760px){
+  .product-card .product-info h2{margin:6px 0 0}
+  .product-card .product-info .price{text-align:right}
+  .product-card .card-actions{flex-direction:row-reverse;justify-content:space-between;align-items:center;gap:16px;margin-top:20px;align-self:stretch}
+  .product-card .card-actions .button,.product-card .card-actions .button.full{width:auto;min-height:40px;padding:0 26px}
+  .product-card .card-actions .text-link{align-self:center}
+}
+/* Gun thumbnails on phones, Browse Collections and the home page cards (user, Nov 10): the guns whole and the glow
+   behind them round, fading to black inside the thumbnail. The listing photos can't do that (the gun fills almost the
+   whole frame and the gray is the studio light on the backdrop), so phones get their own 16:10 copies, <slug>-01-phone.jpg:
+   the gun cut out of the -01 photo (BiRefNet, as in the Studio) at the size and place the card showed, on a new round
+   glow in the backdrop's own color. Made once with a one-off script; the -01 photos and desktop are unchanged. */
+@media(max-width:760px){
+  .product-image,.card-image{aspect-ratio:16/10;border-radius:0;box-shadow:none;-webkit-mask-image:none;mask-image:none}
+  .product-image[style],.card-image[style]{background-size:cover!important;background-position:center!important}
+  .product-image[style]::before,.card-image[style]::before{display:none}
+  .product-image[style*="/the-capital-01.jpg"],.card-image[style*="/the-capital-01.jpg"]{background-image:url("assets/listings/the-capital/the-capital-01-phone.jpg")!important}
+  .product-image[style*="/signing-the-constitution-01.jpg"],.card-image[style*="/signing-the-constitution-01.jpg"]{background-image:url("assets/listings/signing-the-constitution/signing-the-constitution-01-phone.jpg")!important}
+  .product-image[style*="/mount-rushmore-with-trump-01.jpg"],.card-image[style*="/mount-rushmore-with-trump-01.jpg"]{background-image:url("assets/listings/mount-rushmore-with-trump/mount-rushmore-with-trump-01-phone.jpg")!important}
+  .product-image[style*="/uss-constitution-01.jpg"],.card-image[style*="/uss-constitution-01.jpg"]{background-image:url("assets/listings/uss-constitution/uss-constitution-01-phone.jpg")!important}
+  .product-image[style*="/trump-01.jpg"],.card-image[style*="/trump-01.jpg"]{background-image:url("assets/listings/trump/trump-01-phone.jpg")!important}
+  .product-image[style*="/remember-the-alamo-01.jpg"],.card-image[style*="/remember-the-alamo-01.jpg"]{background-image:url("assets/listings/remember-the-alamo/remember-the-alamo-01-phone.jpg")!important}
+  .product-image[style*="/donald-trump-47th-01.jpg"],.card-image[style*="/donald-trump-47th-01.jpg"]{background-image:url("assets/listings/donald-trump-47th/donald-trump-47th-01-phone.jpg")!important}
+}
+
+
+
+/* Sort and Filters on phones (user, Nov 10: "make the filters button circular like the sort button"): iPhone Safari draws
+   the Sort dropdown rounded; both now get the same pill shape so they match on every phone. */
+@media(max-width:760px){
+  .sort-control select,.mobile-filter-button{border-radius:999px}
+  .sort-control select{padding-left:16px}
+  .mobile-filter-button{padding-left:18px;padding-right:18px}
+}
+/* Header cart icon on phones (user, Nov 10): left of the menu button; added by script.js on every page. */
+.header-cart{display:none}
+@media(max-width:760px){
+  .site-header .header-cart{display:inline-flex;align-items:center;gap:0;margin-right:0;min-height:44px;padding:0 4px;color:#fff;background:transparent;border:0;box-shadow:none;text-decoration:none;position:relative;z-index:3}
+  .site-header .header-cart .cart-icon{width:23px;height:23px;stroke:#fff}
+  .site-header .header-cart .cart-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .site-header .header-cart .cart-count{background:transparent;border:0;color:#fff;margin-left:-3px}
+}
+/* Home film from the 4K Alamo cut-out (user, Nov 10): one full turn. Seen end-on this gun reaches 30.5%-69.5% of the
+   film height, past the old fade; the brown band's top and bottom now fade inside the film itself, so on phones the
+   rounded fade opens to 28%-72% and the gun stays whole (same sides and corners as above). */
+@media(max-width:760px){
+  .hero-film{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cfilter id='b' x='-.2' y='-.2' width='1.4' height='1.4'%3E%3CfeGaussianBlur stdDeviation='2 1.15'/%3E%3C/filter%3E%3Crect x='4' y='28' width='92' height='44' rx='16' ry='9' filter='url(%23b)'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cfilter id='b' x='-.2' y='-.2' width='1.4' height='1.4'%3E%3CfeGaussianBlur stdDeviation='2 1.15'/%3E%3C/filter%3E%3Crect x='4' y='28' width='92' height='44' rx='16' ry='9' filter='url(%23b)'/%3E%3C/svg%3E")}
+}
+/* Checkout on phones (user, Nov 10): compliance confirmation and Proceed to Checkout sit in their own box under the FFL
+   dealer section (script.js moves them there); the summary at the top keeps the items and the collection total. */
+.checkout-confirm:empty,.checkout-confirm:has(> .summary-compliance[hidden]){display:none}
+@media(max-width:760px){
+  .checkout-confirm{background:var(--paper);padding:28px 24px}
+  .checkout-confirm .summary-compliance{margin-top:0;padding-top:0;border-top:0}
+  .checkout-confirm .submit-button{width:100%}
+}
