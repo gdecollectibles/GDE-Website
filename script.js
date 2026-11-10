@@ -30,7 +30,7 @@ const products = {
     ]
   },
   "signing-the-constitution": {
-    "name": "Signing the Constitution",
+    "name": "US Constitution",
     "collection": "US Constitution",
     "collectionNumber": "1 of 300",
     "type": "Pistol",
@@ -61,7 +61,7 @@ const products = {
     "spin": "assets/spin/signing-the-constitution/index.html"
   },
   "mount-rushmore-with-trump": {
-    "name": "Mount Rushmore with Trump",
+    "name": "Mt. Rushmore",
     "collection": "Mt. Rushmore",
     "collectionNumber": "1 of 300",
     "type": "Pistol",
@@ -123,7 +123,7 @@ const products = {
     "spin": "assets/spin/uss-constitution/index.html"
   },
   "trump": {
-    "name": "Trump",
+    "name": "America's 250 Anniversary Donald J Trump",
     "collection": "America's 250 Anniversary Donald J Trump",
     "collectionNumber": "1 of 25",
     "type": "Pistol",
@@ -185,7 +185,7 @@ const products = {
     "spin": "assets/spin/remember-the-alamo/index.html"
   },
   "donald-trump-47th": {
-    "name": "Donald Trump 47th",
+    "name": "Donald J Trump",
     "collection": "Donald J Trump",
     "collectionNumber": "1 of 300",
     "type": "Pistol",
@@ -284,12 +284,12 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="collections.html?platform=45-acp">.45 ACP</a>
         <p>Individual listings</p>
         <a href="collections.html?item=the-capital">The Capital</a>
-        <a href="collections.html?item=signing-the-constitution">Signing the Constitution</a>
-        <a href="collections.html?item=mount-rushmore-with-trump">Mount Rushmore with Trump</a>
+        <a href="collections.html?item=signing-the-constitution">US Constitution</a>
+        <a href="collections.html?item=mount-rushmore-with-trump">Mt. Rushmore</a>
         <a href="collections.html?item=uss-constitution">USS Constitution</a>
-        <a href="collections.html?item=trump">Trump</a>
+        <a href="collections.html?item=trump">America's 250 Anniversary Donald J Trump</a>
         <a href="collections.html?item=remember-the-alamo">Remember the Alamo</a>
-        <a href="collections.html?item=donald-trump-47th">Donald Trump 47th</a>
+        <a href="collections.html?item=donald-trump-47th">Donald J Trump</a>
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
   }

@@ -31,7 +31,7 @@
       ]
     },
     "signing-the-constitution": {
-      "name": "Signing the Constitution",
+      "name": "US Constitution",
       "collection": "US Constitution",
       "collectionNumber": "1 of 300",
       "type": "Pistol",
@@ -62,7 +62,7 @@
       "spin": "assets/spin/signing-the-constitution/index.html"
     },
     "mount-rushmore-with-trump": {
-      "name": "Mount Rushmore with Trump",
+      "name": "Mt. Rushmore",
       "collection": "Mt. Rushmore",
       "collectionNumber": "1 of 300",
       "type": "Pistol",
@@ -124,7 +124,7 @@
       "spin": "assets/spin/uss-constitution/index.html"
     },
     "trump": {
-      "name": "Trump",
+      "name": "America's 250 Anniversary Donald J Trump",
       "collection": "America's 250 Anniversary Donald J Trump",
       "collectionNumber": "1 of 25",
       "type": "Pistol",
@@ -186,7 +186,7 @@
       "spin": "assets/spin/remember-the-alamo/index.html"
     },
     "donald-trump-47th": {
-      "name": "Donald Trump 47th",
+      "name": "Donald J Trump",
       "collection": "Donald J Trump",
       "collectionNumber": "1 of 300",
       "type": "Pistol",
