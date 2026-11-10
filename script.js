@@ -123,8 +123,8 @@ const products = {
     "spin": "assets/spin/uss-constitution/index.html"
   },
   "trump": {
-    "name": "America's 250 Anniversary Donald J Trump",
-    "collection": "America's 250 Anniversary Donald J Trump",
+    "name": "America's 250 Anniversary",
+    "collection": "America's 250 Anniversary",
     "collectionNumber": "1 of 25",
     "type": "Pistol",
     "manufacturer": "Colt",
@@ -277,7 +277,7 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="product.html?product=signing-the-constitution">US Constitution</a>
         <a href="product.html?product=mount-rushmore-with-trump">Mt. Rushmore</a>
         <a href="product.html?product=uss-constitution">USS Constitution</a>
-        <a href="product.html?product=trump">America's 250 Anniversary Donald J Trump</a>
+        <a href="product.html?product=trump">America's 250 Anniversary</a>
         <a href="product.html?product=remember-the-alamo">Remember the Alamo</a>
         <a href="product.html?product=donald-trump-47th">Donald J Trump</a>
       </div>`;

@@ -417,3 +417,11 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 .card-actions .button,.card-actions .button.full{width:100%;min-height:48px;background:var(--raised);border:1px solid var(--line-strong);color:var(--text);font-size:.66rem}
 .card-actions .button:hover{background:var(--text);border-color:var(--text);color:#0a0a0a}
 .card-actions .text-link{align-self:flex-start}
+/* Add to Cart lined up across each row (user, Nov 10): cards stretch to the row height and the buttons sit at the bottom. */
+.featured-grid,.product-grid{align-items:stretch}
+.collection-card,.product-card{display:flex;flex-direction:column;height:auto}
+.collection-card .card-body,.product-card .product-info{flex:1}
+.collection-card .card-body{display:flex;flex-direction:column}
+.collection-card .card-actions{margin-top:auto;padding-top:16px}
+.product-card .product-info{grid-template-rows:auto auto auto 1fr}
+.product-card .card-actions{align-self:end}
