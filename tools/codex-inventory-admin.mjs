@@ -84,11 +84,9 @@ function generate() {
   const maxPrice = prices.length ? Math.max(...prices) : 0;
   const collectionFilters = checkboxGroup("Collection", "collection", labelsFor(products, productCollections));
   const productFilters = checkboxGroup("Listing", "product", entries.map(([, p]) => p.name), value => entries.find(([, p]) => p.name === value)?.[0] || slug(value));
-  const typeFilters = checkboxGroup("Collection type", "type", labelsFor(products, p => p.type));
   const platformFilters = checkboxGroup("Firearm platform", "platform", labelsFor(products, p => p.platform), platformSlug);
-  const finishFilters = checkboxGroup("Finish", "finish", labelsFor(products, p => p.finish));
   const availabilityFilters = checkboxGroup("Availability", "availability", labelsFor(products, p => p.availability), availabilitySlug);
-  const filters = `${collectionFilters}\n        ${typeFilters}\n        ${platformFilters}\n        ${finishFilters}\n        <div class="filter-group"><div class="range-heading"><h3>Maximum price</h3><strong id="priceValue">$${maxPrice.toLocaleString()}</strong></div><input id="priceRange" type="range" min="${minPrice}" max="${maxPrice}" step="100" value="${maxPrice}"><div class="range-limits"><span>$${minPrice.toLocaleString()}</span><span>$${maxPrice.toLocaleString()}</span></div></div>\n        ${availabilityFilters}`;
+  const filters = `${collectionFilters}\n        ${platformFilters}\n        <div class="filter-group"><div class="range-heading"><h3>Maximum price</h3><strong id="priceValue">$${maxPrice.toLocaleString()}</strong></div><input id="priceRange" type="range" min="${minPrice}" max="${maxPrice}" step="100" value="${maxPrice}"><div class="range-limits"><span>$${minPrice.toLocaleString()}</span><span>$${maxPrice.toLocaleString()}</span></div></div>\n        ${availabilityFilters}`;
   let collections = read(collectionsPath);
   collections = collections.replace(/        <div class="filter-group"><h3>Collection<\/h3>[\s\S]*?        <button class="button secondary full reset-filters"|        <div class="filter-group"><h3>Collections<\/h3>[\s\S]*?        <button class="button secondary full reset-filters"/, `        ${filters}\n        <button class="button secondary full reset-filters"`);
   collections = collections.replace(/<p id="resultsLabel">Showing all \d+ (?:collections|listings)<\/p>/, `<p id="resultsLabel">Showing all ${entries.length} listings</p>`);
