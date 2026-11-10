@@ -15,7 +15,7 @@ canvas.drag{cursor:grabbing}
 <script>
 // Frame-by-frame 360: every picture is a real filmed frame (cut out), no 3D. A small sheet of every angle loads first so
 // it turns at once; the full frames load in the background, nearest angle first, and are decoded off the main thread.
-const M={"n": 345, "w": 1100, "h": 883, "sheet": {"cols": 17, "cw": 240, "ch": 193}, "start": 94}, V="5faaeb91e1";
+const M={"n": 345, "w": 1600, "h": 1277, "sheet": {"cols": 17, "cw": 240, "ch": 192}, "start": 94}, V="6a84fbe650";
 const N=M.n, cv=document.getElementById('c'), g=cv.getContext('2d'), hint=document.getElementById('hint');
 const MOB=/Mobi|Android|iPhone|iPad/.test(navigator.userAgent), KEEP=MOB?70:160; // decoded frames kept in memory
 let cur=M.start, sheet=null, drawn=-1, dirty=true;
