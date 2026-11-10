@@ -272,24 +272,14 @@ document.querySelectorAll(".site-nav").forEach(nav => {
     collectionMenu.innerHTML = `<button class="nav-dropdown-toggle" type="button" aria-expanded="false">Collections <span>&or;</span></button>
       <div class="nav-dropdown-panel">
         <a href="collections.html">All Collections</a>
-        <p>Collection</p>
-        <a href="collections.html?collection=the-capital">The Capital</a>
-        <a href="collections.html?collection=us-constitution">US Constitution</a>
-        <a href="collections.html?collection=mt-rushmore">Mt. Rushmore</a>
-        <a href="collections.html?collection=uss-constitution">USS Constitution</a>
-        <a href="collections.html?collection=america-s-250-anniversary-donald-j-trump">America's 250 Anniversary Donald J Trump</a>
-        <a href="collections.html?collection=remember-the-alamo">Remember the Alamo</a>
-        <a href="collections.html?collection=donald-j-trump">Donald J Trump</a>
-        <p>Platform</p>
-        <a href="collections.html?platform=45-acp">.45 ACP</a>
-        <p>Individual listings</p>
-        <a href="collections.html?item=the-capital">The Capital</a>
-        <a href="collections.html?item=signing-the-constitution">US Constitution</a>
-        <a href="collections.html?item=mount-rushmore-with-trump">Mt. Rushmore</a>
-        <a href="collections.html?item=uss-constitution">USS Constitution</a>
-        <a href="collections.html?item=trump">America's 250 Anniversary Donald J Trump</a>
-        <a href="collections.html?item=remember-the-alamo">Remember the Alamo</a>
-        <a href="collections.html?item=donald-trump-47th">Donald J Trump</a>
+        <p>Collections</p>
+        <a href="product.html?product=the-capital">The Capital</a>
+        <a href="product.html?product=signing-the-constitution">US Constitution</a>
+        <a href="product.html?product=mount-rushmore-with-trump">Mt. Rushmore</a>
+        <a href="product.html?product=uss-constitution">USS Constitution</a>
+        <a href="product.html?product=trump">America's 250 Anniversary Donald J Trump</a>
+        <a href="product.html?product=remember-the-alamo">Remember the Alamo</a>
+        <a href="product.html?product=donald-trump-47th">Donald J Trump</a>
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
   }

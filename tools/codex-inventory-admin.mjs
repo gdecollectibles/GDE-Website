@@ -71,17 +71,11 @@ function generate() {
 
   let script = read(scriptPath);
   script = script.replace(/^const products = [\s\S]*?;\r?\nconst priceNumber/m, `const products = ${JSON.stringify(jsProducts(products), null, 2)};\nconst priceNumber`);
-  const collectionNavLinks = labelsFor(products, productCollections)
-    .map(collection => `        <a href="collections.html?collection=${slug(collection)}">${escapeHtml(collection)}</a>`)
-    .join("\n");
-  const platformNavLinks = labelsFor(products, p => p.platform)
-    .map(platform => `        <a href="collections.html?platform=${platformSlug(platform)}">${escapeHtml(platform)}</a>`)
-    .join("\n");
   const navLinks = entries
     .filter(([, p]) => availabilitySlug(p.availability) !== "archive")
-    .map(([id, p]) => `        <a href="collections.html?item=${id}">${escapeHtml(p.name)}</a>`)
+    .map(([id, p]) => `        <a href="product.html?product=${id}">${escapeHtml(p.name)}</a>`)
     .join("\n");
-  const dropdownContent = `        <a href="collections.html">All Collections</a>\n        <p>Collection</p>\n${collectionNavLinks || `        <a href="collections.html">No active collections</a>`}\n        <p>Platform</p>\n${platformNavLinks || `        <a href="collections.html">No active platforms</a>`}\n        <p>Individual listings</p>\n${navLinks || `        <a href="collections.html">No active listings</a>`}`;
+  const dropdownContent = `        <a href="collections.html">All Collections</a>\n        <p>Collections</p>\n${navLinks || `        <a href="collections.html">No active collections</a>`}`;
   script = script.replace(/        <a href="collections\.html">All Collections<\/a>\r?\n[\s\S]*?      <\/div>`;/, `${dropdownContent}\n      </div>\`;`);
   write(scriptPath, script);
 
