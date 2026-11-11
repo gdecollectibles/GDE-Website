@@ -472,6 +472,12 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
   .product-image[style*="/trump-01.jpg"],.card-image[style*="/trump-01.jpg"]{background-image:url("assets/listings/trump/trump-01-phone.jpg")!important}
   .product-image[style*="/remember-the-alamo-01.jpg"],.card-image[style*="/remember-the-alamo-01.jpg"]{background-image:url("assets/listings/remember-the-alamo/remember-the-alamo-01-phone.jpg")!important}
   .product-image[style*="/donald-trump-47th-01.jpg"],.card-image[style*="/donald-trump-47th-01.jpg"]{background-image:url("assets/listings/donald-trump-47th/donald-trump-47th-01-phone.jpg")!important}
+  .product-image[style*="/el-alamo-01.jpg"],.card-image[style*="/el-alamo-01.jpg"]{background-image:url("assets/listings/el-alamo/el-alamo-01-phone.jpg")!important}
+  .product-image[style*="/blue-scroll-engraved-01.jpg"],.card-image[style*="/blue-scroll-engraved-01.jpg"]{background-image:url("assets/listings/blue-scroll-engraved/blue-scroll-engraved-01-phone.jpg")!important}
+  .product-image[style*="/gold-accent-scroll-01.jpg"],.card-image[style*="/gold-accent-scroll-01.jpg"]{background-image:url("assets/listings/gold-accent-scroll/gold-accent-scroll-01-phone.jpg")!important}
+  .product-image[style*="/scroll-engraved-pearl-01.jpg"],.card-image[style*="/scroll-engraved-pearl-01.jpg"]{background-image:url("assets/listings/scroll-engraved-pearl/scroll-engraved-pearl-01-phone.jpg")!important}
+  .product-image[style*="/gold-skull-engraved-01.jpg"],.card-image[style*="/gold-skull-engraved-01.jpg"]{background-image:url("assets/listings/gold-skull-engraved/gold-skull-engraved-01-phone.jpg")!important}
+  .product-image[style*="/gold-white-house-masonic-01.jpg"],.card-image[style*="/gold-white-house-masonic-01.jpg"]{background-image:url("assets/listings/gold-white-house-masonic/gold-white-house-masonic-01-phone.jpg")!important}
 }
 
 
@@ -505,3 +511,10 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
   .checkout-confirm .summary-compliance{margin-top:0;padding-top:0;border-top:0}
   .checkout-confirm .submit-button{width:100%}
 }
+
+/* Gallery page (user, Nov 10): refinished guns not designed by GDE. A bold italic notice under the heading, and a small
+   "Not designed by GDE" tag under each gun's title (the card gains a row for it, Add to Cart stays at the bottom). */
+.page-intro>p.not-gde-notice{color:var(--text,var(--ink));font-size:1.05rem}
+.not-gde-notice strong{font-weight:700}
+.product-card.not-gde .product-info{grid-template-rows:auto auto auto auto 1fr}
+.not-gde-tag{justify-self:start;margin:8px 0 0;padding:4px 9px;border:1px solid var(--line-strong,var(--line));color:var(--muted);font:600 .56rem var(--sans);text-transform:uppercase;letter-spacing:.16em;line-height:1.4}

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gallery | GDE Collectibles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Gloock&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20261111six">
+<link rel="icon" href="favicon.ico?v=20261108" sizes="16x16 32x32 48x48"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261108"></head>
+<body class="gallery-page">
+  <header class="site-header dark-header"><a class="brand" href="index.html"><span class="brand-mark">GDE</span><span>Collectibles</span></a><button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button><nav class="site-nav"><a href="index.html">Home</a><a href="collections.html">Collections</a><a class="active" href="gallery.html">Gallery</a><a href="index.html#compliance">Compliance</a><a href="index.html#contact">Contact</a><a class="button button-small" href="checkout.html">Request Availability</a></nav></header>
+  <main class="page-main">
+    <section class="page-intro"><p class="eyebrow">Refinished firearms</p><h1>Browse Gallery</h1><p class="not-gde-notice"><strong><em>These guns are not designed by GDE. They have been refinished.</em></strong></p></section>
+    <section class="shop-layout">
+      <aside class="filters" id="filters">
+        <div class="filter-title"><h2>Filters</h2><button class="filter-close" type="button" aria-label="Close filters">×</button></div>
+        <div class="filter-group"><h3>Firearm platform</h3>
+          <label><input type="checkbox" name="platform" value="45-acp"> .45 ACP</label>
+          <label><input type="checkbox" name="platform" value="38-super"> .38 Super</label>
+        </div>
+        <div class="filter-group"><div class="range-heading"><h3>Maximum price</h3><strong id="priceValue">$3,500</strong></div><input id="priceRange" type="range" min="3000" max="3500" step="100" value="3500"><div class="range-limits"><span>$3,000</span><span>$3,500</span></div></div>
+        <div class="filter-group"><h3>Availability</h3>
+          <label><input type="checkbox" name="availability" value="available"> Available</label>
+        </div>
+        <button class="button secondary full reset-filters" type="button">Reset Filters</button>
+      </aside>
+      <div class="shop-results">
+        <div class="results-bar"><p id="resultsLabel">Showing all 2 listings</p><div class="results-actions"><label class="sort-control">Sort <select id="sortSelect" aria-label="Sort listings"><option value="featured">Featured</option><option value="price-low">Price: Low to High</option><option value="price-high">Price: High to Low</option><option value="name-az">Name: A to Z</option><option value="name-za">Name: Z to A</option></select></label><button class="mobile-filter-button" type="button">Filters <span>⌁</span></button></div></div>
+        <div class="product-grid" id="productGrid">
+          <article class="product-card" data-type="pistol" data-product="gold-skull-engraved" data-collection="gallery" data-platform="45-acp" data-finish="polished-stainless-steel-with-scroll-engraving-and-gold-filled-skulls" data-price="3500" data-availability="available"><a class="product-image image-gold" href="product.html?product=gold-skull-engraved" style="background-image:url('assets/listings/gold-skull-engraved/gold-skull-engraved-01.jpg')"></a><div class="product-info"><p class="meta">Gallery</p><p class="card-availability">Available</p><h2>Gold Skull Engraved Colt 1911</h2><p class="price">$3,500</p><div class="card-actions"><a class="button full add-to-cart-link" href="checkout.html?product=gold-skull-engraved" data-product="gold-skull-engraved">ADD TO CART</a><a class="text-link" href="product.html?product=gold-skull-engraved">View Details &rarr;</a></div></div></article>
+          <article class="product-card" data-type="pistol" data-product="gold-white-house-masonic" data-collection="gallery" data-platform="38-super" data-finish="polished-with-gold-filled-engraving" data-price="3500" data-availability="available"><a class="product-image image-gold" href="product.html?product=gold-white-house-masonic" style="background-image:url('assets/listings/gold-white-house-masonic/gold-white-house-masonic-01.jpg')"></a><div class="product-info"><p class="meta">Gallery</p><p class="card-availability">Available</p><h2>Gold White House Masonic Colt 1911</h2><p class="price">$3,500</p><div class="card-actions"><a class="button full add-to-cart-link" href="checkout.html?product=gold-white-house-masonic" data-product="gold-white-house-masonic">ADD TO CART</a><a class="text-link" href="product.html?product=gold-white-house-masonic">View Details &rarr;</a></div></div></article>
+        </div>
+        <div class="no-results" id="noResults"><h2>No guns here yet</h2><p>Refinished guns will be listed here.</p></div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><div><a class="brand footer-brand" href="index.html"><span class="brand-mark">GDE</span><span>Collectibles</span></a><p>Limited engraved firearm collections for serious collectors.</p></div><div class="footer-links"><a href="index.html">Home</a><a href="collections.html">Collections</a><a href="checkout.html">Checkout</a><a href="index.html#compliance">Compliance</a><a href="index.html#contact">Contact</a></div><div class="footer-legal"><p>All firearm transactions must comply with federal, state, and local laws.</p><div class="footer-social" aria-label="GDE Collectibles on social media"><a href="https://www.instagram.com/gdecollectibles/" target="_blank" rel="noopener" aria-label="GDE Collectibles on Instagram" title="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a><a href="https://www.facebook.com/gdecollectibles" target="_blank" rel="noopener" aria-label="GDE Collectibles on Facebook" title="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.4H7.7V14h2.7v8z"/></svg></a><a href="https://www.youtube.com/@GDE-Collectibles" target="_blank" rel="noopener" aria-label="GDE Collectibles on YouTube" title="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M6 5h12a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V9a4 4 0 0 1 4-4zm4 4v6l5-3z"/></svg></a><a href="https://x.com/GDECollectibles" target="_blank" rel="noopener" aria-label="GDE Collectibles on X" title="X"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.59-6.64 7.59H.47l8.6-9.83L0 1.15h7.59l5.24 6.93zm-1.29 19.5h2.04L6.49 3.24H4.3z"/></svg></a></div><span>© 2026 GDE Collectibles</span></div></footer>
+  <script src="script.js?v=20261111six"></script><script src="gde-account.js?v=20261108acct5"></script>
+</body>
+</html>

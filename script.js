@@ -214,6 +214,182 @@ const products = {
       "assets/listings/donald-trump-47th/donald-trump-47th-08.jpg"
     ],
     "spin": "assets/spin/donald-trump-47th/index.html"
+  },
+  "el-alamo": {
+    "name": "El Alamo Gold Engraved Colt 1911",
+    "collection": "El Alamo",
+    "collectionNumber": "50 of 300",
+    "type": "Pistol",
+    "manufacturer": "Colt",
+    "model": "Colt Government Model Series 70",
+    "caliber": ".38 Super",
+    "platform": ".38 Super",
+    "capacity": "9 + 1",
+    "action": "Semi-Automatic",
+    "slideMaterial": "Stainless Steel",
+    "frameMaterial": "Stainless Steel",
+    "finish": "Polished Stainless Steel with Gold-Filled Engraving",
+    "gripColor": "Swirled brown pearl with Estados Unidos Mexicanos medallion",
+    "price": "$3,500",
+    "availability": "Available",
+    "image": "image-gold",
+    "description": "Polished stainless Colt 1911 in .38 Super with gold-filled scrollwork, 'El Alamo' lettering, the Alamo mission, a cannon and a 'Marzo 6, 1836' banner on the slide. Gold-plated hammer, trigger, safeties, slide stop, grip screws and mainspring housing.",
+    "photos": [
+      "assets/listings/el-alamo/el-alamo-01.jpg",
+      "assets/listings/el-alamo/el-alamo-02.jpg",
+      "assets/listings/el-alamo/el-alamo-03.jpg",
+      "assets/listings/el-alamo/el-alamo-04.jpg",
+      "assets/listings/el-alamo/el-alamo-05.jpg",
+      "assets/listings/el-alamo/el-alamo-06.jpg",
+      "assets/listings/el-alamo/el-alamo-07.jpg",
+      "assets/listings/el-alamo/el-alamo-08.jpg"
+    ]
+  },
+  "blue-scroll-engraved": {
+    "name": "Blue Scroll Engraved Colt 1911 38 Super",
+    "collection": "Blue Finish",
+    "collectionNumber": "",
+    "type": "Pistol",
+    "manufacturer": "Colt",
+    "model": "Colt Government Model Series 70",
+    "caliber": ".38 Super",
+    "platform": ".38 Super",
+    "capacity": "9 + 1",
+    "action": "Semi-Automatic",
+    "finish": "Royal Blue with Full Scroll Engraving",
+    "gripColor": "White pearl with gold rearing horse medallions",
+    "price": "$3,500",
+    "availability": "Available",
+    "image": "image-gold",
+    "description": "Royal blued Colt Government Model in .38 Super with full scroll engraving on the slide and a polished silver barrel. Gold-plated hammer, trigger, safety, slide stop, screws and pins.",
+    "photos": [
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-01.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-02.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-03.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-04.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-05.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-06.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-07.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-08.jpg"
+    ]
+  },
+  "gold-accent-scroll": {
+    "name": "Gold Accent Scroll Colt 1911 38 Super",
+    "collection": "Scrolls",
+    "collectionNumber": "",
+    "type": "Pistol",
+    "manufacturer": "Colt",
+    "model": "Colt Government Model",
+    "caliber": ".38 Super",
+    "platform": ".38 Super",
+    "capacity": "9 + 1",
+    "action": "Semi-Automatic",
+    "slideMaterial": "Stainless Steel",
+    "frameMaterial": "Stainless Steel",
+    "finish": "Polished Stainless Steel with Full Scroll Engraving",
+    "gripColor": "Pearl white with gold Colt pony",
+    "price": "$3,500",
+    "availability": "Available",
+    "image": "image-gold",
+    "description": "Polished stainless Colt 1911 in .38 Super with full scroll engraving on the slide and frame. Gold-plated hammer, trigger, safeties, slide stop, screws and grip medallion.",
+    "photos": [
+      "assets/listings/gold-accent-scroll/gold-accent-scroll-01.jpg",
+      "assets/listings/gold-accent-scroll/gold-accent-scroll-02.jpg",
+      "assets/listings/gold-accent-scroll/gold-accent-scroll-03.jpg",
+      "assets/listings/gold-accent-scroll/gold-accent-scroll-04.jpg",
+      "assets/listings/gold-accent-scroll/gold-accent-scroll-05.jpg",
+      "assets/listings/gold-accent-scroll/gold-accent-scroll-06.jpg",
+      "assets/listings/gold-accent-scroll/gold-accent-scroll-07.jpg",
+      "assets/listings/gold-accent-scroll/gold-accent-scroll-08.jpg"
+    ]
+  },
+  "scroll-engraved-pearl": {
+    "name": "Scroll Engraved Pearl Colt 1911",
+    "collection": "Scrolls",
+    "collectionNumber": "",
+    "type": "Pistol",
+    "manufacturer": "Colt",
+    "model": "Colt M1911",
+    "caliber": ".45 ACP",
+    "platform": ".45 ACP",
+    "capacity": "7 + 1",
+    "action": "Semi-Automatic",
+    "finish": "Bright Polish with Full Floral Scroll Engraving",
+    "gripColor": "Pearl with gold rearing horse medallions",
+    "price": "$3,500",
+    "availability": "Available",
+    "image": "image-gold",
+    "description": "Bright polished Colt 1911 in .45 ACP with full-coverage floral scroll engraving on the slide and frame. Gold-plated hammer, trigger, safeties, slide stop, magazine release, sights, screws and pins.",
+    "photos": [
+      "assets/listings/scroll-engraved-pearl/scroll-engraved-pearl-01.jpg",
+      "assets/listings/scroll-engraved-pearl/scroll-engraved-pearl-02.jpg",
+      "assets/listings/scroll-engraved-pearl/scroll-engraved-pearl-03.jpg",
+      "assets/listings/scroll-engraved-pearl/scroll-engraved-pearl-04.jpg",
+      "assets/listings/scroll-engraved-pearl/scroll-engraved-pearl-05.jpg",
+      "assets/listings/scroll-engraved-pearl/scroll-engraved-pearl-06.jpg",
+      "assets/listings/scroll-engraved-pearl/scroll-engraved-pearl-07.jpg",
+      "assets/listings/scroll-engraved-pearl/scroll-engraved-pearl-08.jpg"
+    ]
+  },
+  "gold-skull-engraved": {
+    "name": "Gold Skull Engraved Colt 1911",
+    "collection": "Gallery",
+    "collectionNumber": "",
+    "type": "Pistol",
+    "manufacturer": "Colt",
+    "model": "Colt Government Model",
+    "caliber": ".45 ACP",
+    "platform": ".45 ACP",
+    "capacity": "7 + 1",
+    "action": "Semi-Automatic",
+    "slideMaterial": "Stainless Steel",
+    "frameMaterial": "Stainless Steel",
+    "finish": "Polished Stainless Steel with Scroll Engraving and Gold-Filled Skulls",
+    "gripColor": "Black pearl swirl with gold screws",
+    "price": "$3,500",
+    "availability": "Available",
+    "image": "image-gold",
+    "description": "Polished stainless Colt Government Model in .45 ACP with fine scroll engraving and gold-filled skulls and scroll panels on the slide. Gold hammer, trigger, grip bushings and sights.",
+    "photos": [
+      "assets/listings/gold-skull-engraved/gold-skull-engraved-01.jpg",
+      "assets/listings/gold-skull-engraved/gold-skull-engraved-02.jpg",
+      "assets/listings/gold-skull-engraved/gold-skull-engraved-03.jpg",
+      "assets/listings/gold-skull-engraved/gold-skull-engraved-04.jpg",
+      "assets/listings/gold-skull-engraved/gold-skull-engraved-05.jpg",
+      "assets/listings/gold-skull-engraved/gold-skull-engraved-06.jpg",
+      "assets/listings/gold-skull-engraved/gold-skull-engraved-07.jpg",
+      "assets/listings/gold-skull-engraved/gold-skull-engraved-08.jpg"
+    ],
+    "refinished": true
+  },
+  "gold-white-house-masonic": {
+    "name": "Gold White House Masonic Colt 1911",
+    "collection": "Gallery",
+    "collectionNumber": "",
+    "type": "Pistol",
+    "manufacturer": "Colt",
+    "model": "Colt Government Model",
+    "caliber": ".38 Super",
+    "platform": ".38 Super",
+    "capacity": "9 + 1",
+    "action": "Semi-Automatic",
+    "finish": "Polished with Gold-Filled Engraving",
+    "gripColor": "Black and gold swirl",
+    "price": "$3,500",
+    "availability": "Available",
+    "image": "image-gold",
+    "description": "Polished Colt Government Model in .38 Super with gold-filled engraving: the White House, the American flag, the all-seeing eye pyramid, the Masonic square and compass, scrollwork and Greek key borders. Gold grip screws, hammer, trigger and small parts.",
+    "photos": [
+      "assets/listings/gold-white-house-masonic/gold-white-house-masonic-01.jpg",
+      "assets/listings/gold-white-house-masonic/gold-white-house-masonic-02.jpg",
+      "assets/listings/gold-white-house-masonic/gold-white-house-masonic-03.jpg",
+      "assets/listings/gold-white-house-masonic/gold-white-house-masonic-04.jpg",
+      "assets/listings/gold-white-house-masonic/gold-white-house-masonic-05.jpg",
+      "assets/listings/gold-white-house-masonic/gold-white-house-masonic-06.jpg",
+      "assets/listings/gold-white-house-masonic/gold-white-house-masonic-07.jpg",
+      "assets/listings/gold-white-house-masonic/gold-white-house-masonic-08.jpg"
+    ],
+    "refinished": true
   }
 };
 const priceNumber = value => Number(value.replace(/[$,]/g,""));
@@ -280,9 +456,16 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="product.html?product=trump">America's 250 Anniversary</a>
         <a href="product.html?product=remember-the-alamo">Remember the Alamo</a>
         <a href="product.html?product=donald-trump-47th">Donald J Trump</a>
+        <a href="product.html?product=el-alamo">El Alamo</a>
+        <a href="product.html?product=blue-scroll-engraved">Blue Finish</a>
+        <a href="collections.html?collection=scrolls">Scrolls</a>
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
   }
+  // Gallery tab (user, Nov 10): refinished guns not designed by GDE, kept apart from the collections. Every page gets it.
+  if (!nav.querySelector('a[href="gallery.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="gallery.html">Gallery</a>');
+  const galleryLink = nav.querySelector('a[href="gallery.html"]');
+  galleryLink.classList.toggle("active", document.body.classList.contains("gallery-page"));
   if (!nav.querySelector(".marketplaces-menu")) {
     const marketplaceMenu = document.createElement("div");
     marketplaceMenu.className = "nav-dropdown marketplaces-menu";
@@ -313,7 +496,8 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   const complianceLink = nav.querySelector('a[href="#compliance"], a[href="index.html#compliance"]');
   const contactLink = nav.querySelector('a[href="contact.html"], a[href="#contact"], a[href="index.html#contact"], a[href="#inquiry"]');
   const headerAction = nav.querySelector(".button");
-  [homeLink, collectionsMenu, marketplacesMenu, socialsMenu, complianceLink, contactLink, headerAction].forEach(item => {
+  // Gallery opens the right side of the logo: the left side (Home … Socials) has no room for a fifth item.
+  [homeLink, collectionsMenu, marketplacesMenu, socialsMenu, galleryLink, complianceLink, contactLink, headerAction].forEach(item => {
     if (item) nav.appendChild(item);
   });
 });
@@ -341,6 +525,7 @@ document.querySelectorAll(".site-footer").forEach(footer => {
     footerLinks.innerHTML = `
       <a href="index.html">Home</a>
       <a href="collections.html">Collections</a>
+      <a href="gallery.html">Gallery</a>
       <a href="cart.html">Cart</a>
       <a href="checkout.html">Checkout</a>
       <a href="contact.html">Contact</a>
@@ -405,6 +590,12 @@ cards.forEach(card => {
   const productLink = card.querySelector('a[href*="product="]');
   const itemKey = productLink ? new URL(productLink.href).searchParams.get("product") : "";
   const item = products[itemKey];
+  // Every gun on the Gallery page (or a listing marked refinished) gets a "Not designed by GDE" tag under its title.
+  if ((document.body.classList.contains("gallery-page") || item?.refinished) && !card.querySelector(".not-gde-tag")) {
+    card.classList.add("not-gde");
+    const title = card.querySelector(".product-info h2");
+    (card.querySelector(".product-info .price") || title)?.insertAdjacentHTML("afterend", '<p class="not-gde-tag">Not designed by GDE</p>');
+  }
   if (!item) return;
   card.dataset.product = itemKey;
   card.dataset.collection = collectionSlugs(item);
@@ -413,7 +604,7 @@ cards.forEach(card => {
   if (meta) meta.textContent = item.collectionNumber || displayCollections(item);
 });
 const priceRange = document.querySelector("#priceRange");
-if (cards.length) {
+if (cards.length || document.querySelector("#productGrid")) { // the Gallery page's grid can still be empty
   const productGrid = document.querySelector("#productGrid");
   const sortSelect = document.querySelector("#sortSelect");
   const catalogParams = new URLSearchParams(location.search);
@@ -456,7 +647,7 @@ if (cards.length) {
     document.querySelector("#priceValue").textContent = `$${maxPrice.toLocaleString()}`;
     const selectedProducts = selected.product.length;
     const selectedCollections = selected.collection.length;
-    document.querySelector("#resultsLabel").textContent = selectedProducts || selectedCollections ? `Showing ${visible} selected listing${visible===1?"":"s"}` : maxPrice < 5000 ? `Showing ${visible} listing${visible===1?"":"s"} up to $${maxPrice.toLocaleString()}` : `Showing ${visible} of ${cards.length} listings`;
+    document.querySelector("#resultsLabel").textContent = !cards.length ? "No listings yet" : selectedProducts || selectedCollections ? `Showing ${visible} selected listing${visible===1?"":"s"}` : maxPrice < 5000 ? `Showing ${visible} listing${visible===1?"":"s"} up to $${maxPrice.toLocaleString()}` : `Showing ${visible} of ${cards.length} listings`;
     document.querySelector("#noResults").classList.toggle("show", visible === 0);
     sortCards();
   };
@@ -465,7 +656,7 @@ if (cards.length) {
   document.querySelector(".reset-filters").addEventListener("click", () => {
     document.querySelectorAll('.filters input[type="checkbox"]').forEach(input => input.checked = false);
     priceRange.value = priceRange.max;
-    if (requestedItem || requestedPlatform || requestedType || requestedCollection) history.replaceState({}, "", "collections.html");
+    if (requestedItem || requestedPlatform || requestedType || requestedCollection) history.replaceState({}, "", location.pathname);
     location.reload();
   });
   document.querySelector(".mobile-filter-button")?.addEventListener("click", () => document.querySelector(".filters").classList.add("open"));
@@ -586,6 +777,8 @@ if (document.querySelector(".product-detail-page")) {
   } else {
     document.title = `${product.name} | GDE Collectibles`;
     setText("#detailCollection",displayCollections(product)); setText("#detailCollectionNumber",product.collectionNumber || ""); setText("#detailHeaderAvailability",product.availability); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage"); setProductGallery(product); setExtraSpecs(product);
+    // Gallery guns (refinished, not designed by GDE) carry the same tag on their own page as on their card.
+    if (product.refinished && !document.querySelector("#detailPrice + .not-gde-tag")) document.querySelector("#detailPrice")?.insertAdjacentHTML("afterend", '<p class="not-gde-tag">Not designed by GDE</p>');
     if (request) request.dataset.product=key || Object.keys(products)[0];
     paintDetail();
   }
