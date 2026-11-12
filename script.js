@@ -480,7 +480,11 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   const headerAction = nav.querySelector(".button");
   // Left of the logo: Home, Collections, Gallery. Right: Contact, social icons, then the account icon
   // (added by gde-account.js just before the cart) and the cart (user, Nov 12).
-  [homeLink, collectionsMenu, galleryLink, contactLink, socialsMenu, headerAction].forEach(item => {
+  // About page (user, Nov 12): every page gets it, just before Contact.
+  if (!nav.querySelector('a[href="about.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="about.html">About</a>');
+  const aboutLink = nav.querySelector('a[href="about.html"]');
+  aboutLink.classList.toggle("active", document.body.classList.contains("about-page"));
+  [homeLink, collectionsMenu, galleryLink, aboutLink, contactLink, socialsMenu, headerAction].forEach(item => {
     if (item) nav.appendChild(item);
   });
 });
@@ -509,6 +513,7 @@ document.querySelectorAll(".site-footer").forEach(footer => {
       <a href="index.html">Home</a>
       <a href="collections.html">Collections</a>
       <a href="gallery.html">Gallery</a>
+      <a href="about.html">About</a>
       <a href="cart.html">Cart</a>
       <a href="checkout.html">Checkout</a>
       <a href="contact.html">Contact</a>

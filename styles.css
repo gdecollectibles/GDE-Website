@@ -513,6 +513,42 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 .not-gde-notice strong{font-weight:700}
 .product-card.not-gde .product-info{grid-template-rows:auto auto auto auto 1fr}
 .not-gde-tag{justify-self:start;margin:8px 0 0;padding:4px 9px;border:1px solid var(--line-strong,var(--line));color:var(--muted);font:600 .56rem var(--sans);text-transform:uppercase;letter-spacing:.16em;line-height:1.4}
+
+/* About page (user, Nov 12): who GDE is, and the RP signature under the trigger that only GDE-designed guns carry
+   (Gallery guns are refinished, not designed by GDE, and have no RP signature). */
+.about-image{background:#050505 url("assets/about-blue-scroll.jpg") center/contain no-repeat}
+.about-image{filter:none!important}.about-image:after{display:none}
+.about-signature{padding:clamp(80px,10vw,140px) clamp(24px,9vw,150px);text-align:center}
+.about-signature h2{margin:.2em 0 .45em}
+.about-signature-mark{margin:10px auto 40px;max-width:480px}.about-signature-mark img{display:block;width:100%;height:auto}.about-signature-mark figcaption{margin-top:14px;color:var(--muted);font:600 .6rem var(--sans);text-transform:uppercase;letter-spacing:.18em}
+.about-lead{max-width:760px;margin:0 auto;color:var(--text,var(--ink));font-size:1.05rem}
+.about-compare{display:grid;grid-template-columns:repeat(2,1fr);max-width:1000px;margin:60px auto 0;border-top:1px solid var(--line);text-align:left}
+.about-compare>div{padding:40px 34px;display:flex;flex-direction:column;gap:6px}
+.about-compare>div:first-child{border-right:1px solid var(--line)}
+.about-compare h3{margin:0 0 6px}
+.about-compare p{color:var(--muted);margin:0}
+.about-mark{margin:14px 0 22px!important;font:600 .62rem var(--sans);text-transform:uppercase;letter-spacing:.16em}
+.about-mark.yes{color:var(--text,var(--ink))!important}
+.about-mark.yes:before{content:"✓  "}
+.about-mark.no:before{content:"—  "}
+.about-compare .text-link{align-self:flex-start;margin-top:auto}
+.not-gde-more{margin-top:10px}
+.about-top{padding-top:clamp(70px,8vw,110px)}
+.about-top h1{font-size:clamp(3rem,6vw,5.8rem);margin:.15em 0 .35em}
+.about-steps{list-style:none;padding:0;margin:26px 0 30px;max-width:560px}
+.about-steps li{display:grid;grid-template-columns:48px 1fr;gap:6px;padding:16px 0;border-top:1px solid var(--line-strong,var(--line))}
+.about-steps li>span{font:500 1.15rem var(--serif);color:var(--muted)}
+.about-steps h3{font-size:1.45rem;margin:0 0 4px}
+.about-steps p{margin:0;color:#a9a9ae}
+.about-family{grid-template-columns:minmax(0,560px) minmax(0,460px);justify-content:center;column-gap:clamp(40px,7vw,120px);padding:0 24px;min-height:0}
+.about-family .about-business{padding:100px 0}
+.about-family-logo{display:grid;place-items:center;padding:40px 0;background:transparent}
+.about-family-logo img{width:100%;max-width:420px;height:auto}
+.about-business{padding:80px clamp(35px,7vw,120px)}
+.about-business h2{margin:.2em 0 .5em}
+.about-inline-link{color:var(--text,var(--ink));text-decoration:underline;text-underline-offset:3px}
+.about-business p:not(.eyebrow){color:#a9a9ae;font-size:.95rem;max-width:560px}
+@media(max-width:760px){.about-family{grid-template-columns:1fr;padding:0}.about-family-logo{order:-1;padding:60px 24px 0}.about-family-logo img{max-width:260px}.about-family .about-business{padding:40px 24px 60px}.about-compare{grid-template-columns:1fr}.about-compare>div{padding:32px 4px}.about-compare>div:first-child{border-right:0;border-bottom:1px solid var(--line)}.about-image{min-height:360px!important;background-position:center}}
 /* Header social icons (user, Nov 12): replace the Socials menu; Compliance left the header. */
 .nav-socials{display:inline-flex;align-items:center;gap:14px}
 .nav-socials a{display:inline-flex;align-items:center;justify-content:center;color:#c9c9cd;transition:color .2s}
