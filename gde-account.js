@@ -143,7 +143,7 @@
     const items = o.items.map((i) => {
       const p = productsRef?.[i.listing];
       const photo = Array.isArray(p?.photos) && p.photos[0] ? ` style="background-image:url('${esc(p.photos[0])}')"` : "";
-      const name = p ? `<a href="product.html?product=${encodeURIComponent(i.listing)}">${esc(i.name)}</a>` : esc(i.name);
+      const name = p ? `<a href="gun/${encodeURIComponent(i.listing)}.html">${esc(i.name)}</a>` : esc(i.name);
       return `<div class="gde-order-item"><div class="thumb-img"${photo}></div><div>${name}${p ? `<div class="gde-note">${esc(p.platform || "")}${p.finish ? " · " + esc(p.finish) : ""}</div>` : ""}</div><b>${money(i.price)}</b></div>`;
     }).join("");
     return `<article class="gde-order">

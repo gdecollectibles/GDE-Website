@@ -443,15 +443,15 @@ document.querySelectorAll(".site-nav").forEach(nav => {
       <div class="nav-dropdown-panel">
         <a href="collections.html">All Collections</a>
         <p>Collections</p>
-        <a href="product.html?product=the-capital">The Capital</a>
-        <a href="product.html?product=signing-the-constitution">US Constitution</a>
-        <a href="product.html?product=mount-rushmore-with-trump">Mt. Rushmore</a>
-        <a href="product.html?product=uss-constitution">USS Constitution</a>
-        <a href="product.html?product=trump">America's 250 Anniversary</a>
-        <a href="product.html?product=remember-the-alamo">Remember the Alamo</a>
-        <a href="product.html?product=donald-trump-47th">Donald J Trump</a>
-        <a href="product.html?product=el-alamo">El Alamo</a>
-        <a href="product.html?product=blue-scroll-engraved">Blue Finish</a>
+        <a href="gun/the-capital.html">The Capital</a>
+        <a href="gun/signing-the-constitution.html">US Constitution</a>
+        <a href="gun/mount-rushmore-with-trump.html">Mt. Rushmore</a>
+        <a href="gun/uss-constitution.html">USS Constitution</a>
+        <a href="gun/trump.html">America's 250 Anniversary</a>
+        <a href="gun/remember-the-alamo.html">Remember the Alamo</a>
+        <a href="gun/donald-trump-47th.html">Donald J Trump</a>
+        <a href="gun/el-alamo.html">El Alamo</a>
+        <a href="gun/blue-scroll-engraved.html">Blue Finish</a>
         <a href="collections.html?collection=scrolls">Scrolls</a>
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
