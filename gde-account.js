@@ -11,7 +11,7 @@
   const NO_POPUP = ["checkout.html", "payment-success.html", "payment-cancel.html", "cart.html", "account.html", "iframe-communicator.html"];
 
   const css = document.createElement("link");
-  css.rel = "stylesheet"; css.href = "account.css?v=20261108acct5";
+  css.rel = "stylesheet"; css.href = "account.css?v=20261112hdr5";
   document.head.append(css);
 
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

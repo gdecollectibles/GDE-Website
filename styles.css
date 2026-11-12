@@ -513,3 +513,13 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 .not-gde-notice strong{font-weight:700}
 .product-card.not-gde .product-info{grid-template-rows:auto auto auto auto 1fr}
 .not-gde-tag{justify-self:start;margin:8px 0 0;padding:4px 9px;border:1px solid var(--line-strong,var(--line));color:var(--muted);font:600 .56rem var(--sans);text-transform:uppercase;letter-spacing:.16em;line-height:1.4}
+/* Header social icons (user, Nov 12): replace the Socials menu; Compliance left the header. */
+.nav-socials{display:inline-flex;align-items:center;gap:14px}
+.nav-socials a{display:inline-flex;align-items:center;justify-content:center;color:#c9c9cd;transition:color .2s}
+.nav-socials a:hover,.nav-socials a:focus-visible{color:#fff}
+.nav-socials{--icon:17px}
+.nav-socials svg{width:var(--icon);height:var(--icon)}
+/* YouTube (user, Nov 12): 85% of Instagram's height ("a little smaller"); its 20:14 glyph gets a wider box. */
+.nav-socials .nav-youtube svg{height:calc(var(--icon) * .85);width:calc(var(--icon) * .85 * 20 / 14)}
+@media(min-width:761px) and (max-width:980px){.nav-socials{gap:10px;--icon:15px}}
+@media(max-width:760px){.nav-socials{gap:24px;padding:14px 0;--icon:22px}}

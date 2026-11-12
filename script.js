@@ -461,25 +461,26 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   const galleryLink = nav.querySelector('a[href="gallery.html"]');
   galleryLink.classList.toggle("active", document.body.classList.contains("gallery-page"));
   // Marketplaces menu (GunBroker, Guns International) removed (user, Nov 12).
-  if (!nav.querySelector(".socials-menu")) {
-    const socialMenu = document.createElement("div");
-    socialMenu.className = "nav-dropdown socials-menu";
-    socialMenu.innerHTML = `<button class="nav-dropdown-toggle" type="button" aria-expanded="false">Socials <span>&or;</span></button>
-      <div class="nav-dropdown-panel external-panel">
-        <a href="https://www.instagram.com/gdecollectibles/" target="_blank" rel="noopener">INSTAGRAM <span>&nearr;</span></a>
-        <a href="https://www.facebook.com/gdecollectibles" target="_blank" rel="noopener">FACEBOOK <span>&nearr;</span></a>
-        <a href="https://www.youtube.com/@GDE-Collectibles" target="_blank" rel="noopener">YOUTUBE <span>&nearr;</span></a>
-      </div>`;
-    nav.appendChild(socialMenu);
+  // Socials as icons (user, Nov 12): Instagram, Facebook and YouTube sit after Contact, before the account icon.
+  // X dropped from the header; Instagram is a solid glyph like YouTube. Each viewBox is cropped to its glyph so all
+  // three fill the same box.
+  if (!nav.querySelector(".nav-socials")) {
+    nav.insertAdjacentHTML("beforeend", `<div class="nav-socials" aria-label="GDE Collectibles on social media">
+      <a href="https://www.instagram.com/gdecollectibles/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram"><svg viewBox="2 2 20 20" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2zM12 7a5 5 0 1 0 0 10a5 5 0 1 0 0-10zm0 1.8a3.2 3.2 0 1 0 0 6.4a3.2 3.2 0 1 0 0-6.4zm5.4-3.45a1.25 1.25 0 1 0 0 2.5a1.25 1.25 0 1 0 0-2.5z"/></svg></a>
+      <a class="nav-youtube" href="https://www.youtube.com/@GDE-Collectibles" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube"><svg viewBox="2 5 20 14" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M6 5h12a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V9a4 4 0 0 1 4-4zm4 4v6l5-3z"/></svg></a>
+      <a href="https://www.facebook.com/gdecollectibles" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook"><svg viewBox="7.2 4.2 10.2 17.9" aria-hidden="true" fill="currentColor"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.4H7.7V14h2.7v8z"/></svg></a>
+    </div>`);
   }
+  // Compliance out of the header (user, Nov 12); it stays in the footer and on the home page.
+  nav.querySelectorAll('a[href="#compliance"], a[href="index.html#compliance"]').forEach(link => link.remove());
   const homeLink = nav.querySelector('a[href="index.html"]');
   const collectionsMenu = nav.querySelector(".collections-menu");
-  const socialsMenu = nav.querySelector(".socials-menu");
-  const complianceLink = nav.querySelector('a[href="#compliance"], a[href="index.html#compliance"]');
+  const socialsMenu = nav.querySelector(".nav-socials");
   const contactLink = nav.querySelector('a[href="contact.html"], a[href="#contact"], a[href="index.html#contact"], a[href="#inquiry"]');
   const headerAction = nav.querySelector(".button");
-  // Gallery sits next to Collections; Socials opens the right side of the logo (user, Nov 12).
-  [homeLink, collectionsMenu, galleryLink, socialsMenu, complianceLink, contactLink, headerAction].forEach(item => {
+  // Left of the logo: Home, Collections, Gallery. Right: Contact, social icons, then the account icon
+  // (added by gde-account.js just before the cart) and the cart (user, Nov 12).
+  [homeLink, collectionsMenu, galleryLink, contactLink, socialsMenu, headerAction].forEach(item => {
     if (item) nav.appendChild(item);
   });
 });
