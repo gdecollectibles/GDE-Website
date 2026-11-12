@@ -460,6 +460,10 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   if (!nav.querySelector('a[href="gallery.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="gallery.html">Gallery</a>');
   const galleryLink = nav.querySelector('a[href="gallery.html"]');
   galleryLink.classList.toggle("active", document.body.classList.contains("gallery-page"));
+  // Collectors page (user, Nov 12): collector tiers. Every page gets it, first on the right of the logo (user, Nov 12).
+  if (!nav.querySelector('a[href="collectors.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="collectors.html">Collectors</a>');
+  const collectorsLink = nav.querySelector('a[href="collectors.html"]');
+  collectorsLink.classList.toggle("active", document.body.classList.contains("collectors-page"));
   // Marketplaces menu (GunBroker, Guns International) removed (user, Nov 12).
   // Socials as icons (user, Nov 12): Instagram, Facebook and YouTube sit after Contact, before the account icon.
   // X dropped from the header; Instagram is a solid glyph like YouTube. Each viewBox is cropped to its glyph so all
@@ -484,7 +488,7 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   if (!nav.querySelector('a[href="about.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="about.html">About</a>');
   const aboutLink = nav.querySelector('a[href="about.html"]');
   aboutLink.classList.toggle("active", document.body.classList.contains("about-page"));
-  [homeLink, collectionsMenu, galleryLink, aboutLink, contactLink, socialsMenu, headerAction].forEach(item => {
+  [homeLink, collectionsMenu, galleryLink, collectorsLink, aboutLink, contactLink, socialsMenu, headerAction].forEach(item => {
     if (item) nav.appendChild(item);
   });
 });
@@ -513,6 +517,7 @@ document.querySelectorAll(".site-footer").forEach(footer => {
       <a href="index.html">Home</a>
       <a href="collections.html">Collections</a>
       <a href="gallery.html">Gallery</a>
+      <a href="collectors.html">Collectors</a>
       <a href="about.html">About</a>
       <a href="cart.html">Cart</a>
       <a href="checkout.html">Checkout</a>
