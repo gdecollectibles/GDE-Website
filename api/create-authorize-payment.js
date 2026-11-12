@@ -1,6 +1,10 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const store = require("./_store");
+const { readSession } = require("./_session");
+const { collectorStatus, discounted } = require("./_collector");
+const ffcode = require("./_ffcode");
+const referral = require("./_referral");
 
 const AUTHORIZE_ENDPOINTS = {
   sandbox: "https://apitest.authorize.net/xml/v1/request.api",
@@ -42,12 +46,16 @@ function cleanText(value, maxLength = 255) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLength);
 }
 
-function buildCheckoutEmailPayload({ customer, items, amount, invoiceNumber }) {
+function buildCheckoutEmailPayload({ customer, items, amount, invoiceNumber, discount, account, referredBy }) {
   const data = new URLSearchParams();
   data.set("subject", "New GDE Collectibles Checkout");
   data.set("invoiceNumber", invoiceNumber);
   data.set("cartTotal", `$${amount.toLocaleString()}`);
   data.set("cartItems", items.map(item => `${item.product.name} | ${item.product.platform} | ${item.product.finish} | ${item.product.price}`).join("\n"));
+  if (referredBy) data.set("referredBy", `Bought through the share link of ${referredBy} (counts toward their club)`);
+  if (discount) data.set("collectorDiscount", discount.type === "ffcode"
+    ? `${discount.name}, ${discount.percent}% off: -$${discount.amount.toLocaleString()} (code of ${discount.owner})`
+    : `${discount.name}, ${discount.percent}% off: -$${discount.amount.toLocaleString()} (${discount.guns} guns bought before, account ${account})`);
   for (const [key, value] of Object.entries(customer || {})) data.set(key, cleanText(value, 1000));
   data.set("complianceEligible", "Yes - checked");
   data.set("complianceFFLDealer", "Yes - checked");
@@ -161,8 +169,36 @@ module.exports = async function handler(request, response) {
       return response.status(400).json({ error: "No valid cart items were provided." });
     }
 
-    const items = cart.map(id => ({ id, product: inventory[id], unitPrice: priceNumber(inventory[id].price) }));
-    const amount = items.reduce((sum, item) => sum + item.unitPrice, 0);
+    // Collector clubs (see _collector.js): 3+ guns bought 5% off, 5+ guns 10% off, on every gun, when signed in.
+    const session = readSession(request);
+    let collector = null;
+    if (session) {
+      try { collector = await collectorStatus(session.email); } catch (error) { console.error(error); }
+    }
+    const isCollector = !!collector?.collector;
+    // A friends and family code (5%, _ffcode.js) only when the buyer has no club discount of their own: the two never add up.
+    let code = null;
+    if (!isCollector && body.code) {
+      code = await ffcode.checkCode(body.code, session?.email);
+      if (!code.ok) return response.status(400).json({ error: code.error });
+    }
+    const percent = isCollector ? collector.percent : code ? code.percent : 0;
+    // A friend's share link (_referral.js): no discount, but the guns also count toward the link owner's club.
+    // A link that's unknown or the buyer's own is simply ignored.
+    let ref = null;
+    if (body.ref) {
+      try { ref = await referral.ownerOf(body.ref, session?.email, body.customer?.email); } catch (error) { console.error(error); }
+    }
+    const items = cart.map(id => {
+      const listPrice = priceNumber(inventory[id].price);
+      return { id, product: inventory[id], listPrice, unitPrice: percent ? discounted(listPrice, percent) : listPrice };
+    });
+    const amount = Math.round(items.reduce((sum, item) => sum + item.unitPrice, 0) * 100) / 100;
+    const listTotal = items.reduce((sum, item) => sum + item.listPrice, 0);
+    const savedAmount = Math.round((listTotal - amount) * 100) / 100;
+    const discount = isCollector
+      ? { type: collector.tier, name: collector.tierName, percent: collector.percent, amount: savedAmount, guns: collector.guns }
+      : code ? { type: "ffcode", name: `Friends and family code ${code.code}`, code: code.code, owner: code.owner, percent: code.percent, amount: savedAmount } : null;
     if (!Number.isFinite(amount) || amount <= 0) {
       return response.status(400).json({ error: "The cart total could not be calculated." });
     }
@@ -181,7 +217,11 @@ module.exports = async function handler(request, response) {
       status: "awaiting_payment",
       environment,
       amount,
-      items: items.map(item => ({ listing: item.id, name: item.product.name, price: item.unitPrice })),
+      items: items.map(item => ({ listing: item.id, name: item.product.name, price: item.unitPrice, ...(discount ? { listPrice: item.listPrice } : {}) })),
+      ...(discount ? { discount } : {}),
+      ...(code ? { ffCode: code.code } : {}),
+      ...(ref ? { referredBy: ref.owner, ref: ref.code } : {}),
+      ...(session ? { account: session.email } : {}),
       form: cleanForm(customer)
     };
     const saveOrder = async (changes, isNew) => {
@@ -189,7 +229,7 @@ module.exports = async function handler(request, response) {
       try { await store.saveOrder(Object.assign(order, changes), isNew); return true; } catch (error) { console.error(error); return false; }
     };
     const saved = await saveOrder({}, true);
-    const emailError = await sendCheckoutEmail(buildCheckoutEmailPayload({ customer, items, amount, invoiceNumber }));
+    const emailError = await sendCheckoutEmail(buildCheckoutEmailPayload({ customer, items, amount, invoiceNumber, discount, account: session?.email, referredBy: ref?.owner }));
     if (emailError) {
       // With no saved order the email is GDE's only copy, so stop; otherwise note it on the order and carry on.
       if (!saved) return response.status(502).json({ error: "Your checkout details could not be sent. Please try again in a minute." });
@@ -203,7 +243,7 @@ module.exports = async function handler(request, response) {
           amount: amount.toFixed(2),
           order: {
             invoiceNumber,
-            description: `GDE Collectibles order: ${items.map(item => item.product.name).join(", ")}`.slice(0, 255)
+            description: `GDE Collectibles order: ${items.map(item => item.product.name).join(", ")}${discount ? ` (${discount.name}, ${discount.percent}% off)` : ""}`.slice(0, 255)
           },
           lineItems: {
             lineItem: items.map(item => ({
@@ -279,7 +319,8 @@ module.exports = async function handler(request, response) {
       token: result.token,
       paymentUrl: environment === "production" ? "https://accept.authorize.net/payment/payment" : "https://test.authorize.net/payment/payment",
       amount: amount.toFixed(2),
-      invoiceNumber
+      invoiceNumber,
+      discount
     });
   } catch (error) {
     return response.status(500).json({ error: error.message || "Unable to create payment session." });

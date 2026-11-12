@@ -5,10 +5,21 @@
 //   GET  /api/admin?action=orders    every saved checkout; recent unpaid or paid ones are first checked against Authorize.net
 //   POST /api/admin?action=delete-order  { invoice }: removes one saved order (test orders); the payment itself is untouched
 //   GET  /api/admin?action=subscribers&since=<ms>  email-list sign-ups and leavers changed since then (api/account.js saves them)
+// Collector credit (guns bought outside the website, see _credits.js):
+//   GET  /api/admin?action=credit-requests          every request (without file contents) and every account's credited guns
+//   GET  /api/admin?action=credit-file&id=<id>&n=<n> one proof file: { name, type, size, data (base64) }
+//   POST /api/admin?action=credit-decide  { id, decision: approved|declined, guns, note }
+//   POST /api/admin?action=credit-add     { email, guns, note }: guns added by hand (bought in person, checked by GDE)
+//   POST /api/admin?action=credit-remove  { email, entry }: takes one credit back (its request, if any, goes back to pending)
+// Friends and family codes (_ffcode.js):
+//   POST /api/admin?action=ffcode-reset   { email }: clears a Legacy Club member's code so they can make a new one
 const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const store = require("./_store");
+const credits = require("./_credits");
+const { collectorStatus } = require("./_collector");
+const ffcode = require("./_ffcode");
 
 const AUTHORIZE_ENDPOINTS = {
   sandbox: "https://apitest.authorize.net/xml/v1/request.api",
@@ -164,6 +175,49 @@ module.exports = async function handler(request, response) {
       const values = emails.length ? await store.cmd("MGET", ...emails.map((e) => `gde:subscriber:${e}`)) : [];
       const subscribers = values.map((v) => { try { return JSON.parse(v); } catch { return null; } }).filter(Boolean);
       return response.status(200).json({ subscribers, now });
+    }
+    if (action === "credit-requests" && request.method === "GET") {
+      const [requests, credited, orders] = await Promise.all([credits.listRequests(), credits.listCredits(), store.listOrders()]);
+      // Each requester's standing now, so the app can show what approving would do.
+      const emails = [...new Set([...requests.map((r) => r.email), ...credited.map((c) => c.email)])];
+      const status = {};
+      for (const email of emails) status[email] = await collectorStatus(email, orders);
+      return response.status(200).json({ requests, credits: credited, status, where: credits.WHERE });
+    }
+    if (action === "credit-file" && request.method === "GET") {
+      const q = new URL(request.url, "http://x").searchParams;
+      const file = await credits.getFile(q.get("id"), q.get("n"));
+      return file ? response.status(200).json(file) : response.status(404).json({ error: "No such file." });
+    }
+    if (action === "credit-decide" && request.method === "POST") {
+      const body = await readBody(request);
+      const guns = Math.round(Number(body.guns) || 0);
+      if (!(guns >= 0 && guns <= 50)) return response.status(400).json({ error: "Guns to add: a number from 0 to 50." });
+      try {
+        return response.status(200).json({ ok: true, request: await credits.decide(String(body.id || ""), body.decision, guns, body.note) });
+      } catch (error) {
+        if (error.status) return response.status(error.status).json({ error: error.message });
+        throw error;
+      }
+    }
+    if (action === "credit-add" && request.method === "POST") {
+      const body = await readBody(request);
+      const email = credits.norm(body.email), guns = Math.round(Number(body.guns));
+      if (!/^\S+@\S+\.\S{2,}$/.test(email)) return response.status(400).json({ error: "Enter the email the customer signs in with." });
+      if (!(guns >= 1 && guns <= 50)) return response.status(400).json({ error: "Guns to add: a number from 1 to 50." });
+      const { credit } = await credits.addCredit(email, guns, body.note || "Added by GDE", "app");
+      return response.status(200).json({ ok: true, credit });
+    }
+    if (action === "credit-remove" && request.method === "POST") {
+      const body = await readBody(request);
+      const entry = await credits.removeCredit(body.email, String(body.entry || ""));
+      if (!entry) return response.status(404).json({ error: "That credit isn't there any more." });
+      if (/^CR-/.test(entry.source)) await credits.reopen(entry.source);
+      return response.status(200).json({ ok: true, removed: entry });
+    }
+    if (action === "ffcode-reset" && request.method === "POST") {
+      const code = await ffcode.clearCode((await readBody(request)).email);
+      return code ? response.status(200).json({ ok: true, cleared: code }) : response.status(404).json({ error: "That account has no code." });
     }
     if (action === "delete-order" && request.method === "POST") {
       const invoice = String((await readBody(request)).invoice || "");

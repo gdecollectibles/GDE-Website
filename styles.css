@@ -406,6 +406,16 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
   .site-header .brand{width:120px;flex-basis:120px}
 }
 @media(min-width:1181px) and (max-width:1320px){.site-nav{gap:16px}}
+/* Header social icons (user, Nov 12): replace the Socials menu; Compliance left the header. */
+.nav-socials{display:inline-flex;align-items:center;gap:14px}
+.nav-socials a{display:inline-flex;align-items:center;justify-content:center;color:#c9c9cd;transition:color .2s}
+.nav-socials a:hover,.nav-socials a:focus-visible{color:#fff}
+.nav-socials{--icon:17px}
+.nav-socials svg{width:var(--icon);height:var(--icon)}
+/* YouTube (user, Nov 12): 85% of Instagram's height ("a little smaller"); its 20:14 glyph gets a wider box. */
+.nav-socials .nav-youtube svg{height:calc(var(--icon) * .85);width:calc(var(--icon) * .85 * 20 / 14)}
+@media(min-width:761px) and (max-width:980px){.nav-socials{gap:10px;--icon:15px}}
+@media(max-width:760px){.nav-socials{gap:24px;padding:14px 0;--icon:22px}}
 
 /* Add to Cart option C (user, Nov 10): full-width dark gray bar, View Details underneath. */
 .card-actions{flex-direction:column;justify-content:flex-start;align-items:stretch;gap:14px}
@@ -549,16 +559,6 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 .about-inline-link{color:var(--text,var(--ink));text-decoration:underline;text-underline-offset:3px}
 .about-business p:not(.eyebrow){color:#a9a9ae;font-size:.95rem;max-width:560px}
 @media(max-width:760px){.about-family{grid-template-columns:1fr;padding:0}.about-family-logo{order:-1;padding:60px 24px 0}.about-family-logo img{max-width:260px}.about-family .about-business{padding:40px 24px 60px}.about-compare{grid-template-columns:1fr}.about-compare>div{padding:32px 4px}.about-compare>div:first-child{border-right:0;border-bottom:1px solid var(--line)}.about-image{min-height:360px!important;background-position:center}}
-/* Header social icons (user, Nov 12): replace the Socials menu; Compliance left the header. */
-.nav-socials{display:inline-flex;align-items:center;gap:14px}
-.nav-socials a{display:inline-flex;align-items:center;justify-content:center;color:#c9c9cd;transition:color .2s}
-.nav-socials a:hover,.nav-socials a:focus-visible{color:#fff}
-.nav-socials{--icon:17px}
-.nav-socials svg{width:var(--icon);height:var(--icon)}
-/* YouTube (user, Nov 12): 85% of Instagram's height ("a little smaller"); its 20:14 glyph gets a wider box. */
-.nav-socials .nav-youtube svg{height:calc(var(--icon) * .85);width:calc(var(--icon) * .85 * 20 / 14)}
-@media(min-width:761px) and (max-width:980px){.nav-socials{gap:10px;--icon:15px}}
-@media(max-width:760px){.nav-socials{gap:24px;padding:14px 0;--icon:22px}}
 /* Checkout page (user, Nov 12): narrower side margins, dark grey background, slightly rounded boxes. */
 .checkout-page{--co-bg:#1c1d1f;--co-panel:#26272a;--co-field:#45474b;background:var(--co-bg)}
 .checkout-page .page-intro,.checkout-page .checkout-layout,.checkout-page .inquiry-section,.checkout-page .faq-section{background:var(--co-bg);padding-left:max(24px,9%,calc((100% - 1180px) / 2));padding-right:max(24px,9%,calc((100% - 1180px) / 2))}
@@ -683,3 +683,21 @@ body.side-cart-locked{overflow:hidden}
    out up to 1380px (they stay in the footer and the phone menu), and wide screens space the links a little closer. */
 @media(min-width:761px) and (max-width:1380px){.site-nav .nav-socials{display:none}}
 @media(min-width:1321px){.site-nav{gap:24px}}
+/* Friends and family codes (user, Nov 12): a Legacy Club member's code on the account page, and the code box at checkout. */
+.ff-code-box{margin-top:14px;font-size:.78rem}
+.ff-code-box summary{cursor:pointer;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.ff-row{display:flex;gap:8px;margin-top:10px}
+.ff-row input{flex:1;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--text,#fff);text-transform:uppercase;letter-spacing:.08em}
+.ff-row .button{min-height:40px;border-radius:6px}
+.ff-applied{display:flex;justify-content:space-between;align-items:center;margin:0;padding:10px 12px;border:1px solid #caa36b;border-radius:6px;color:#caa36b}
+.ff-applied b{letter-spacing:.08em}
+.ff-note{margin:0;color:var(--muted)}
+.ff-code-show{display:flex;align-items:center;gap:16px;margin:4px 0 10px}
+.ff-code-show strong{font:500 1.6rem var(--sans);letter-spacing:.12em;color:#caa36b;padding:10px 18px;border:1px solid #caa36b;border-radius:8px}
+.ff-make{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 6px}
+.ff-make input{flex:1;min-width:200px;padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--text,#fff);text-transform:uppercase;letter-spacing:.08em}
+/* Share link (user, Nov 12): on the account page once a customer has bought a gun. */
+.ref-share p{margin:0 0 12px}
+.ref-link{display:flex;gap:8px;flex-wrap:wrap}
+.ref-link input{flex:1;min-width:220px;padding:11px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--text,#fff);font:500 .85rem var(--sans)}
+.ref-link .button{min-height:42px;border-radius:6px}

@@ -1,24 +1,27 @@
 // Customer accounts and the email list.
 //   GET  /api/account?action=config     what the page needs: the Google sign-in id, is everything set up
 //   POST /api/account?action=google     { credential }: a Google sign-in; sets the session cookie
-//   GET  /api/account?action=me         the signed-in customer, their orders and whether they get emails
+//   GET  /api/account?action=me         the signed-in customer, their orders, collector status and whether they get emails
 //   POST /api/account?action=logout
 //   POST /api/account?action=lookup     { email, invoice }: one order, for people who don't sign in with Google
 //   POST /api/account?action=subscribe  { email, firstName?, source }: joins the email list (new collections, deals)
 //   POST /api/account?action=unsubscribe  signed in: leaves the email list
 //   POST /api/account?action=decline      signed in: "no thanks" to the list question asked after the first sign-in
+//   POST /api/account?action=ffcode-create { code }: a Legacy Club member makes their friends and family code (_ffcode.js)
+//   GET  /api/account?action=ffcode-check&code=<code>  checkout asks whether a code is good (5% off)
 // Stored next to the orders (see _store.js), one record per person, whether they joined the list, signed in, or both:
 //   gde:subscriber:<email>  { email, firstName, lastName, status: none|declined|subscribed|unsubscribed, account (signed in
 //                             with Google), source, verified, signedInAt, createdAt, updatedAt, consent }
 //   gde:subscribers         sorted set of emails, by last change (the inventory app pulls them through /api/admin)
 //   gde:rl:<what>:<ip>      short-lived counters against abuse
 // Needs in Vercel: GOOGLE_CLIENT_ID (Google Cloud, OAuth client, "Web application"). The session cookie is signed with
-// GDE_SESSION_SECRET, or a key derived from GDE_ADMIN_KEY when that isn't set.
-const crypto = require("node:crypto");
+// GDE_SESSION_SECRET, or a key derived from GDE_ADMIN_KEY when that isn't set (see _session.js).
 const store = require("./_store");
+const { COOKIE, SESSION_DAYS, secret, makeSession, readSession } = require("./_session");
+const { collectorStatus } = require("./_collector");
+const ffcode = require("./_ffcode");
+const referral = require("./_referral");
 
-const COOKIE = "gde_account";
-const SESSION_DAYS = 30;
 const CONSENT = "Emails from GDE Collectibles about new collections, limited releases and offers. Unsubscribe any time.";
 const EMAIL_RE = /^[^\s@<>()[\]\\,;:"]{1,64}@[A-Za-z0-9.-]{1,253}\.[A-Za-z]{2,24}$/;
 const INVOICE_RE = /^GDE-\d{6,16}$/;
@@ -33,34 +36,6 @@ const STATUS = {
   voided: "Cancelled",
   refunded: "Refunded"
 };
-
-function secret() {
-  if (process.env.GDE_SESSION_SECRET) return process.env.GDE_SESSION_SECRET;
-  if (process.env.GDE_ADMIN_KEY) return crypto.createHmac("sha256", process.env.GDE_ADMIN_KEY).update("gde-account-session").digest("hex");
-  return "";
-}
-
-const b64 = (s) => Buffer.from(s).toString("base64url");
-const sign = (data) => crypto.createHmac("sha256", secret()).update(data).digest("base64url");
-
-function makeSession(user) {
-  const data = b64(JSON.stringify({ ...user, exp: Date.now() + SESSION_DAYS * 86400000 }));
-  return `${data}.${sign(data)}`;
-}
-
-function readSession(request) {
-  if (!secret()) return null;
-  const raw = String(request.headers.cookie || "").split(/;\s*/).find((c) => c.startsWith(COOKIE + "="));
-  if (!raw) return null;
-  const [data, mac] = raw.slice(COOKIE.length + 1).split(".");
-  if (!data || !mac) return null;
-  const want = Buffer.from(sign(data)), got = Buffer.from(mac);
-  if (want.length !== got.length || !crypto.timingSafeEqual(want, got)) return null;
-  try {
-    const user = JSON.parse(Buffer.from(data, "base64url").toString());
-    return user.exp > Date.now() && user.email ? user : null;
-  } catch { return null; }
-}
 
 function setCookie(request, response, value, maxAge) {
   const proto = String(request.headers["x-forwarded-proto"] || "https").split(",")[0];
@@ -128,9 +103,9 @@ function publicOrder(order) {
   };
 }
 
-async function ordersFor(email) {
-  const all = await store.listOrders();
-  return all.filter((o) => normEmail(o.form?.email) === email && o.status !== "payment_error").map(publicOrder);
+// Orders placed with this email at checkout, or while signed in to this account.
+function ordersFor(email, all) {
+  return all.filter((o) => (normEmail(o.form?.email) === email || normEmail(o.account) === email) && o.status !== "payment_error").map(publicOrder);
 }
 
 async function getSubscriber(email) {
@@ -180,13 +155,31 @@ module.exports = async function handler(request, response) {
     if (action === "me" && !post) {
       const user = readSession(request);
       if (!user) return response.status(200).json({ user: null });
-      const [orders, sub] = await Promise.all([ordersFor(user.email), getSubscriber(user.email)]);
+      const [all, sub] = await Promise.all([store.listOrders(), getSubscriber(user.email)]);
+      const collector = await collectorStatus(user.email, all);
       return response.status(200).json({
         user: { email: user.email, name: user.name, picture: user.picture },
-        orders,
+        orders: ordersFor(user.email, all),
+        collector,
+        ffCode: collector.tier === "legacy" ? await ffcode.codeFor(user.email, all) : null,
+        referral: await referral.linkOf(user.email, collector),
         subscribed: sub?.status === "subscribed",
         listStatus: sub?.status || "none"
       });
+    }
+
+    if (action === "ffcode-create" && post) {
+      const user = readSession(request);
+      if (!user) return response.status(401).json({ error: "Please sign in first." });
+      if (!(await allowed(request, "ffcode", 20))) return response.status(429).json({ error: "Too many tries. Please wait a while." });
+      return response.status(200).json({ ok: true, ffCode: await ffcode.createCode(user.email, (await readBody(request)).code) });
+    }
+
+    if (action === "ffcode-check" && !post) {
+      if (!(await allowed(request, "ffcheck", 30))) return response.status(429).json({ error: "Too many tries. Please wait a while." });
+      const user = readSession(request);
+      const result = await ffcode.checkCode(new URL(request.url, "http://x").searchParams.get("code"), user?.email);
+      return response.status(result.ok ? 200 : 404).json(result.ok ? { ok: true, code: result.code, percent: result.percent, usesLeft: result.usesLeft } : { error: result.error });
     }
 
     if (action === "logout" && post) {

@@ -428,6 +428,15 @@ const addToCart = itemKey => {
   saveCart(cart);
   return cart.includes(itemKey);
 };
+// Share links (user, Nov 12): ?ref=<CODE> on any page is kept for 30 days and sent with the next checkout, so the
+// guns count toward the friend who shared it (api/_referral.js). No discount. Dropped after a purchase.
+(() => {
+  const ref = new URLSearchParams(location.search).get("ref");
+  if (ref && /^[A-Za-z2-9]{8}$/.test(ref)) { try { localStorage.setItem("gdeRef", JSON.stringify({ code: ref.toUpperCase(), at: Date.now() })); } catch {} }
+})();
+function currentRef() {
+  try { const r = JSON.parse(localStorage.getItem("gdeRef")); return r && Date.now() - r.at < 30 * 864e5 ? r.code : undefined; } catch { return undefined; }
+}
 const incomingCart = new URLSearchParams(location.search).get("cart");
 if (incomingCart) {
   const validIncoming = incomingCart.split(",").filter(item => isBuyable(products[item]));
@@ -482,12 +491,12 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   const socialsMenu = nav.querySelector(".nav-socials");
   const contactLink = nav.querySelector('a[href="contact.html"], a[href="#contact"], a[href="index.html#contact"], a[href="#inquiry"]');
   const headerAction = nav.querySelector(".button");
-  // Left of the logo: Home, Collections, Gallery. Right: Contact, social icons, then the account icon
-  // (added by gde-account.js just before the cart) and the cart (user, Nov 12).
   // About page (user, Nov 12): every page gets it, just before Contact.
   if (!nav.querySelector('a[href="about.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="about.html">About</a>');
   const aboutLink = nav.querySelector('a[href="about.html"]');
   aboutLink.classList.toggle("active", document.body.classList.contains("about-page"));
+  // Left of the logo: Home, Collections, Gallery. Right: Collectors, About, Contact, social icons, then the account icon
+  // (added by gde-account.js just before the cart) and the cart (user, Nov 12).
   [homeLink, collectionsMenu, galleryLink, collectorsLink, aboutLink, contactLink, socialsMenu, headerAction].forEach(item => {
     if (item) nav.appendChild(item);
   });
@@ -900,13 +909,46 @@ if (document.querySelector("#checkoutSummaryItems")) {
   if (queryProduct && products[queryProduct]) addToCart(queryProduct);
   renderCheckoutSummary();
 }
+// Collector clubs (3+ guns bought: Collectors Club, 5% off; 5+: Legacy Club, 10% off), on every gun.
+// gde-account.js sets window.gdeCollector from the signed-in
+// account; the payment API works the discount out again on its own, rounding each gun to the cent the same way.
+// A friends and family code (window.gdeFFCode, set by gde-account.js) gives 5% only when there is no club discount.
+function collectorTotal(prices) {
+  const club = window.gdeCollector?.collector ? window.gdeCollector : null;
+  const ff = !club && window.gdeFFCode ? window.gdeFFCode : null;
+  const c = club ? { tierName: club.tierName, percent: club.percent } : ff ? { tierName: `Code ${ff.code}`, percent: ff.percent } : null;
+  if (!c || !prices.length) return null;
+  const list = prices.reduce((sum, price) => sum + price, 0);
+  const total = Math.round(prices.reduce((sum, price) => sum + Math.round(price * (100 - c.percent)) / 100, 0) * 100) / 100;
+  return { name: c.tierName, percent: c.percent, list, total, off: Math.round((list - total) * 100) / 100 };
+}
+function renderCollectorRow(pay) {
+  const priceRow = document.querySelector("#summaryPrice")?.closest(".summary-price");
+  if (!priceRow) return;
+  let row = document.querySelector("#summaryCollector");
+  const c = window.gdeCollector;
+  if (pay) {
+    if (!row) { row = document.createElement("div"); row.id = "summaryCollector"; row.className = "summary-collector"; priceRow.before(row); }
+    row.innerHTML = `<dt>${pay.name} (${pay.percent}% off)</dt><dd>&minus;$${pay.off.toLocaleString("en-US", { maximumFractionDigits: 2 })}</dd>`;
+  } else row?.remove();
+  // Signed out: a quiet reminder that collectors sign in to get their discount.
+  let hint = document.querySelector("#summaryCollectorHint");
+  if (c === null && !hint) {
+    hint = document.createElement("p"); hint.id = "summaryCollectorHint"; hint.className = "summary-collector-hint";
+    hint.innerHTML = 'Collectors Club or Legacy Club member? <a href="account.html?next=checkout.html">Sign in</a> for your discount. <a href="collectors.html">What is this?</a>';
+    priceRow.closest("dl").after(hint);
+  } else if (c !== null) hint?.remove();
+}
 function renderCheckoutSummary() {
   const summary = document.querySelector("#checkoutSummaryItems");
   if (!summary) return;
   const cart = getCart().filter(item => isBuyable(products[item]));
   if (cart.length) {
     summary.innerHTML=cart.map(item=>{const p=products[item];return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"${productImageStyle(p)}></div><div><h2>${p.name}</h2><p>${p.platform} · ${p.finish}</p><strong>${p.price}</strong></div></div>`}).join("");
-    setText("#summaryPrice",`$${cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0).toLocaleString()}`);
+    const listTotal = cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0);
+    const pay = collectorTotal(cart.map(item => priceNumber(products[item].price)));
+    setText("#summaryPrice",`$${(pay ? pay.total : listTotal).toLocaleString("en-US", { maximumFractionDigits: 2 })}`);
+    renderCollectorRow(pay);
   } else {
     summary.innerHTML='<div class="checkout-empty"><p>No collections selected.</p><a class="text-link" href="collections.html">Browse collections &rarr;</a></div>';
   }
@@ -936,7 +978,7 @@ async function startAuthorizeCheckout({button, status, cart, customer, resetText
     const response = await fetch("/api/create-authorize-payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cart, customer, embedded })
+      body: JSON.stringify({ cart, customer, embedded, code: window.gdeFFCode?.code || undefined, ref: currentRef() })
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok || !result.token || !result.paymentUrl) throw new Error(result.error || "Unable to start Authorize.net checkout.");
@@ -1057,6 +1099,7 @@ function showPaymentStep(session, onBack) {
 if (document.querySelector(".payment-success-order")) {
   const order = new URLSearchParams(location.search).get("order");
   if (order && /^GDE-\d+$/.test(order)) document.querySelector(".payment-success-order").textContent = `Order ${order}`;
+  try { sessionStorage.removeItem("gdeFFCode"); localStorage.removeItem("gdeRef"); } catch {}
 }
 renderPaymentSummary();
 function renderPaymentSummary() {
