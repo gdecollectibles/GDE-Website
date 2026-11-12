@@ -460,17 +460,7 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   if (!nav.querySelector('a[href="gallery.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="gallery.html">Gallery</a>');
   const galleryLink = nav.querySelector('a[href="gallery.html"]');
   galleryLink.classList.toggle("active", document.body.classList.contains("gallery-page"));
-  if (!nav.querySelector(".marketplaces-menu")) {
-    const marketplaceMenu = document.createElement("div");
-    marketplaceMenu.className = "nav-dropdown marketplaces-menu";
-    marketplaceMenu.innerHTML = `<button class="nav-dropdown-toggle" type="button" aria-expanded="false">Marketplaces <span>&or;</span></button>
-      <div class="nav-dropdown-panel external-panel">
-      <a href="https://www.gunbroker.com/All/search?IncludeSellers=7849083" target="_blank" rel="noopener noreferrer">GUNBROKER <span>&nearr;</span></a>
-        <a href="https://www.gunsinternational.com/" target="_blank" rel="noopener noreferrer">GUNS INTERNATIONAL <span>&nearr;</span></a>
-      </div>`;
-    const action = nav.querySelector(".button");
-    action ? nav.insertBefore(marketplaceMenu, action) : nav.appendChild(marketplaceMenu);
-  }
+  // Marketplaces menu (GunBroker, Guns International) removed (user, Nov 12).
   if (!nav.querySelector(".socials-menu")) {
     const socialMenu = document.createElement("div");
     socialMenu.className = "nav-dropdown socials-menu";
@@ -484,13 +474,12 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   }
   const homeLink = nav.querySelector('a[href="index.html"]');
   const collectionsMenu = nav.querySelector(".collections-menu");
-  const marketplacesMenu = nav.querySelector(".marketplaces-menu");
   const socialsMenu = nav.querySelector(".socials-menu");
   const complianceLink = nav.querySelector('a[href="#compliance"], a[href="index.html#compliance"]');
   const contactLink = nav.querySelector('a[href="contact.html"], a[href="#contact"], a[href="index.html#contact"], a[href="#inquiry"]');
   const headerAction = nav.querySelector(".button");
   // Gallery sits next to Collections; Socials opens the right side of the logo (user, Nov 12).
-  [homeLink, collectionsMenu, galleryLink, marketplacesMenu, socialsMenu, complianceLink, contactLink, headerAction].forEach(item => {
+  [homeLink, collectionsMenu, galleryLink, socialsMenu, complianceLink, contactLink, headerAction].forEach(item => {
     if (item) nav.appendChild(item);
   });
 });
