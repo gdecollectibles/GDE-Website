@@ -479,7 +479,6 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="https://www.instagram.com/gdecollectibles/" target="_blank" rel="noopener">INSTAGRAM <span>&nearr;</span></a>
         <a href="https://www.facebook.com/gdecollectibles" target="_blank" rel="noopener">FACEBOOK <span>&nearr;</span></a>
         <a href="https://www.youtube.com/@GDE-Collectibles" target="_blank" rel="noopener">YOUTUBE <span>&nearr;</span></a>
-        <a href="https://x.com/GDECollectibles" target="_blank" rel="noopener">X <span>&nearr;</span></a>
       </div>`;
     nav.appendChild(socialMenu);
   }
