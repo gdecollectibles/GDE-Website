@@ -29,6 +29,64 @@ const products = {
       "assets/listings/the-capital/the-capital-08.jpg"
     ]
   },
+  "remember-the-alamo": {
+    "name": "Remember the Alamo",
+    "collection": "Remember the Alamo",
+    "collectionNumber": "1 of 300",
+    "type": "Pistol",
+    "manufacturer": "Colt",
+    "model": "Colt M1911",
+    "caliber": ".45 ACP",
+    "platform": ".45 ACP",
+    "capacity": "7 + 1",
+    "action": "Semi-Automatic",
+    "slideMaterial": "Stainless Steel",
+    "frameMaterial": "Stainless Steel",
+    "finish": "Hand Polished & Hand 24K Gold Plated also on the frame",
+    "gripColor": "Composite - Pearl Brown with Colt Horse in gold",
+    "price": "$3,500",
+    "availability": "Available",
+    "image": "image-gold",
+    "description": "Picture of Serial # or Sequence # on the gun is different from the one you are purchasing. If you are interested in a specific sequence number call us, if available we will work with you so you can obtain the number.",
+    "photos": [
+      "assets/listings/remember-the-alamo/remember-the-alamo-01.jpg",
+      "assets/listings/remember-the-alamo/remember-the-alamo-02.jpg",
+      "assets/listings/remember-the-alamo/remember-the-alamo-03.jpg",
+      "assets/listings/remember-the-alamo/remember-the-alamo-04.jpg",
+      "assets/listings/remember-the-alamo/remember-the-alamo-05.jpg",
+      "assets/listings/remember-the-alamo/remember-the-alamo-06.jpg",
+      "assets/listings/remember-the-alamo/remember-the-alamo-07.jpg",
+      "assets/listings/remember-the-alamo/remember-the-alamo-08.jpg"
+    ]
+  },
+  "blue-scroll-engraved": {
+    "name": "Blue Scroll Engraved Colt 1911 38 Super",
+    "collection": "Blue Finish",
+    "collectionNumber": "",
+    "type": "Pistol",
+    "manufacturer": "Colt",
+    "model": "Colt Government Model Series 70",
+    "caliber": ".38 Super",
+    "platform": ".38 Super",
+    "capacity": "9 + 1",
+    "action": "Semi-Automatic",
+    "finish": "Royal Blue with Full Scroll Engraving",
+    "gripColor": "White pearl with gold rearing horse medallions",
+    "price": "$3,500",
+    "availability": "Available",
+    "image": "image-gold",
+    "description": "Royal blued Colt Government Model in .38 Super with full scroll engraving on the slide and a polished silver barrel. Gold-plated hammer, trigger, safety, slide stop, screws and pins.",
+    "photos": [
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-01.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-02.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-03.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-04.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-05.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-06.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-07.jpg",
+      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-08.jpg"
+    ]
+  },
   "signing-the-constitution": {
     "name": "US Constitution",
     "collection": "US Constitution",
@@ -149,36 +207,6 @@ const products = {
       "assets/listings/trump/trump-08.jpg"
     ]
   },
-  "remember-the-alamo": {
-    "name": "Remember the Alamo",
-    "collection": "Remember the Alamo",
-    "collectionNumber": "1 of 300",
-    "type": "Pistol",
-    "manufacturer": "Colt",
-    "model": "Colt M1911",
-    "caliber": ".45 ACP",
-    "platform": ".45 ACP",
-    "capacity": "7 + 1",
-    "action": "Semi-Automatic",
-    "slideMaterial": "Stainless Steel",
-    "frameMaterial": "Stainless Steel",
-    "finish": "Hand Polished & Hand 24K Gold Plated also on the frame",
-    "gripColor": "Composite - Pearl Brown with Colt Horse in gold",
-    "price": "$3,500",
-    "availability": "Available",
-    "image": "image-gold",
-    "description": "Picture of Serial # or Sequence # on the gun is different from the one you are purchasing. If you are interested in a specific sequence number call us, if available we will work with you so you can obtain the number.",
-    "photos": [
-      "assets/listings/remember-the-alamo/remember-the-alamo-01.jpg",
-      "assets/listings/remember-the-alamo/remember-the-alamo-02.jpg",
-      "assets/listings/remember-the-alamo/remember-the-alamo-03.jpg",
-      "assets/listings/remember-the-alamo/remember-the-alamo-04.jpg",
-      "assets/listings/remember-the-alamo/remember-the-alamo-05.jpg",
-      "assets/listings/remember-the-alamo/remember-the-alamo-06.jpg",
-      "assets/listings/remember-the-alamo/remember-the-alamo-07.jpg",
-      "assets/listings/remember-the-alamo/remember-the-alamo-08.jpg"
-    ]
-  },
   "donald-trump-47th": {
     "name": "Donald J Trump",
     "collection": "Donald J Trump",
@@ -237,34 +265,6 @@ const products = {
       "assets/listings/el-alamo/el-alamo-06.jpg",
       "assets/listings/el-alamo/el-alamo-07.jpg",
       "assets/listings/el-alamo/el-alamo-08.jpg"
-    ]
-  },
-  "blue-scroll-engraved": {
-    "name": "Blue Scroll Engraved Colt 1911 38 Super",
-    "collection": "Blue Finish",
-    "collectionNumber": "",
-    "type": "Pistol",
-    "manufacturer": "Colt",
-    "model": "Colt Government Model Series 70",
-    "caliber": ".38 Super",
-    "platform": ".38 Super",
-    "capacity": "9 + 1",
-    "action": "Semi-Automatic",
-    "finish": "Royal Blue with Full Scroll Engraving",
-    "gripColor": "White pearl with gold rearing horse medallions",
-    "price": "$3,500",
-    "availability": "Available",
-    "image": "image-gold",
-    "description": "Royal blued Colt Government Model in .38 Super with full scroll engraving on the slide and a polished silver barrel. Gold-plated hammer, trigger, safety, slide stop, screws and pins.",
-    "photos": [
-      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-01.jpg",
-      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-02.jpg",
-      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-03.jpg",
-      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-04.jpg",
-      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-05.jpg",
-      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-06.jpg",
-      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-07.jpg",
-      "assets/listings/blue-scroll-engraved/blue-scroll-engraved-08.jpg"
     ]
   },
   "gold-accent-scroll": {
@@ -444,14 +444,14 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <a href="collections.html">All Collections</a>
         <p>Collections</p>
         <a href="gun/the-capital.html">The Capital</a>
+        <a href="gun/remember-the-alamo.html">Remember the Alamo</a>
+        <a href="gun/blue-scroll-engraved.html">Blue Finish</a>
         <a href="gun/signing-the-constitution.html">US Constitution</a>
         <a href="gun/mount-rushmore-with-trump.html">Mt. Rushmore</a>
         <a href="gun/uss-constitution.html">USS Constitution</a>
         <a href="gun/trump.html">America's 250 Anniversary</a>
-        <a href="gun/remember-the-alamo.html">Remember the Alamo</a>
         <a href="gun/donald-trump-47th.html">Donald J Trump</a>
         <a href="gun/el-alamo.html">El Alamo</a>
-        <a href="gun/blue-scroll-engraved.html">Blue Finish</a>
         <a href="collections.html?collection=scrolls">Scrolls</a>
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
