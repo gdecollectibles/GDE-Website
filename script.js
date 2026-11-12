@@ -775,6 +775,76 @@ function paintCards() {
 }
 paintCards();
 
+// Side cart (user, Nov 12): Add to Cart and the cart icon slide a panel in from the right with the cart, subtotal,
+// View cart and Checkout. The cart page keeps the icon as a plain link, since the cart is already on the page.
+const sideCart = (() => {
+  if (document.querySelector(".cart-page")) return null;
+  document.body.insertAdjacentHTML("beforeend", `<div class="side-cart" id="sideCart" aria-hidden="true">
+    <div class="side-cart-backdrop" data-close></div>
+    <aside class="side-cart-panel" role="dialog" aria-modal="true" aria-labelledby="sideCartTitle" tabindex="-1">
+      <div class="side-cart-head"><h2 id="sideCartTitle">Your cart <span class="side-cart-count"></span></h2><button type="button" class="side-cart-close" data-close aria-label="Close cart">&times;</button></div>
+      <div class="side-cart-items"></div>
+      <div class="side-cart-foot">
+        <div class="side-cart-subtotal"><span>Subtotal</span><strong></strong></div>
+        <p class="side-cart-note">Firearms ship only to a licensed FFL dealer.</p>
+        <div class="side-cart-actions"><a class="button secondary side-cart-view" href="cart.html">View cart</a><a class="button side-cart-checkout" href="checkout.html">Checkout</a></div>
+      </div>
+    </aside>
+  </div>`);
+  const root = document.querySelector("#sideCart");
+  const panel = root.querySelector(".side-cart-panel");
+  let lastFocus = null;
+  const render = () => {
+    const cart = getCart().filter(item => products[item]);
+    const buyable = cart.filter(item => isBuyable(products[item]));
+    root.querySelector(".side-cart-count").textContent = cart.length ? `(${cart.length})` : "";
+    root.querySelector(".side-cart-items").innerHTML = cart.length ? cart.map(item => {
+      const p = products[item];
+      return `<div class="side-cart-item"><a class="mini-image ${p.image}" href="gun/${item}.html"${productImageStyle(p)} tabindex="-1" aria-hidden="true"></a><div class="side-cart-copy"><a class="side-cart-name" href="gun/${item}.html">${p.name}</a><p>1 &times; ${p.soldOut ? "Sold Out" : p.price}</p></div><button type="button" class="side-cart-remove" data-product="${item}" aria-label="Remove ${p.name}">&times;</button></div>`;
+    }).join("") : '<div class="side-cart-empty"><p>Your cart is empty.</p><a class="text-link" href="collections.html">Browse collections <span>&rarr;</span></a></div>';
+    root.querySelector(".side-cart-foot").hidden = !cart.length;
+    root.querySelector(".side-cart-subtotal strong").textContent = `$${buyable.reduce((sum, item) => sum + priceNumber(products[item].price), 0).toLocaleString()}`;
+    root.querySelector(".side-cart-view").href = cart.length ? `cart.html?cart=${cart.join(",")}` : "cart.html";
+    const checkout = root.querySelector(".side-cart-checkout");
+    checkout.href = buyable.length ? `checkout.html?cart=${buyable.join(",")}` : "checkout.html";
+    checkout.classList.toggle("disabled", !buyable.length);
+    checkout.setAttribute("aria-disabled", String(!buyable.length));
+  };
+  const open = () => {
+    render();
+    lastFocus = document.activeElement;
+    root.classList.add("open");
+    root.setAttribute("aria-hidden", "false");
+    document.body.classList.add("side-cart-locked");
+    panel.focus({ preventScroll: true });
+  };
+  const close = () => {
+    root.classList.remove("open");
+    root.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("side-cart-locked");
+    lastFocus?.focus?.({ preventScroll: true });
+  };
+  root.addEventListener("click", event => {
+    const remove = event.target.closest(".side-cart-remove");
+    if (remove) {
+      saveCart(getCart().filter(item => item !== remove.dataset.product));
+      render(); renderCheckoutSummary();
+      return;
+    }
+    if (event.target.closest("[data-close]")) close();
+  });
+  document.addEventListener("keydown", event => { if (event.key === "Escape" && root.classList.contains("open")) close(); });
+  document.addEventListener("click", event => {
+    const link = event.target.closest(".cart-nav");
+    if (!link || event.metaKey || event.ctrlKey || event.shiftKey) return;
+    event.preventDefault();
+    document.querySelector(".site-nav.open") && document.querySelector(".nav-toggle")?.click();
+    open();
+  });
+  return { open, render };
+})();
+const showCart = () => sideCart ? sideCart.open() : (location.href = "cart.html");
+
 document.querySelectorAll('a[href^="checkout.html?product="]').forEach(link => {
   const itemKey = new URL(link.href).searchParams.get("product");
   link.textContent = products[itemKey]?.soldOut ? "SOLD OUT" : "ADD TO CART";
@@ -782,15 +852,14 @@ document.querySelectorAll('a[href^="checkout.html?product="]').forEach(link => {
     event.preventDefault();
     if (!addToCart(itemKey)) return;
     link.textContent = "Added - View Cart";
-    link.href = "cart.html";
-    link.addEventListener("click", () => location.href="cart.html", {once:true});
+    showCart();
   });
 });
 document.querySelectorAll(".add-to-cart").forEach(button => button.addEventListener("click", () => {
   if (!addToCart(button.dataset.product)) return;
   button.textContent = "Added - View Cart";
   button.classList.add("added");
-  setTimeout(() => location.href="cart.html", 450);
+  showCart();
 }));
 
 function renderCart() {
