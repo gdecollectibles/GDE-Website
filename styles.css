@@ -375,7 +375,7 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 .payment-step[hidden],.form-column[hidden],.summary-compliance[hidden],#proceedToPayment[hidden]{display:none!important}
 .payment-step{grid-column:1;min-width:0}
 .payment-step fieldset{margin-bottom:0}
-.payment-step-note{color:var(--muted);font-size:.86rem;line-height:1.6;margin:0 0 22px}
+.payment-step-note,.fieldset-note{color:var(--muted);font-size:.86rem;line-height:1.6;margin:0 0 22px}
 .payment-back{background:none;border:0;border-bottom:1px solid var(--line-strong);padding:0 0 2px;margin-left:8px;color:var(--text,#f2f2f3);font:inherit;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
 .payment-back:hover{border-bottom-color:var(--text,#f2f2f3)}
 .payment-frame{position:relative;background:#fff;border:1px solid var(--line-strong);padding:18px 10px 6px;box-shadow:0 30px 60px rgba(0,0,0,.45)}
@@ -523,3 +523,19 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 .nav-socials .nav-youtube svg{height:calc(var(--icon) * .85);width:calc(var(--icon) * .85 * 20 / 14)}
 @media(min-width:761px) and (max-width:980px){.nav-socials{gap:10px;--icon:15px}}
 @media(max-width:760px){.nav-socials{gap:24px;padding:14px 0;--icon:22px}}
+/* Checkout page (user, Nov 12): narrower side margins, dark grey background, slightly rounded boxes. */
+.checkout-page{--co-bg:#1c1d1f;--co-panel:#26272a;--co-field:#45474b;background:var(--co-bg)}
+.checkout-page .page-intro,.checkout-page .checkout-layout,.checkout-page .inquiry-section,.checkout-page .faq-section{background:var(--co-bg);padding-left:max(24px,9%,calc((100% - 1180px) / 2));padding-right:max(24px,9%,calc((100% - 1180px) / 2))}
+.checkout-page .important-note{max-width:none}
+.checkout-page .order-summary,.checkout-page .checkout-confirm,.checkout-page .important-note,.checkout-page .confirmation-panel{background:var(--co-panel);border-radius:10px}
+.checkout-page .field-grid input,.checkout-page .field-grid select,.checkout-page .field-grid textarea,.checkout-page .inquiry-form input,.checkout-page .inquiry-form select,.checkout-page .inquiry-form textarea{border-radius:6px;border-color:var(--co-field)}
+.checkout-page .inquiry-form select{background:var(--co-bg)}
+.checkout-page .button,.checkout-page .payment-frame{border-radius:6px}
+.checkout-page .check-list input[type=checkbox]{border-radius:3px}
+@media(max-width:760px){.checkout-page .page-intro,.checkout-page .checkout-layout,.checkout-page .inquiry-section,.checkout-page .faq-section{padding-left:24px;padding-right:24px}}
+/* Checkout fields (user, Nov 12): one field per line; only the short ones share a line (first|last name, city|state|ZIP). */
+.checkout-page .form-column .field-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+.checkout-page .form-column .field-grid>label{grid-column:1/-1}
+.checkout-page .form-column .field-grid>label.half{grid-column:span 3}
+.checkout-page .form-column .field-grid>label.third{grid-column:span 2}
+@media(max-width:760px){.checkout-page .form-column .field-grid>label.third{grid-column:span 3}.checkout-page .form-column .field-grid>label:not(.third)+label.third{grid-column:1/-1}}
