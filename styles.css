@@ -395,10 +395,10 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 .footer-social a:hover,.footer-social a:focus-visible{color:#fff;border-color:#fff;background:rgba(255,255,255,.06)}
 .footer-social svg{width:17px;height:17px}
 @media(max-width:760px){.footer-social{justify-content:flex-start}}
-/* Socials dropdown next to Marketplaces (user, Nov 10): it is now the last item on the left of the logo. */
+/* Left of the logo: Home, Collections, Gallery, Marketplaces. Socials opens the right side (user, Nov 12). */
 @media(min-width:761px){
   .site-nav>:nth-child(3){margin-right:0}
-  .site-nav>.socials-menu{margin-right:auto}
+  .site-nav>.marketplaces-menu{margin-right:auto}
 }
 .socials-menu .nav-dropdown-panel{width:190px}
 @media(max-width:760px){.socials-menu .nav-dropdown-panel{width:100%}}

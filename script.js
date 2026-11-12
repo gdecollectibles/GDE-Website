@@ -496,8 +496,8 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   const complianceLink = nav.querySelector('a[href="#compliance"], a[href="index.html#compliance"]');
   const contactLink = nav.querySelector('a[href="contact.html"], a[href="#contact"], a[href="index.html#contact"], a[href="#inquiry"]');
   const headerAction = nav.querySelector(".button");
-  // Gallery opens the right side of the logo: the left side (Home … Socials) has no room for a fifth item.
-  [homeLink, collectionsMenu, marketplacesMenu, socialsMenu, galleryLink, complianceLink, contactLink, headerAction].forEach(item => {
+  // Gallery sits next to Collections; Socials opens the right side of the logo (user, Nov 12).
+  [homeLink, collectionsMenu, galleryLink, marketplacesMenu, socialsMenu, complianceLink, contactLink, headerAction].forEach(item => {
     if (item) nav.appendChild(item);
   });
 });
