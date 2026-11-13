@@ -1,6 +1,6 @@
 // The Contact page form (contact.html). Saves each message in the store; the GDE app picks them up every couple of
 // minutes into Customers > Website inquiries (via /api/admin?action=messages). Replaced Formspree on Nov 13, 2026.
-//   POST /api/contact   JSON (or a plain form post): { name, email, phone, state, collection: [names], message }
+//   POST /api/contact   JSON (or a plain form post): { name, email, phone, state, collection: [names], contactPreference: [Call|Text|Email], message }
 // Stored next to the orders (see _store.js):
 //   gde:message:<id>   one message, kept 180 days (the app keeps its own copy)
 //   gde:messages       message ids, newest first
@@ -13,6 +13,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@.]{2,}$/;
 // The site's collections plus the Gallery (the Contact page's "Collections of interest" tick boxes); none ticked = general.
 const COLLECTIONS = ["The Capital", "Remember the Alamo", "Blue Finish", "US Constitution", "Mt. Rushmore", "USS Constitution",
   "America's 250 Anniversary", "Donald J Trump", "El Alamo", "Scrolls", "Gallery"];
+const PREFERENCES = ["Call", "Text", "Email"]; // "How should we reach you?" (optional)
 
 const clean = (value, max) => String(value ?? "").replace(/[<>\u0000-\u0008\u000b-\u001f]/g, "").trim().slice(0, max);
 
@@ -28,7 +29,7 @@ function readBody(request) {
       try {
         if (json) return resolve(body ? JSON.parse(body) : {});
         const params = new URLSearchParams(body);
-        resolve({ ...Object.fromEntries(params), collection: params.getAll("collection") });
+        resolve({ ...Object.fromEntries(params), collection: params.getAll("collection"), contactPreference: params.getAll("contactPreference") });
       }
       catch { reject(Object.assign(new Error("Invalid request."), { status: 400 })); }
     });
@@ -62,6 +63,7 @@ module.exports = async function handler(request, response) {
       phone: clean(body.phone, 40),
       state: clean(body.state, 60),
       collection: [...new Set([body.collection].flat().filter((c) => COLLECTIONS.includes(c)))].join(", ") || "General inquiry",
+      prefer: PREFERENCES.filter((p) => [body.contactPreference].flat().includes(p)).join(", "),
       message: clean(body.message, 5000)
     };
     if (!record.name) return reply(400, { error: "Please enter your name." });

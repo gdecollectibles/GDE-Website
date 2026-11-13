@@ -537,7 +537,7 @@ document.querySelectorAll(".site-footer").forEach(footer => {
       <a href="refund.html">Refund Policy</a>`;
   }
   const legal = footer.querySelector(".footer-legal");
-  if (legal && !legal.querySelector(".footer-contact")) legal.insertAdjacentHTML("afterbegin", '<div class="footer-contact"><strong>Contact Us</strong><a href="tel:+17869313566">Phone: 1-786-931-3566</a><a href="mailto:gdecollectibles@gmail.com">Email: gdecollectibles@gmail.com</a><div><a href="privacy.html">Privacy Policy</a><span>|</span><a href="terms.html">Terms of Service</a></div></div>');
+  if (legal && !legal.querySelector(".footer-contact")) legal.insertAdjacentHTML("afterbegin", '<div class="footer-contact"><strong>Contact Us</strong><a href="tel:+17869313566">Phone: 1-786-931-3566</a><a href="mailto:info@gdecollectibles.com">Email: info@gdecollectibles.com</a><div><a href="privacy.html">Privacy Policy</a><span>|</span><a href="terms.html">Terms of Service</a></div></div>');
 });
 
 if (!sessionStorage.getItem("gdeAgeConfirmed")) {
@@ -1135,7 +1135,7 @@ document.querySelector("#inquiryForm")?.addEventListener("submit", e => {
   const contactMessage = document.querySelector("#contactForm .form-message");
   const contactResult = new URLSearchParams(location.search);
   if (contactMessage && contactResult.has("sent")) contactMessage.textContent = "Thank you. Your inquiry was submitted successfully.";
-  if (contactMessage && contactResult.has("error")) contactMessage.innerHTML = `Your message could not be sent. Please try again, or email us directly at <a href="mailto:gdecollectibles@gmail.com">gdecollectibles@gmail.com</a>.`;
+  if (contactMessage && contactResult.has("error")) contactMessage.innerHTML = `Your message could not be sent. Please try again, or email us directly at <a href="mailto:info@gdecollectibles.com">info@gdecollectibles.com</a>.`;
 }
 document.querySelector("#contactForm")?.addEventListener("submit", async e => {
   e.preventDefault();
@@ -1149,7 +1149,7 @@ document.querySelector("#contactForm")?.addEventListener("submit", async e => {
   message.textContent = "";
   try {
     const data = new FormData(form);
-    const fields = { ...Object.fromEntries(data), collection: data.getAll("collection") };
+    const fields = { ...Object.fromEntries(data), collection: data.getAll("collection"), contactPreference: data.getAll("contactPreference") };
     const response = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -1164,7 +1164,7 @@ document.querySelector("#contactForm")?.addEventListener("submit", async e => {
     message.textContent = "Thank you. Your inquiry was submitted successfully.";
     form.reset();
   } catch (error) {
-    message.innerHTML = `${error.message ? `${error.message.replace(/[<>&]/g, "")} ` : ""}Please try again, or email us directly at <a href="mailto:gdecollectibles@gmail.com">gdecollectibles@gmail.com</a>.`;
+    message.innerHTML = `${error.message ? `${error.message.replace(/[<>&]/g, "")} ` : ""}Please try again, or email us directly at <a href="mailto:info@gdecollectibles.com">info@gdecollectibles.com</a>.`;
   } finally {
     button.disabled = false;
     button.textContent = originalText;
