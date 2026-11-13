@@ -5,6 +5,7 @@
 //   GET  /api/admin?action=orders    every saved checkout; recent unpaid or paid ones are first checked against Authorize.net
 //   POST /api/admin?action=delete-order  { invoice }: removes one saved order (test orders); the payment itself is untouched
 //   GET  /api/admin?action=subscribers&since=<ms>  email-list sign-ups and leavers changed since then (api/account.js saves them)
+//   GET  /api/admin?action=messages     Contact page messages (api/contact.js saves them), newest first
 // Collector credit (guns bought outside the website, see _credits.js):
 //   GET  /api/admin?action=credit-requests          every request (without file contents) and every account's credited guns
 //   GET  /api/admin?action=credit-file&id=<id>&n=<n> one proof file: { name, type, size, data (base64) }
@@ -175,6 +176,12 @@ module.exports = async function handler(request, response) {
       const values = emails.length ? await store.cmd("MGET", ...emails.map((e) => `gde:subscriber:${e}`)) : [];
       const subscribers = values.map((v) => { try { return JSON.parse(v); } catch { return null; } }).filter(Boolean);
       return response.status(200).json({ subscribers, now });
+    }
+    if (action === "messages" && request.method === "GET") {
+      const ids = await store.cmd("LRANGE", "gde:messages", 0, 499);
+      const values = ids.length ? await store.cmd("MGET", ...ids.map((id) => `gde:message:${id}`)) : [];
+      const messages = values.map((v) => { try { return JSON.parse(v); } catch { return null; } }).filter(Boolean);
+      return response.status(200).json({ messages });
     }
     if (action === "credit-requests" && request.method === "GET") {
       const [requests, credited, orders] = await Promise.all([credits.listRequests(), credits.listCredits(), store.listOrders()]);

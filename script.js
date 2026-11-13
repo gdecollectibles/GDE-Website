@@ -1130,6 +1130,13 @@ document.querySelector("#inquiryForm")?.addEventListener("submit", e => {
   e.currentTarget.querySelector(".form-message").textContent="Thank you. Our collection team will be in touch.";
   e.currentTarget.reset();
 });
+// Back from a plain form post (no JavaScript): api/contact.js sends the buyer here with ?sent=1 or ?error=1.
+{
+  const contactMessage = document.querySelector("#contactForm .form-message");
+  const contactResult = new URLSearchParams(location.search);
+  if (contactMessage && contactResult.has("sent")) contactMessage.textContent = "Thank you. Your inquiry was submitted successfully.";
+  if (contactMessage && contactResult.has("error")) contactMessage.innerHTML = `Your message could not be sent. Please try again, or email us directly at <a href="mailto:gdecollectibles@gmail.com">gdecollectibles@gmail.com</a>.`;
+}
 document.querySelector("#contactForm")?.addEventListener("submit", async e => {
   e.preventDefault();
   const form = e.currentTarget;
@@ -1141,17 +1148,22 @@ document.querySelector("#contactForm")?.addEventListener("submit", async e => {
   button.textContent = "Sending...";
   message.textContent = "";
   try {
-    const response = await fetch(form.action, {
+    const fields = Object.fromEntries(new FormData(form));
+    const response = await fetch("/api/contact", {
       method: "POST",
-      headers: { "Accept": "application/json" },
-      body: new FormData(form)
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(fields)
     });
     const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || result.errors?.[0]?.message || "Formspree did not accept the message.");
+    if (!response.ok) {
+      message.textContent = result.error || "Your message could not be sent.";
+      if (response.status < 500 && response.status !== 429) return;
+      throw new Error(message.textContent);
+    }
     message.textContent = "Thank you. Your inquiry was submitted successfully.";
     form.reset();
   } catch (error) {
-    message.innerHTML = `The form service did not confirm delivery. Please try again, or email us directly at <a href="mailto:gdecollectibles@gmail.com">gdecollectibles@gmail.com</a>.`;
+    message.innerHTML = `${error.message ? `${error.message.replace(/[<>&]/g, "")} ` : ""}Please try again, or email us directly at <a href="mailto:gdecollectibles@gmail.com">gdecollectibles@gmail.com</a>.`;
   } finally {
     button.disabled = false;
     button.textContent = originalText;

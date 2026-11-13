@@ -10,7 +10,6 @@ const AUTHORIZE_ENDPOINTS = {
   sandbox: "https://apitest.authorize.net/xml/v1/request.api",
   production: "https://api.authorize.net/xml/v1/request.api"
 };
-const CHECKOUT_FORMSPREE_URL = "https://formspree.io/f/mrenwyyv";
 
 function readInventory() {
   return JSON.parse(fs.readFileSync(path.join(process.cwd(), "codex-inventory.json"), "utf8")).products;
@@ -44,62 +43,6 @@ function priceNumber(value) {
 
 function cleanText(value, maxLength = 255) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLength);
-}
-
-function buildCheckoutEmailPayload({ customer, items, amount, invoiceNumber, discount, account, referredBy }) {
-  const data = new URLSearchParams();
-  data.set("subject", "New GDE Collectibles Checkout");
-  data.set("invoiceNumber", invoiceNumber);
-  data.set("cartTotal", `$${amount.toLocaleString()}`);
-  data.set("cartItems", items.map(item => `${item.product.name} | ${item.product.platform} | ${item.product.finish} | ${item.product.price}`).join("\n"));
-  if (referredBy) data.set("referredBy", `Bought through the share link of ${referredBy} (counts toward their club)`);
-  if (discount) data.set("collectorDiscount", discount.type === "ffcode"
-    ? `${discount.name}, ${discount.percent}% off: -$${discount.amount.toLocaleString()} (code of ${discount.owner})`
-    : `${discount.name}, ${discount.percent}% off: -$${discount.amount.toLocaleString()} (${discount.guns} guns bought before, account ${account})`);
-  for (const [key, value] of Object.entries(customer || {})) data.set(key, cleanText(value, 1000));
-  data.set("complianceEligible", "Yes - checked");
-  data.set("complianceFFLDealer", "Yes - checked");
-  data.set("complianceBackgroundChecks", "Yes - checked");
-  data.set("complianceRequestOnly", "Yes - checked");
-  data.set("complianceContactPermission", "Yes - checked");
-  return data;
-}
-
-// Formspree checks some fields itself (an "email" field must look like an email) and answers only "Validation errors",
-// which stopped phone checkouts (Nov 8, 2026). The email is a backup copy for GDE: the order is saved in the store
-// first, so a Formspree refusal is retried once with the flagged fields renamed, and never blocks the payment.
-async function postCheckoutEmail(payload) {
-  const response = await fetch(CHECKOUT_FORMSPREE_URL, {
-    method: "POST",
-    headers: { "Accept": "application/json" },
-    body: payload
-  });
-  const result = await response.json().catch(() => ({}));
-  if (response.ok) return null;
-  const details = (result.errors || []).map(e => `${e.field || "form"}: ${e.message || e.code || "invalid"}`).join("; ");
-  return { status: response.status, fields: (result.errors || []).map(e => e.field).filter(Boolean), text: [result.error, details].filter(Boolean).join(" - ") || `HTTP ${response.status}` };
-}
-
-async function sendCheckoutEmail(payload) {
-  try {
-    let failure = await postCheckoutEmail(payload);
-    if (!failure) return null;
-    console.error("Checkout email refused:", failure.text);
-    if (failure.fields.length) {
-      for (const field of failure.fields) {
-        if (!payload.has(field)) continue;
-        payload.set(`${field}Given`, payload.get(field));
-        payload.delete(field);
-      }
-      failure = await postCheckoutEmail(payload);
-      if (!failure) return null;
-      console.error("Checkout email refused again:", failure.text);
-    }
-    return failure.text;
-  } catch (error) {
-    console.error("Checkout email failed:", error);
-    return error.message || "network error";
-  }
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@.]{2,}$/;
@@ -209,8 +152,8 @@ module.exports = async function handler(request, response) {
     const customer = checked.customer;
     const embedded = body.embedded === true;
     const invoiceNumber = `GDE-${Date.now().toString().slice(-10)}`;
-    // Saved for the inventory app, which checks the payment and files the buyer. A store hiccup never blocks the sale
-    // while the email below still goes out with every detail.
+    // Saved for the inventory app, which checks the payment and files the buyer. This is GDE's only copy of the order
+    // (the Formspree email was disconnected Nov 13, 2026), so the checkout stops if it can't be saved.
     const order = {
       invoice: invoiceNumber,
       createdAt: new Date().toISOString(),
@@ -228,12 +171,8 @@ module.exports = async function handler(request, response) {
       if (!store.configured()) return false;
       try { await store.saveOrder(Object.assign(order, changes), isNew); return true; } catch (error) { console.error(error); return false; }
     };
-    const saved = await saveOrder({}, true);
-    const emailError = await sendCheckoutEmail(buildCheckoutEmailPayload({ customer, items, amount, invoiceNumber, discount, account: session?.email, referredBy: ref?.owner }));
-    if (emailError) {
-      // With no saved order the email is GDE's only copy, so stop; otherwise note it on the order and carry on.
-      if (!saved) return response.status(502).json({ error: "Your checkout details could not be sent. Please try again in a minute." });
-      await saveOrder({ emailError: emailError.slice(0, 300) });
+    if (!(await saveOrder({}, true))) {
+      return response.status(503).json({ error: "Your checkout details could not be saved. Please try again in a minute, or call us at 1-786-931-3566." });
     }
     const authorizeRequest = {
       getHostedPaymentPageRequest: {

@@ -2,13 +2,12 @@
 // (collector-request.html; storage and the review flow in _credits.js).
 //   GET  /api/collector-request   signed in: { user, status, requests } (their own requests); signed out: { user: null }
 //   POST /api/collector-request   signed in, JSON: { name, phone, where, whereOther, when, guns, which, explanation,
-//                                 files: [{ name, data (base64) }] }: saves the request and emails GDE a heads-up
+//                                 files: [{ name, data (base64) }] }: saves the request (reviewed in the GDE app)
 const store = require("./_store");
 const { readSession, secret } = require("./_session");
 const { collectorStatus } = require("./_collector");
 const credits = require("./_credits");
 
-const NOTIFY_URL = "https://formspree.io/f/mrenwyyv"; // the same inbox that gets every checkout
 const PER_DAY = 5;
 
 const clean = (value, max) => String(value ?? "").replace(/[<>\u0000-\u0008\u000b-\u001f]/g, "").trim().slice(0, max);
@@ -23,23 +22,6 @@ function readBody(request) {
     request.on("end", () => { try { resolve(body ? JSON.parse(body) : {}); } catch { reject(Object.assign(new Error("Invalid request."), { status: 400 })); } });
     request.on("error", reject);
   });
-}
-
-async function notify(record) {
-  try {
-    const data = new URLSearchParams();
-    data.set("subject", `Collector request ${record.id}: ${record.guns} gun${record.guns === 1 ? "" : "s"} from ${record.name || record.email}`);
-    data.set("email", record.email);
-    data.set("name", record.name);
-    data.set("phone", record.phone || "");
-    data.set("whereBought", credits.WHERE[record.where] + (record.whereOther ? `: ${record.whereOther}` : ""));
-    data.set("whenBought", record.when || "");
-    data.set("guns", String(record.guns));
-    data.set("whichGuns", record.which || "");
-    data.set("explanation", record.explanation || "");
-    data.set("proofFiles", `${record.files.length} file(s): review and approve in the GDE app, Website tab, Collector requests`);
-    await fetch(NOTIFY_URL, { method: "POST", headers: { Accept: "application/json" }, body: data });
-  } catch (error) { console.error("Collector request email failed:", error); }
 }
 
 module.exports = async function handler(request, response) {
@@ -96,7 +78,6 @@ module.exports = async function handler(request, response) {
     if (!files.length) return response.status(400).json({ error: "Add at least one receipt or photo as proof." });
 
     const saved = await credits.saveRequest(record, files);
-    await notify(saved);
     return response.status(200).json({ ok: true, id: saved.id });
   } catch (error) {
     if (!error.status) console.error(error);

@@ -3,6 +3,7 @@
 //   gde:catalog         prices and stock the app sends (JSON: { updated, listings: { <listing>: { price, soldOut } } })
 //   gde:order:<invoice> each checkout, with everything the buyer filled in and the payment once it is seen
 //   gde:orders          the invoice numbers, newest first
+//   gde:message:<id>    each Contact page message (api/contact.js); gde:messages the ids, newest first
 // Files starting with "_" in api/ are helpers, not web addresses.
 // Vercel's Upstash integration sets KV_REST_API_URL / KV_REST_API_TOKEN (older ones UPSTASH_REDIS_REST_*).
 
