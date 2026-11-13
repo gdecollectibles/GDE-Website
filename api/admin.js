@@ -5,8 +5,10 @@
 //   GET  /api/admin?action=orders    every saved checkout; recent unpaid or paid ones are first checked against Authorize.net
 //   POST /api/admin?action=delete-order  { invoice }: removes one saved order (test orders); the payment itself is untouched
 //   GET  /api/admin?action=subscribers&since=<ms>  email-list sign-ups and leavers changed since then (api/account.js saves them)
-//   GET  /api/admin?action=messages     Contact page messages (api/contact.js saves them), newest first
-//   POST /api/admin?action=delete-message  { id }: removes one Contact page message (deleted in the app)
+//   GET  /api/admin?action=messages     Contact page messages and "make it unique" requests (api/contact.js and
+//                                       api/custom-request.js save them; kind "custom" for the second), newest first
+//   GET  /api/admin?action=message-file&id=<id>&n=<n>  one reference picture of a custom request: { name, type, size, data (base64) }
+//   POST /api/admin?action=delete-message  { id }: removes one message and its pictures (deleted in the app)
 // Collector credit (guns bought outside the website, see _credits.js):
 //   GET  /api/admin?action=credit-requests          every request (without file contents) and every account's credited guns
 //   GET  /api/admin?action=credit-file&id=<id>&n=<n> one proof file: { name, type, size, data (base64) }
@@ -184,10 +186,20 @@ module.exports = async function handler(request, response) {
       const messages = values.map((v) => { try { return JSON.parse(v); } catch { return null; } }).filter(Boolean);
       return response.status(200).json({ messages });
     }
+    if (action === "message-file" && request.method === "GET") {
+      const q = new URL(request.url, "http://x").searchParams;
+      const id = String(q.get("id") || ""), n = Number(q.get("n"));
+      if (!/^M-\d{10,16}-[0-9a-f]{6}$/.test(id)) return response.status(400).json({ error: "That is not a message id." });
+      const [value, data] = await store.pipeline([["GET", `gde:message:${id}`], ["GET", `gde:msgfile:${id}:${n}`]]);
+      let meta = null;
+      try { meta = JSON.parse(value)?.files?.find((f) => f.n === n); } catch {}
+      return meta && data ? response.status(200).json({ ...meta, data }) : response.status(404).json({ error: "No such file." });
+    }
     if (action === "delete-message" && request.method === "POST") {
       const id = String((await readBody(request)).id || "");
       if (!/^M-\d{10,16}-[0-9a-f]{6}$/.test(id)) return response.status(400).json({ error: "That is not a message id." });
-      const [removed] = await store.pipeline([["DEL", `gde:message:${id}`], ["LREM", "gde:messages", 0, id]]);
+      const [removed] = await store.pipeline([["DEL", `gde:message:${id}`], ["LREM", "gde:messages", 0, id],
+        ...[0, 1, 2, 3].map((n) => ["DEL", `gde:msgfile:${id}:${n}`])]);
       return response.status(200).json({ ok: true, removed: removed > 0 });
     }
     if (action === "credit-requests" && request.method === "GET") {

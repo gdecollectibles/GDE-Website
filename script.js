@@ -469,6 +469,10 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   if (!nav.querySelector('a[href="gallery.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="gallery.html">Gallery</a>');
   const galleryLink = nav.querySelector('a[href="gallery.html"]');
   galleryLink.classList.toggle("active", document.body.classList.contains("gallery-page"));
+  // Piece Unique (user, Nov 13): custom-piece requests, on every page, left of the logo after Gallery.
+  if (!nav.querySelector('a[href="piece-unique.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="piece-unique.html">Piece Unique</a>');
+  const uniqueNavLink = nav.querySelector('a[href="piece-unique.html"]');
+  uniqueNavLink.classList.toggle("active", document.body.classList.contains("unique-page"));
   // Collectors page (user, Nov 12): collector tiers. Every page gets it, first on the right of the logo (user, Nov 12).
   if (!nav.querySelector('a[href="collectors.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="collectors.html">Collectors</a>');
   const collectorsLink = nav.querySelector('a[href="collectors.html"]');
@@ -493,9 +497,9 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   if (!nav.querySelector('a[href="about.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="about.html">About</a>');
   const aboutLink = nav.querySelector('a[href="about.html"]');
   aboutLink.classList.toggle("active", document.body.classList.contains("about-page"));
-  // Left of the logo: Home, Collections, Gallery. Right: Collectors, About, Contact, social icons, then the account icon
+  // Left of the logo: Home, Collections, Gallery, Piece Unique. Right: Collectors, About, Contact, social icons, then the account icon
   // (added by gde-account.js just before the cart) and the cart (user, Nov 12).
-  [homeLink, collectionsMenu, galleryLink, collectorsLink, aboutLink, contactLink, socialsMenu, headerAction].forEach(item => {
+  [homeLink, collectionsMenu, galleryLink, uniqueNavLink, collectorsLink, aboutLink, contactLink, socialsMenu, headerAction].forEach(item => {
     if (item) nav.appendChild(item);
   });
 });
@@ -525,6 +529,7 @@ document.querySelectorAll(".site-footer").forEach(footer => {
       <a href="collections.html">Collections</a>
       <a href="gallery.html">Gallery</a>
       <a href="collectors.html">Collectors</a>
+      <a href="piece-unique.html">Piece Unique</a>
       <a href="about.html">About</a>
       <a href="cart.html">Cart</a>
       <a href="checkout.html">Checkout</a>
@@ -757,6 +762,9 @@ if (document.querySelector(".product-detail-page")) {
   } else {
     if (!document.body.dataset.product) document.title = `${product.name} | GDE Collectibles`; // gun/<slug>.html keeps its longer search title
     setText("#detailCollection",displayCollections(product)); setText("#detailCollectionNumber",product.collectionNumber || ""); setText("#detailHeaderAvailability",product.availability); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); document.querySelector("#serialCallout")?.classList.toggle("is-hidden", !product.collectionNumber); /* the sequence box only on numbered editions (user, Nov 13) */ setImage("#detailImage"); setProductGallery(product); setExtraSpecs(product);
+    // "Piece Unique" link under the cart button: opens piece-unique.html starting from this gun (user, Nov 13).
+    const uniqueLink = document.querySelector("#uniqueLink a");
+    if (uniqueLink) { const c = productCollections(product)[0] || ""; uniqueLink.href = `/piece-unique.html?${new URLSearchParams({ collection: c === "Gallery" ? "" : c, model: product.model || "", caliber: product.caliber || "", gun: [product.name, product.collectionNumber].filter(Boolean).join(", ") })}`; }
     // Gallery guns (refinished, not designed by GDE) carry the same tag on their own page as on their card.
     if (product.refinished && !document.querySelector("#detailPrice + .not-gde-tag")) document.querySelector("#detailPrice")?.insertAdjacentHTML("afterend", '<p class="not-gde-tag">Not designed by GDE</p>');
     if (request) request.dataset.product=key || Object.keys(products)[0];

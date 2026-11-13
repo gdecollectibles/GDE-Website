@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Piece Unique | GDE Collectibles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Gloock&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css?v=20261113uniq">
+<link rel="icon" href="favicon.ico?v=20261108" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261113"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261108"><script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script><script defer src="/_vercel/insights/script.js"></script><!--seo--><meta name="description" content="Request a custom GDE piece: choose the Colt 1911 model and caliber, send your own design or have GDE design it, and pick the finish and colors."><link rel="canonical" href="https://www.gdecollectibles.com/piece-unique.html"><meta property="og:site_name" content="GDE Collectibles"><meta property="og:type" content="website"><meta property="og:title" content="Piece Unique: Custom Engraved 1911 | GDE Collectibles"><meta property="og:description" content="Request a custom GDE piece: choose the Colt 1911 model and caliber, send your own design or have GDE design it, and pick the finish and colors."><meta property="og:url" content="https://www.gdecollectibles.com/piece-unique.html"><meta property="og:image" content="https://www.gdecollectibles.com/assets/hero/alamo-film-loop-4k-poster.jpg"><!--/seo--><style>
+.pu-form{display:grid;gap:0}
+.pu-step{border:0;margin:0;padding:0 0 34px;min-width:0}
+.pu-step+.pu-step{border-top:1px solid var(--line);padding-top:30px}
+.pu-step>legend{float:left;width:100%;padding:0;margin:0 0 18px;font:500 1.55rem var(--serif);color:var(--text)}
+.pu-step>legend span{font:600 .7rem var(--sans);color:var(--gold);margin-right:12px;letter-spacing:.1em}
+.pu-step>legend+*{clear:both}
+.pu-q{grid-column:1/-1;border:0;margin:0;padding:0;min-width:0}
+.pu-q>legend,.pu-label{padding:0;font-size:.65rem;text-transform:uppercase;letter-spacing:.14em;font-weight:600}
+.pu-q legend em,.field-grid label em,.pu-label em{font-style:normal;font-weight:400;opacity:.6;letter-spacing:.08em;text-transform:none;font-size:.7rem}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
+.pills label{position:relative;cursor:pointer;letter-spacing:0;text-transform:none;font-weight:400}
+.pills input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.pills span{display:block;padding:9px 14px;border:1px solid var(--line-strong);font-size:.78rem;color:var(--text);transition:border-color .15s,background .15s}
+.pills label:hover span{border-color:var(--gold)}
+.pills input:checked+span{background:var(--gold);border-color:var(--gold);color:#111}
+.pills input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
+.pu-design-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:9px}
+.pu-design-cards label{position:relative;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:400}
+.pu-design-cards input{position:absolute;opacity:0;width:1px;height:1px}
+.pu-design-cards span{display:block;height:100%;padding:16px;border:1px solid var(--line-strong);transition:border-color .15s,background .15s}
+.pu-design-cards b{display:block;font:500 1.05rem var(--serif);color:var(--text);margin-bottom:4px}
+.pu-design-cards small{display:block;font-size:.74rem;line-height:1.5;color:var(--muted)}
+.pu-design-cards label:hover span{border-color:var(--gold)}
+.pu-design-cards input:checked+span{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.pu-design-cards input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
+.pu-files{grid-column:1/-1}
+.pu-hint{margin:6px 0 10px;font-size:.75rem;color:var(--muted)}
+.pu-drop{display:block;cursor:pointer;border:1px dashed var(--line-strong);padding:22px;text-align:center;font-size:.8rem;color:var(--text);letter-spacing:0;text-transform:none;font-weight:400;transition:border-color .15s}
+.pu-drop:hover,.pu-drop:focus-within{border-color:var(--gold)}
+.pu-drop input{position:absolute;opacity:0;width:1px;height:1px}
+.pu-thumbs{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px}
+.pu-thumbs li{position:relative;width:86px;height:86px;border:1px solid var(--line);display:grid;place-items:center;font-size:.65rem;color:var(--muted);text-align:center;padding:4px;overflow:hidden}
+.pu-thumbs img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pu-thumbs button{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;border:0;background:var(--gold);color:#111;cursor:pointer;font-size:.9rem;line-height:1;z-index:1}
+.unique-steps{list-style:none;margin:28px 0 0;padding:0;counter-reset:step}
+.unique-steps li{counter-increment:step;display:grid;grid-template-columns:34px 1fr;gap:4px 14px;padding:18px 0;border-top:1px solid var(--line)}
+.unique-steps li:before{content:counter(step);grid-row:span 2;width:28px;height:28px;border:1px solid var(--gold);border-radius:50%;display:grid;place-content:center;font-size:.72rem;color:var(--gold)}
+.unique-steps b{font:500 1.15rem var(--serif);color:var(--text)}
+.unique-steps span{font-size:.8rem;color:var(--muted)}
+.unique-done{text-align:center;padding:30px 10px}
+.unique-done h2{margin:.2em 0 .4em}
+.unique-done p:not(.eyebrow){color:var(--muted)}
+.form-message.error{color:#c0503e}
+[hidden]{display:none!important}
+/* Black page (as the rest of the site) with the form in a dark grey rounded box, like checkout; smaller title (user, Nov 13) */
+body.unique-page{--co-panel:#26272a;--co-field:#45474b}
+body.unique-page .contact-hero h1{font-size:clamp(2.4rem,4.5vw,4rem)}
+body.unique-page .contact-form{background:var(--paper);border-radius:10px} /* same color as the Piece Unique banner (user, Nov 13) */
+body.unique-page .field-grid input,body.unique-page .field-grid select,body.unique-page .field-grid textarea{border-radius:6px;border-color:var(--co-field)}
+body.unique-page .field-grid select option{background:var(--co-panel)}
+body.unique-page .pills span{border-radius:6px;border-color:var(--co-field)}
+body.unique-page .pu-design-cards span{border-radius:8px;border-color:var(--co-field)}
+body.unique-page .pu-drop{border-radius:8px;border-color:var(--co-field)}
+body.unique-page .pu-thumbs li,body.unique-page .pu-thumbs img{border-radius:6px}
+body.unique-page .pu-step+.pu-step{border-top-color:var(--co-field)}
+body.unique-page .button{border-radius:6px}
+@media(max-width:760px){.pu-design-cards{grid-template-columns:1fr}}
+</style></head>
+<body class="unique-page">
+  <header class="site-header dark-header"><a class="brand" href="index.html"><span class="brand-mark">GDE</span><span>Collectibles</span></a><button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button><nav class="site-nav"><a href="index.html">Home</a><a href="collections.html">Collections</a><a class="active" href="piece-unique.html">Piece Unique</a><a href="collectors.html">Collectors</a><a href="about.html">About</a><a href="contact.html">Contact</a><a class="button button-small cart-nav" href="cart.html">Cart <span class="cart-count">0</span></a></nav></header>
+  <main class="contact-page">
+    <section class="contact-hero"><p class="eyebrow">Custom commissions</p><h1>Piece Unique</h1><p>A GDE piece built your way. Choose the gun, bring your own design or let us create one, and pick the colors and finish. We'll come back to you with what's possible, a price and a timeline.</p></section>
+    <section class="contact-layout">
+      <div class="contact-details">
+        <p class="eyebrow">How it works</p><h2>From your idea to your piece.</h2>
+        <ol class="unique-steps">
+          <li><b>Tell us what you want</b><span>The gun, the design and the colors. Send pictures or your own artwork if you have them.</span></li>
+          <li><b>We send you a proposal</b><span>What's possible, a price and a timeline. If we're designing it, you see the design before anything is made.</span></li>
+          <li><b>We make your piece</b><span>Once you approve, we engrave and finish it, then ship it to your FFL dealer.</span></li>
+        </ol>
+        <div class="contact-method"><span>Rather talk it through?</span><a href="tel:+17869313566">1-786-931-3566</a></div>
+        <p class="contact-note">Please do not send identity documents, payment-card details, or Social Security numbers.</p>
+      </div>
+      <form id="uniqueForm" class="contact-form pu-form" novalidate>
+        <label class="hp-field" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
+
+        <fieldset class="pu-step"><legend><span>01</span>The gun</legend>
+          <div class="field-grid">
+            <fieldset class="pu-q"><legend>Model</legend><div class="pills" id="modelOptions"></div></fieldset>
+            <label class="wide" id="modelOtherWrap" hidden>Which model?<input name="modelOther" maxlength="120" placeholder="e.g. Colt Commander, Kimber, Springfield"></label>
+            <fieldset class="pu-q"><legend>Caliber</legend><div class="pills" id="caliberOptions"></div></fieldset>
+            <label class="wide" id="caliberOtherWrap" hidden>Which caliber?<input name="caliberOther" maxlength="60" placeholder="e.g. 10mm"></label>
+            <label class="wide">Other details <em>(optional)</em><input name="gunDetails" maxlength="300" placeholder="Barrel length, sights, a specific gun or number you saw on our site..."></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="pu-step"><legend><span>02</span>The design</legend>
+          <div class="field-grid">
+            <fieldset class="pu-q"><legend>Whose design?</legend><div class="pu-design-cards">
+              <label><input type="radio" name="design" value="own"><span><b>My own design</b><small>You have the artwork, a logo or a drawing. Upload it below.</small></span></label>
+              <label><input type="radio" name="design" value="gde"><span><b>Design it for me</b><small>Tell us the theme and we create the design for you.</small></span></label>
+              <label><input type="radio" name="design" value="collection"><span><b>Start from a collection</b><small>One of our designs, changed your way.</small></span></label>
+            </div></fieldset>
+            <label class="wide" id="collectionWrap" hidden>Which collection?<select name="collection"><option value="">Choose one</option></select></label>
+            <label class="wide" id="themeLabel"><span id="themeText">Tell us about the design</span><textarea name="message" rows="5" maxlength="5000" placeholder="The theme, the story behind it, the style you like."></textarea></label>
+            <fieldset class="pu-q"><legend>Where on the gun? <em>(pick any)</em></legend><div class="pills" id="placementOptions"></div></fieldset>
+            <label class="wide">Names, initials or dates to engrave <em>(optional)</em><input name="text" maxlength="300" placeholder="Spelled exactly as you want them"></label>
+            <div class="pu-files">
+              <p class="pu-label" id="filesTitle">Pictures <em>(optional)</em></p>
+              <p class="pu-hint" id="filesHint">Anything that shows your idea: a logo, a crest, a design you like. Pictures or PDFs, up to 4 files.</p>
+              <label class="pu-drop"><input type="file" name="files" accept="image/*,application/pdf" multiple><span>Add files</span></label>
+              <ul class="pu-thumbs" id="uniqueThumbs"></ul>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="pu-step"><legend><span>03</span>Colors &amp; finish</legend>
+          <div class="field-grid">
+            <label>Slide<select name="slide" data-list="finishes"></select></label>
+            <label>Frame<select name="frame" data-list="finishes"></select></label>
+            <label>Engraving color<select name="engraving" data-list="fills"></select></label>
+            <label>Grips<select name="grips" data-list="grips"></select></label>
+            <label class="wide">Anything else about the colors? <em>(optional)</em><input name="colorNotes" maxlength="300" placeholder="e.g. gold trigger and hammer, blue accents, a medallion on the grips"></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="pu-step"><legend><span>04</span>About you</legend>
+          <div class="field-grid">
+            <label>Full name<input required name="name" autocomplete="name" maxlength="120"></label>
+            <label>Email address<input required type="email" name="email" autocomplete="email" maxlength="200"></label>
+            <label>Phone number<input required type="tel" name="phone" autocomplete="tel" maxlength="40"></label>
+            <label>State<input name="state" autocomplete="address-level1" maxlength="60"></label>
+            <label>Budget <em>(optional)</em><select name="budget" data-list="budgets"></select></label>
+            <label>Needed by <em>(optional)</em><input name="when" maxlength="80" placeholder="e.g. a birthday on June 14"></label>
+            <fieldset class="pu-q"><legend>How should we reach you? <em>(optional, pick any)</em></legend><div class="pills"><label><input type="checkbox" name="contactPreference" value="Call"><span>Call</span></label><label><input type="checkbox" name="contactPreference" value="Text"><span>Text</span></label><label><input type="checkbox" name="contactPreference" value="Email"><span>Email</span></label></div></fieldset>
+          </div>
+        </fieldset>
+
+        <div><button class="button" type="submit">Send My Request</button><p class="form-message" aria-live="polite"></p></div>
+      </form>
+    </section>
+  </main>
+  <footer class="site-footer"><div><a class="brand footer-brand" href="index.html"><span class="brand-mark">GDE</span><span>Collectibles</span></a><p>Limited engraved firearm collections for serious collectors.</p></div><div class="footer-links"><a href="index.html">Home</a><a href="collections.html">Collections</a><a href="piece-unique.html">Piece Unique</a><a href="contact.html">Contact</a><a href="cart.html">Cart</a></div><div class="footer-legal"><p>All firearm transactions must comply with federal, state, and local laws.</p><div class="footer-social" aria-label="GDE Collectibles on social media"><a href="https://www.instagram.com/gdecollectibles/" target="_blank" rel="noopener" aria-label="GDE Collectibles on Instagram" title="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a><a href="https://www.facebook.com/gdecollectibles" target="_blank" rel="noopener" aria-label="GDE Collectibles on Facebook" title="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.4H7.7V14h2.7v8z"/></svg></a></div><span>© 2026 GDE Collectibles</span></div></footer>
+  <script src="script.js?v=20261113uniq"></script><script src="gde-account.js?v=20261112col"></script><script src="piece-unique.js?v=20261113"></script>
+</body>
+</html>

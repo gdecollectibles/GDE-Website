@@ -390,10 +390,10 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 .footer-social a:hover,.footer-social a:focus-visible{color:#fff;border-color:#fff;background:rgba(255,255,255,.06)}
 .footer-social svg{width:17px;height:17px}
 @media(max-width:760px){.footer-social{justify-content:flex-start}}
-/* Left of the logo: Home, Collections, Gallery. Socials opens the right side (user, Nov 12; Marketplaces removed). */
+/* Left of the logo: Home, Collections, Gallery, Piece Unique. Socials opens the right side (user, Nov 12; Marketplaces removed). */
 @media(min-width:761px){
   .site-nav>:nth-child(3){margin-right:0}
-  .site-nav>a[href="gallery.html"]{margin-right:auto}
+  .site-nav>a[href="piece-unique.html"]{margin-right:auto}
 }
 .socials-menu .nav-dropdown-panel{width:190px}
 @media(max-width:760px){.socials-menu .nav-dropdown-panel{width:100%}}
@@ -709,3 +709,5 @@ body.side-cart-locked{overflow:hidden}
 .detail-copy>.compliance-callout{margin:18px 0}
 /* Listings: no Serial & Sequence box on guns without an edition number (GDE Scrolls, Gallery) (user, Nov 13). */
 .compliance-callout.is-hidden{display:none}
+.detail-copy>p.unique-link{margin:16px 0 0;text-align:center;font-size:.8rem;color:var(--muted)}.unique-link a span{color:var(--gold);border-bottom:1px solid currentColor;margin-left:4px}.unique-link a:hover span{color:var(--gold-light)}
+.contact-unique{margin-top:35px;padding:22px 24px;border:1px solid var(--line-strong)}.contact-unique strong{display:block;font:500 1.2rem var(--serif);color:var(--text)}.contact-unique p{margin:6px 0 12px;font-size:.8rem;color:var(--muted)}.contact-unique a{color:var(--gold);font-size:.72rem;text-transform:uppercase;letter-spacing:.13em;font-weight:600}
