@@ -6,6 +6,7 @@
 //   POST /api/admin?action=delete-order  { invoice }: removes one saved order (test orders); the payment itself is untouched
 //   GET  /api/admin?action=subscribers&since=<ms>  email-list sign-ups and leavers changed since then (api/account.js saves them)
 //   GET  /api/admin?action=messages     Contact page messages (api/contact.js saves them), newest first
+//   POST /api/admin?action=delete-message  { id }: removes one Contact page message (deleted in the app)
 // Collector credit (guns bought outside the website, see _credits.js):
 //   GET  /api/admin?action=credit-requests          every request (without file contents) and every account's credited guns
 //   GET  /api/admin?action=credit-file&id=<id>&n=<n> one proof file: { name, type, size, data (base64) }
@@ -182,6 +183,12 @@ module.exports = async function handler(request, response) {
       const values = ids.length ? await store.cmd("MGET", ...ids.map((id) => `gde:message:${id}`)) : [];
       const messages = values.map((v) => { try { return JSON.parse(v); } catch { return null; } }).filter(Boolean);
       return response.status(200).json({ messages });
+    }
+    if (action === "delete-message" && request.method === "POST") {
+      const id = String((await readBody(request)).id || "");
+      if (!/^M-\d{10,16}-[0-9a-f]{6}$/.test(id)) return response.status(400).json({ error: "That is not a message id." });
+      const [removed] = await store.pipeline([["DEL", `gde:message:${id}`], ["LREM", "gde:messages", 0, id]]);
+      return response.status(200).json({ ok: true, removed: removed > 0 });
     }
     if (action === "credit-requests" && request.method === "GET") {
       const [requests, credited, orders] = await Promise.all([credits.listRequests(), credits.listCredits(), store.listOrders()]);
