@@ -497,9 +497,9 @@ document.querySelectorAll(".site-nav").forEach(nav => {
   if (!nav.querySelector('a[href="about.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="about.html">About</a>');
   const aboutLink = nav.querySelector('a[href="about.html"]');
   aboutLink.classList.toggle("active", document.body.classList.contains("about-page"));
-  // Left of the logo: Home, Collections, Gallery, Piece Unique. Right: Collectors, About, Contact, social icons, then the account icon
-  // (added by gde-account.js just before the cart) and the cart (user, Nov 12).
-  [homeLink, collectionsMenu, galleryLink, uniqueNavLink, collectorsLink, aboutLink, contactLink, socialsMenu, headerAction].forEach(item => {
+  // Left of the logo: Home, Collections, Gallery. Right: Collectors, Piece Unique (moved right, user Nov 13), About, Contact,
+  // social icons, then the account icon (added by gde-account.js just before the cart) and the cart (user, Nov 12).
+  [homeLink, collectionsMenu, galleryLink, collectorsLink, uniqueNavLink, aboutLink, contactLink, socialsMenu, headerAction].forEach(item => {
     if (item) nav.appendChild(item);
   });
 });

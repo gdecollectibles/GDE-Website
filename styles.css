@@ -393,7 +393,7 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 /* Left of the logo: Home, Collections, Gallery, Piece Unique. Socials opens the right side (user, Nov 12; Marketplaces removed). */
 @media(min-width:761px){
   .site-nav>:nth-child(3){margin-right:0}
-  .site-nav>a[href="piece-unique.html"]{margin-right:auto}
+  .site-nav>a[href="gallery.html"]{margin-right:auto} /* Piece Unique moved to the right side (user, Nov 13) */
 }
 .socials-menu .nav-dropdown-panel{width:190px}
 @media(max-width:760px){.socials-menu .nav-dropdown-panel{width:100%}}
@@ -679,7 +679,7 @@ body.side-cart-locked{overflow:hidden}
 @media(max-width:760px){.collectors-tier,.collectors-tier-two{grid-template-columns:1fr;padding:0}.collectors-mark{order:-1;min-height:0;padding:50px 24px 0}.collectors-mark>div{padding:32px 28px}.collectors-tier .about-business{padding:40px 24px 60px}.collectors-how{padding:70px 22px}.collectors-details{padding:0 22px 80px}}
 /* Collectors on the right (user, Nov 12) left no room beside the logo below about 1400px: the header social icons step
    out up to 1380px (they stay in the footer and the phone menu), and wide screens space the links a little closer. */
-@media(min-width:761px) and (max-width:1380px){.site-nav .nav-socials{display:none}}
+@media(min-width:761px) and (max-width:1490px){.site-nav .nav-socials{display:none}} /* was 1380; Piece Unique joined the right side (Nov 13) */
 @media(min-width:1321px){.site-nav{gap:24px}}
 /* Friends and family codes (user, Nov 12): a Legacy Club member's code on the account page, and the code box at checkout. */
 .ff-code-box{margin-top:14px;font-size:.78rem}
@@ -711,3 +711,22 @@ body.side-cart-locked{overflow:hidden}
 .compliance-callout.is-hidden{display:none}
 .detail-copy>p.unique-link{margin:16px 0 0;text-align:center;font-size:.8rem;color:var(--muted)}.unique-link a span{color:var(--gold);border-bottom:1px solid currentColor;margin-left:4px}.unique-link a:hover span{color:var(--gold-light)}
 .contact-unique{margin-top:35px;padding:22px 24px;border:1px solid var(--line-strong)}.contact-unique strong{display:block;font:500 1.2rem var(--serif);color:var(--text)}.contact-unique p{margin:6px 0 12px;font-size:.8rem;color:var(--muted)}.contact-unique a{color:var(--gold);font-size:.72rem;text-transform:uppercase;letter-spacing:.13em;font-weight:600}
+/* Header icons (user, Nov 13): Instagram, Facebook, account and cart a little closer together, with the same space
+   between each glyph (14px). The nav gap lives in --nav-gap so the account and cart can pull back by it; the 3px and
+   2.6px are the blank edges inside the account and cart icons, the 8px is the cart button's left padding. */
+@media(min-width:761px){
+  .site-nav{--nav-gap:24px;--icon-gap:14px;gap:var(--nav-gap)}
+  .site-nav .nav-socials{gap:var(--icon-gap)}
+  .site-nav .nav-socials svg{width:auto} /* the Facebook "f" is narrow: size each box to its glyph so the gaps read equal */
+  .site-nav .account-nav{margin-left:calc(var(--icon-gap) - 3px - var(--nav-gap))}
+  .site-nav .cart-nav{margin-left:calc(var(--icon-gap) - 3px - 8px - 2.6px - var(--nav-gap))}
+}
+@media(min-width:761px) and (max-width:1320px){.site-nav{--nav-gap:16px}}
+@media(min-width:761px) and (max-width:1180px){.site-nav{--nav-gap:14px}}
+@media(min-width:761px) and (max-width:980px){.site-nav{--nav-gap:10px;--icon-gap:12px}}
+/* Tablets and small laptops (761–1280px): no room right of the logo for Piece Unique, so there it stays the last link on the left. */
+@media(min-width:761px) and (max-width:1280px){
+  .site-nav>a[href="index.html"],.site-nav>.collections-menu,.site-nav>a[href="gallery.html"],.site-nav>a[href="piece-unique.html"]{order:-1}
+  .site-nav>a[href="gallery.html"]{margin-right:0}
+  .site-nav>a[href="piece-unique.html"]{margin-right:auto}
+}
