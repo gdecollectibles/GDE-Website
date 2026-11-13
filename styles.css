@@ -703,3 +703,7 @@ body.side-cart-locked{overflow:hidden}
    picking up the .footer-legal span rule (block, pushed down) meant for the copyright line. */
 .footer-legal .footer-contact div{align-items:baseline}
 .footer-legal .footer-contact div span{display:inline;margin:0;color:#6b6b70}
+/* Listings: fees line in bold right above Add to Cart, not a box (user, Nov 13). */
+.detail-copy>p.fees-included{margin:18px 0 12px;color:var(--text,#fff);font-weight:700;font-size:.82rem;letter-spacing:.02em}
+/* Listings: tighter spacing from "See all…" through the FFL and serial boxes to the fees line (user, Nov 13): 30px -> 18px. */
+.detail-copy>.compliance-callout{margin:18px 0}
