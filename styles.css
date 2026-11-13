@@ -412,8 +412,6 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 .nav-socials a:hover,.nav-socials a:focus-visible{color:#fff}
 .nav-socials{--icon:17px}
 .nav-socials svg{width:var(--icon);height:var(--icon)}
-/* YouTube (user, Nov 12): 85% of Instagram's height ("a little smaller"); its 20:14 glyph gets a wider box. */
-.nav-socials .nav-youtube svg{height:calc(var(--icon) * .85);width:calc(var(--icon) * .85 * 20 / 14)}
 @media(min-width:761px) and (max-width:980px){.nav-socials{gap:10px;--icon:15px}}
 @media(max-width:760px){.nav-socials{gap:24px;padding:14px 0;--icon:22px}}
 
