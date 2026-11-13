@@ -699,3 +699,7 @@ body.side-cart-locked{overflow:hidden}
 .ref-link{display:flex;gap:8px;flex-wrap:wrap}
 .ref-link input{flex:1;min-width:220px;padding:11px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--text,#fff);font:500 .85rem var(--sans)}
 .ref-link .button{min-height:42px;border-radius:6px}
+/* Footer: the "|" between Privacy Policy and Terms of Service sits on the same line as the links (user, Nov 13). It was
+   picking up the .footer-legal span rule (block, pushed down) meant for the copyright line. */
+.footer-legal .footer-contact div{align-items:baseline}
+.footer-legal .footer-contact div span{display:inline;margin:0;color:#6b6b70}
