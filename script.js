@@ -803,7 +803,7 @@ const sideCart = (() => {
       <div class="side-cart-items"></div>
       <div class="side-cart-foot">
         <div class="side-cart-subtotal"><span>Subtotal</span><strong></strong></div>
-        <p class="side-cart-note">Firearms ship only to a licensed FFL dealer.</p>
+        <p class="side-cart-note">Firearms ship only to a licensed FFL dealer. Shipping, insurance and your dealer's FFL transfer fee are on us.</p>
         <div class="side-cart-actions"><a class="button secondary side-cart-view" href="cart.html">View cart</a><a class="button side-cart-checkout" href="checkout.html">Checkout</a></div>
       </div>
     </aside>
