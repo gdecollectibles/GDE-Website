@@ -1,6 +1,6 @@
 // The Contact page form (contact.html). Saves each message in the store; the GDE app picks them up every couple of
 // minutes into Customers > Website inquiries (via /api/admin?action=messages). Replaced Formspree on Nov 13, 2026.
-//   POST /api/contact   JSON (or a plain form post): { name, email, phone, state, collection, message, complianceConfirmed }
+//   POST /api/contact   JSON (or a plain form post): { name, email, phone, state, collection: [names], message }
 // Stored next to the orders (see _store.js):
 //   gde:message:<id>   one message, kept 180 days (the app keeps its own copy)
 //   gde:messages       message ids, newest first
@@ -10,7 +10,9 @@ const store = require("./_store");
 const PER_HOUR = 5;          // messages from one address in an hour
 const KEEP_SECONDS = 180 * 86400;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@.]{2,}$/;
-const COLLECTIONS = ["Presidential Collection", "Heritage Collection", "Gold Inlay Collection", "Wildlife Collection", "General inquiry"];
+// The site's collections plus the Gallery (the Contact page's "Collections of interest" tick boxes); none ticked = general.
+const COLLECTIONS = ["The Capital", "Remember the Alamo", "Blue Finish", "US Constitution", "Mt. Rushmore", "USS Constitution",
+  "America's 250 Anniversary", "Donald J Trump", "El Alamo", "Scrolls", "Gallery"];
 
 const clean = (value, max) => String(value ?? "").replace(/[<>\u0000-\u0008\u000b-\u001f]/g, "").trim().slice(0, max);
 
@@ -23,7 +25,11 @@ function readBody(request) {
     });
     request.on("end", () => {
       const json = /^application\/json\b/i.test(String(request.headers["content-type"] || ""));
-      try { resolve(json ? (body ? JSON.parse(body) : {}) : Object.fromEntries(new URLSearchParams(body))); }
+      try {
+        if (json) return resolve(body ? JSON.parse(body) : {});
+        const params = new URLSearchParams(body);
+        resolve({ ...Object.fromEntries(params), collection: params.getAll("collection") });
+      }
       catch { reject(Object.assign(new Error("Invalid request."), { status: 400 })); }
     });
     request.on("error", reject);
@@ -55,15 +61,13 @@ module.exports = async function handler(request, response) {
       email: clean(body.email, 200).replace(/\s+/g, "").toLowerCase(),
       phone: clean(body.phone, 40),
       state: clean(body.state, 60),
-      collection: COLLECTIONS.includes(body.collection) ? body.collection : "General inquiry",
-      message: clean(body.message, 5000),
-      complianceConfirmed: ["Yes", "on", "true", true].includes(body.complianceConfirmed)
+      collection: [...new Set([body.collection].flat().filter((c) => COLLECTIONS.includes(c)))].join(", ") || "General inquiry",
+      message: clean(body.message, 5000)
     };
     if (!record.name) return reply(400, { error: "Please enter your name." });
     if (!EMAIL_PATTERN.test(record.email)) return reply(400, { error: "Please check your email address. It should look like name@example.com." });
     if (!record.phone) return reply(400, { error: "Please enter your phone number." });
     if (!record.message) return reply(400, { error: "Please write a message." });
-    if (!record.complianceConfirmed) return reply(400, { error: "Please tick the box about firearm laws and FFL transfers." });
 
     const key = `gde:rl:contact:${crypto.createHash("sha256").update(clientIp(request)).digest("hex").slice(0, 32)}`;
     const [, count] = await store.pipeline([["SET", key, 0, "EX", 3600, "NX"], ["INCR", key]]);

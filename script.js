@@ -44,7 +44,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "Hand Polished & Hand 24K Gold Plated also on the frame",
     "gripColor": "Composite - Pearl Brown with Colt Horse in gold",
-    "price": "$3,500",
+    "price": "$3,300",
     "availability": "Available",
     "image": "image-gold",
     "description": "Picture of Serial # or Sequence # on the gun is different from the one you are purchasing. If you are interested in a specific sequence number call us, if available we will work with you so you can obtain the number.",
@@ -72,7 +72,7 @@ const products = {
     "action": "Semi-Automatic",
     "finish": "Royal Blue with Full Scroll Engraving",
     "gripColor": "White pearl with gold rearing horse medallions",
-    "price": "$3,500",
+    "price": "$3,300",
     "availability": "Available",
     "image": "image-gold",
     "description": "Royal blued Colt Government Model in .38 Super with full scroll engraving on the slide and a polished silver barrel. Gold-plated hammer, trigger, safety, slide stop, screws and pins.",
@@ -252,7 +252,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "Polished Stainless Steel with Gold-Filled Engraving",
     "gripColor": "Swirled brown pearl with Estados Unidos Mexicanos medallion",
-    "price": "$3,500",
+    "price": "$3,300",
     "availability": "Available",
     "image": "image-gold",
     "description": "Polished stainless Colt 1911 in .38 Super with gold-filled scrollwork, 'El Alamo' lettering, the Alamo mission, a cannon and a 'Marzo 6, 1836' banner on the slide. Gold-plated hammer, trigger, safeties, slide stop, grip screws and mainspring housing.",
@@ -282,7 +282,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "Polished Stainless Steel with Full Scroll Engraving",
     "gripColor": "Pearl white with gold Colt pony",
-    "price": "$3,500",
+    "price": "$2,500",
     "availability": "Available",
     "image": "image-gold",
     "description": "Polished stainless Colt 1911 in .38 Super with full scroll engraving on the slide and frame. Gold-plated hammer, trigger, safeties, slide stop, screws and grip medallion.",
@@ -310,7 +310,7 @@ const products = {
     "action": "Semi-Automatic",
     "finish": "Bright Polish with Full Floral Scroll Engraving",
     "gripColor": "Pearl with gold rearing horse medallions",
-    "price": "$3,500",
+    "price": "$2,500",
     "availability": "Available",
     "image": "image-gold",
     "description": "Bright polished Colt 1911 in .45 ACP with full-coverage floral scroll engraving on the slide and frame. Gold-plated hammer, trigger, safeties, slide stop, magazine release, sights, screws and pins.",
@@ -340,7 +340,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "Polished Stainless Steel with Scroll Engraving and Gold-Filled Skulls",
     "gripColor": "Black pearl swirl with gold screws",
-    "price": "$3,500",
+    "price": "$3,000",
     "availability": "Available",
     "image": "image-gold",
     "description": "Polished stainless Colt Government Model in .45 ACP with fine scroll engraving and gold-filled skulls and scroll panels on the slide. Gold hammer, trigger, grip bushings and sights.",
@@ -369,7 +369,7 @@ const products = {
     "action": "Semi-Automatic",
     "finish": "Polished with Gold-Filled Engraving",
     "gripColor": "Black and gold swirl",
-    "price": "$3,500",
+    "price": "$3,000",
     "availability": "Available",
     "image": "image-gold",
     "description": "Polished Colt Government Model in .38 Super with gold-filled engraving: the White House, the American flag, the all-seeing eye pyramid, the Masonic square and compass, scrollwork and Greek key borders. Gold grip screws, hammer, trigger and small parts.",
@@ -1148,7 +1148,8 @@ document.querySelector("#contactForm")?.addEventListener("submit", async e => {
   button.textContent = "Sending...";
   message.textContent = "";
   try {
-    const fields = Object.fromEntries(new FormData(form));
+    const data = new FormData(form);
+    const fields = { ...Object.fromEntries(data), collection: data.getAll("collection") };
     const response = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },
