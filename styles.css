@@ -707,3 +707,5 @@ body.side-cart-locked{overflow:hidden}
 .detail-copy>p.fees-included{margin:18px 0 12px;color:var(--text,#fff);font-weight:700;font-size:.82rem;letter-spacing:.02em}
 /* Listings: tighter spacing from "See all…" through the FFL and serial boxes to the fees line (user, Nov 13): 30px -> 18px. */
 .detail-copy>.compliance-callout{margin:18px 0}
+/* Listings: no Serial & Sequence box on guns without an edition number (GDE Scrolls, Gallery) (user, Nov 13). */
+.compliance-callout.is-hidden{display:none}

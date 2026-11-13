@@ -255,7 +255,7 @@ const products = {
     "price": "$3,300",
     "availability": "Available",
     "image": "image-gold",
-    "description": "Polished stainless Colt 1911 in .38 Super with gold-filled scrollwork, 'El Alamo' lettering, the Alamo mission, a cannon and a 'Marzo 6, 1836' banner on the slide. Gold-plated hammer, trigger, safeties, slide stop, grip screws and mainspring housing.",
+    "description": "The serial and sequence number in the pictures are not the ones on the gun you receive. Want a specific sequence number? Reach us however is easiest for you: call, text, email or the contact form. If it's available, we'll make sure it's yours.",
     "photos": [
       "assets/listings/el-alamo/el-alamo-01.jpg",
       "assets/listings/el-alamo/el-alamo-02.jpg",
@@ -756,7 +756,7 @@ if (document.querySelector(".product-detail-page")) {
     }
   } else {
     if (!document.body.dataset.product) document.title = `${product.name} | GDE Collectibles`; // gun/<slug>.html keeps its longer search title
-    setText("#detailCollection",displayCollections(product)); setText("#detailCollectionNumber",product.collectionNumber || ""); setText("#detailHeaderAvailability",product.availability); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); setImage("#detailImage"); setProductGallery(product); setExtraSpecs(product);
+    setText("#detailCollection",displayCollections(product)); setText("#detailCollectionNumber",product.collectionNumber || ""); setText("#detailHeaderAvailability",product.availability); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); document.querySelector("#serialCallout")?.classList.toggle("is-hidden", !product.collectionNumber); /* the sequence box only on numbered editions (user, Nov 13) */ setImage("#detailImage"); setProductGallery(product); setExtraSpecs(product);
     // Gallery guns (refinished, not designed by GDE) carry the same tag on their own page as on their card.
     if (product.refinished && !document.querySelector("#detailPrice + .not-gde-tag")) document.querySelector("#detailPrice")?.insertAdjacentHTML("afterend", '<p class="not-gde-tag">Not designed by GDE</p>');
     if (request) request.dataset.product=key || Object.keys(products)[0];
