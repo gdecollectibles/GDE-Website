@@ -565,6 +565,12 @@ if (!document.querySelector(".cart-page")) {
     updateCartCount();
   }
 }
+// Fixed header (user, Nov 15): on the home page it's faint over the film, then solid once the page has scrolled.
+document.querySelectorAll(".home-page .site-header").forEach(header => {
+  const update = () => header.classList.toggle("scrolled", scrollY > 40);
+  addEventListener("scroll", update, { passive: true });
+  update();
+});
 // Phones (user, Nov 10): a cart icon in the header, left of the menu button, so the cart is one tap away.
 // Hidden on desktop by CSS, where the cart is already in the top bar.
 document.querySelectorAll(".site-header .nav-toggle").forEach(toggle => {
@@ -1146,6 +1152,22 @@ document.querySelector("#inquiryForm")?.addEventListener("submit", e => {
   if (contactMessage && contactResult.has("sent")) contactMessage.textContent = "Thank you. Your inquiry was submitted successfully.";
   if (contactMessage && contactResult.has("error")) contactMessage.innerHTML = `Your message could not be sent. Please try again, or email us directly at <a href="mailto:info@gdecollectibles.com">info@gdecollectibles.com</a>.`;
 }
+// Spam guard (api/_formguard.js): fetch a signed token when the form page opens and send it with the form.
+// piece-unique.js has the same few lines.
+const contactGuard = (() => {
+  if (!document.querySelector("#contactForm")) return null;
+  let token = "", at = 0;
+  const load = () => fetch("/api/contact?token", { headers: { Accept: "application/json" } })
+    .then(r => r.ok ? r.json() : {}).then(j => { if (j.token) { token = j.token; at = Date.now(); } }).catch(() => {});
+  const first = load();
+  return async () => {
+    await first;
+    if (!token) await load();
+    const wait = at + 3200 - Date.now(); // the server drops anything sent within 3 seconds of the token
+    if (wait > 0) await new Promise(r => setTimeout(r, wait));
+    return token;
+  };
+})();
 document.querySelector("#contactForm")?.addEventListener("submit", async e => {
   e.preventDefault();
   const form = e.currentTarget;
@@ -1158,7 +1180,7 @@ document.querySelector("#contactForm")?.addEventListener("submit", async e => {
   message.textContent = "";
   try {
     const data = new FormData(form);
-    const fields = { ...Object.fromEntries(data), collection: data.getAll("collection"), contactPreference: data.getAll("contactPreference") };
+    const fields = { ...Object.fromEntries(data), collection: data.getAll("collection"), contactPreference: data.getAll("contactPreference"), formToken: await contactGuard() };
     const response = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },

@@ -13,6 +13,7 @@
 //   gde:msgfile:<id>:<n>       one file, base64, kept as long as its message
 const crypto = require("node:crypto");
 const store = require("./_store");
+const guard = require("./_formguard"); // token from GET /api/contact?token, see _formguard.js
 
 const PER_HOUR = 4;
 const KEEP_SECONDS = 180 * 86400;
@@ -69,6 +70,9 @@ module.exports = async function handler(request, response) {
   try {
     const body = await readBody(request);
     if (clean(body.website, 200)) return response.status(200).json({ ok: true }); // spam trap, left empty by people
+    const verdict = guard.check(body);
+    if (verdict.bot) { await store.cmd("HINCRBY", "gde:spam:blocked", `custom:${verdict.bot}`, 1).catch(() => {}); return response.status(200).json({ ok: true }); }
+    if (verdict.error) return response.status(400).json({ error: verdict.error });
 
     const list = (value, allowed) => [...new Set([value].flat().filter((v) => allowed.includes(v)))];
     const one = (value, allowed) => (allowed.includes(value) ? value : "");

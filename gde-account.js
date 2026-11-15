@@ -14,7 +14,7 @@
   const NO_POPUP = ["/checkout", "/payment-success", "/payment-cancel", "/cart", "/account", "/iframe-communicator"];
 
   const css = document.createElement("link");
-  css.rel = "stylesheet"; css.href = "account.css?v=20261115pop";
+  css.rel = "stylesheet"; css.href = "account.css?v=20261115round";
   document.head.append(css);
 
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -65,48 +65,228 @@
   }
   const onKey = (e) => { if (e.key === "Escape") closeSignup(true); };
 
-  function openSignup(source) {
+  // Google's sign-in script, loaded once for the popup and the account page.
+  let gsi = null;
+  function loadGsi() {
+    if (window.google?.accounts?.id) return Promise.resolve();
+    return gsi || (gsi = new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = "https://accounts.google.com/gsi/client"; s.async = true;
+      s.onload = resolve;
+      s.onerror = () => { gsi = null; reject(new Error("Google sign-in could not load. Check your connection or ad blocker.")); };
+      document.head.append(s);
+    }));
+  }
+
+  // ---- log in / create account, shared by the popup and the account page (user, Nov 15): email + password or
+  // Google, with "Create an account" underneath. A new email + password account is only made once the 6-digit code
+  // emailed to it is entered (api/account.js), so nobody can take over someone else's orders or club discount.
+  // Creating an account has an "Email me..." box (user, Nov 15; unticked = account only, no promotional email); the
+  // choice is saved with the account (subscribe or decline), and the inventory app files it as email consent.
+  // opts: { config, source, onSignedIn(user, created, list), headings: { <view>: fn } (optional, title per view) }
+  //   list: { chosen: true, subscribed } when they ticked or left the box at sign-up; { chosen: false } on a log-in
+  function authPanel(el, opts) {
+    const config = opts.config || {};
+    let view = "login", pending = null; // pending: the sign-up or reset being confirmed by code
+    const field = (name, label, type = "text", extra = "") =>
+      `<label class="gde-sr" for="gdeA-${name}">${label}</label><input id="gdeA-${name}" name="${name}" type="${type}" placeholder="${label}" ${extra}>`;
+    const googleBlock = config.googleClientId ? `<div class="gde-or"><span>or</span></div><div class="gde-google" data-google></div>` : "";
+    const views = {
+      login: () => `<form class="gde-auth-form" novalidate>
+          ${field("email", "Email*", "email", 'autocomplete="email" inputmode="email" required')}
+          ${field("password", "Password*", "password", 'autocomplete="current-password" required')}
+          <button class="gde-auth-link gde-forgot" type="button" data-view="reset">Forgot password?</button>
+          <button class="button" type="submit">Log In</button>
+          <p class="gde-msg" aria-live="polite"></p>
+        </form>${googleBlock}
+        <p class="gde-auth-switch">Don't have an account? <button class="gde-auth-link" type="button" data-view="signup">Create an account</button></p>`,
+      signup: () => `<form class="gde-auth-form" novalidate>
+          <div class="gde-auth-pair">${field("firstName", "First name*", "text", 'autocomplete="given-name" maxlength="60" required')}${field("lastName", "Last name", "text", 'autocomplete="family-name" maxlength="60"')}</div>
+          ${field("email", "Email*", "email", 'autocomplete="email" inputmode="email" required')}
+          ${field("password", "Password* (8+ characters)", "password", 'autocomplete="new-password" minlength="8" required')}
+          <label class="gde-check"><input type="checkbox" name="emails"><span>Email me about new collections, limited releases and collector offers. Unsubscribe any time.</span></label>
+          <button class="button" type="submit">Create Account</button>
+          <p class="gde-msg" aria-live="polite"></p>
+        </form>${googleBlock}
+        <p class="gde-auth-switch">Already have an account? <button class="gde-auth-link" type="button" data-view="login">Log in</button></p>`,
+      code: () => `<form class="gde-auth-form" novalidate>
+          <p class="gde-auth-note">We sent a 6-digit code to <b>${esc(pending.email)}</b>. Enter it to ${pending.reset ? "set a new password" : "finish creating your account"}.</p>
+          ${field("code", "6-digit code*", "text", 'autocomplete="one-time-code" inputmode="numeric" maxlength="6" required')}
+          ${pending.reset ? field("password", "New password* (8+ characters)", "password", 'autocomplete="new-password" minlength="8" required') : ""}
+          <button class="button" type="submit">${pending.reset ? "Save Password" : "Confirm"}</button>
+          <p class="gde-msg" aria-live="polite"></p>
+        </form>
+        <p class="gde-auth-switch">No email? Check spam, or <button class="gde-auth-link" type="button" data-resend>send a new code</button></p>
+        <p class="gde-auth-switch"><button class="gde-auth-link" type="button" data-view="${pending?.reset ? "login" : "signup"}">Back</button></p>`,
+      reset: () => `<form class="gde-auth-form" novalidate>
+          <p class="gde-auth-note">Enter your account's email and we'll send you a code to set a new password.</p>
+          ${field("email", "Email*", "email", 'autocomplete="email" inputmode="email" required')}
+          <button class="button" type="submit">Send Code</button>
+          <p class="gde-msg" aria-live="polite"></p>
+        </form>
+        <p class="gde-auth-switch"><button class="gde-auth-link" type="button" data-view="login">Back to log in</button></p>`
+    };
+    const actions = {
+      login: async (f) => { const r = await api("login", { email: f.email.value, password: f.password.value }); await opts.onSignedIn(r.user, false, { chosen: false }); },
+      signup: async (f) => {
+        const body = { firstName: f.firstName.value, lastName: f.lastName.value, email: f.email.value.trim(), password: f.password.value,
+          emails: f.emails.checked, source: opts.source || "account", page: location.pathname };
+        await api("register", body);
+        pending = body; show("code");
+      },
+      reset: async (f) => { await api("reset", { email: f.email.value }); pending = { email: f.email.value.trim(), reset: true }; show("code"); },
+      code: async (f) => {
+        if (pending.reset) {
+          const r = await api("reset-finish", { email: pending.email, code: f.code.value, password: f.password.value });
+          return opts.onSignedIn(r.user, false, { chosen: false });
+        }
+        const r = await api("verify", { email: pending.email, code: f.code.value });
+        if (r.subscribed) store.set("gdeSubscribed", "1");
+        return opts.onSignedIn(r.user, true, { chosen: true, subscribed: !!r.subscribed });
+      }
+    };
+    function show(next) {
+      view = next;
+      el.innerHTML = views[view]();
+      opts.headings?.[view]?.();
+      el.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => show(b.dataset.view)));
+      const form = el.querySelector("form"), msg = form.querySelector(".gde-msg");
+      const fail = (error) => { msg.className = "gde-msg error"; msg.textContent = error.message; };
+      el.querySelector("[data-resend]")?.addEventListener("click", async () => {
+        msg.className = "gde-msg"; msg.textContent = "Sending...";
+        try { await api(pending.reset ? "reset" : "register", pending); msg.textContent = "New code sent."; } catch (error) { fail(error); }
+      });
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const empty = [...form.querySelectorAll("input[required]")].find((i) => !i.value.trim());
+        if (empty) { fail(new Error(`Please fill in ${empty.placeholder.replace(/\*.*$/, "").toLowerCase()}.`)); empty.focus(); return; }
+        const button = form.querySelector("button[type=submit]");
+        button.disabled = true; msg.className = "gde-msg"; msg.textContent = "One moment...";
+        try { await actions[view](form); } catch (error) { if (button.isConnected) { button.disabled = false; fail(error); } }
+      });
+      const box = el.querySelector("[data-google]");
+      if (box) renderGoogle(box, view === "signup" ? "signup_with" : "continue_with", fail);
+    }
+    async function renderGoogle(box, text, fail) {
+      try {
+        await loadGsi();
+        if (!box.isConnected) return;
+        google.accounts.id.initialize({
+          client_id: config.googleClientId,
+          ux_mode: "popup",
+          callback: async ({ credential }) => {
+            try {
+              const r = await api("google", { credential });
+              // From the create-account form, the email box counts for a Google sign-up too.
+              const box = view === "signup" ? el.querySelector("input[name=emails]") : null;
+              if (!box) return await opts.onSignedIn(r.user, false, { chosen: false });
+              if (box.checked) { await api("subscribe", { source: opts.source || "account", page: location.pathname }); store.set("gdeSubscribed", "1"); }
+              else await api("decline", {});
+              await opts.onSignedIn(r.user, false, { chosen: true, subscribed: box.checked });
+            } catch (error) { fail(error); }
+          }
+        });
+        google.accounts.id.renderButton(box, { theme: "outline", size: "large", shape: "rectangular", text, logo_alignment: "center", width: Math.min(400, Math.floor(box.clientWidth) || 320) });
+        box.classList.add("ready");
+      } catch {
+        // Google's script blocked (ad blocker, no connection): email + password still works.
+        box.previousElementSibling?.remove(); box.remove();
+      }
+    }
+    show(view);
+  }
+
+  // The collector list popup (user, Nov 15): log in or create an account (email + password, or Google). The list is
+  // the "Email me" box at sign-up; someone logging in who was never asked gets the yes/no question after.
+  // Signed in already: one click to join.
+  async function openSignup(source) {
     if (popup || document.querySelector(".age-gate")) return;
-    popup = document.createElement("div");
+    popup = document.createElement("div"); // claimed now so a second call can't open another while this one loads
+    let config = {}, me = { user: null };
+    try { config = await api("config"); if (config.ready) me = await api("me"); } catch {}
+    if (me.subscribed) store.set("gdeSubscribed", "1");
+    if (me.subscribed && source === "popup") { popup = null; return; }
+    const body = me.subscribed
+      ? `<p class="gde-note">You're already on the list as ${esc(me.user.email)}.</p><a class="button" href="/account">View My Account</a>`
+      : me.user
+      ? `<button class="button" type="button" id="gdeJoinNow">Join the List</button><p class="gde-msg" aria-live="polite"></p>`
+      : `<div class="gde-auth-box"></div>`;
     popup.className = "gde-signup";
     popup.setAttribute("role", "dialog"); popup.setAttribute("aria-modal", "true"); popup.setAttribute("aria-labelledby", "gdeSignupTitle");
     popup.innerHTML = `<div class="gde-signup-panel">
       <button class="gde-signup-close" type="button" aria-label="Close">&times;</button>
       <p class="eyebrow">The collector list</p>
-      <h2 id="gdeSignupTitle">First look at new collections</h2>
-      <p>New editions, limited releases and collector offers.</p>
-      <form novalidate>
-        <label class="gde-field">Email address<input type="email" name="email" autocomplete="email" required inputmode="email"></label>
-        <label class="gde-field">First name (optional)<input name="firstName" autocomplete="given-name" maxlength="60"></label>
-        <label class="gde-hp" aria-hidden="true">Company<input name="company" tabindex="-1" autocomplete="off"></label>
-        <button class="button" type="submit">Join the list</button>
-        <p class="gde-msg" aria-live="polite"></p>
-      </form>
-      <p class="gde-fine">Unsubscribe any time. We never share your email. <a href="/privacy">Privacy</a></p>
-      <button class="gde-signup-later" type="button">No thanks</button>
+      <h2 id="gdeSignupTitle">${me.user ? "First look at new collections" : "Log in"}</h2>
+      <p class="gde-signup-sub">${me.user ? "New editions, limited releases and collector offers." : "First look at new editions, limited releases and collector offers, plus your orders and collector status in one place."}</p>
+      ${body}
+      <p class="gde-fine">We never share your email. <a href="/privacy">Privacy</a></p>
+      ${me.subscribed ? "" : `<button class="gde-signup-later" type="button">No thanks</button>`}
     </div>`;
     document.body.append(popup);
     requestAnimationFrame(() => popup && popup.classList.add("open"));
-    const form = popup.querySelector("form"), msg = popup.querySelector(".gde-msg");
+    const panel = popup.querySelector(".gde-signup-panel");
     popup.querySelector(".gde-signup-close").addEventListener("click", () => closeSignup(true));
-    popup.querySelector(".gde-signup-later").addEventListener("click", () => closeSignup(true));
+    popup.querySelector(".gde-signup-later")?.addEventListener("click", () => closeSignup(true));
     popup.addEventListener("click", (e) => { if (e.target === popup) closeSignup(true); });
     document.addEventListener("keydown", onKey);
-    setTimeout(() => form.email.focus({ preventScroll: true }), 60);
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = form.email.value.trim();
-      if (!/^\S+@\S+\.\S{2,}$/.test(email)) { msg.className = "gde-msg error"; msg.textContent = "Please enter a valid email address."; return; }
-      const button = form.querySelector("button"); button.disabled = true; msg.className = "gde-msg"; msg.textContent = "Joining...";
-      try {
-        await api("subscribe", { email, firstName: form.firstName.value, company: form.company.value, source, page: location.pathname });
-        store.set("gdeSubscribed", "1");
-        popup.querySelector(".gde-signup-panel").innerHTML = `<button class="gde-signup-close" type="button" aria-label="Close">&times;</button>
-          <div class="gde-done"><p class="eyebrow">You're on the list</p><h2>Thank you</h2><p>You'll hear about the next collection first.</p>
-          <button class="button" type="button">Continue</button></div>`;
-        popup.querySelectorAll(".gde-signup-panel button").forEach((b) => b.addEventListener("click", () => closeSignup(false)));
-      } catch (error) {
-        button.disabled = false; msg.className = "gde-msg error"; msg.textContent = error.message;
+    if (me.subscribed) return;
+    // The last screen: what happened, and a way to the account.
+    const finish = ({ eyebrow, title, text, account }) => {
+      if (!popup) return;
+      panel.innerHTML = `<button class="gde-signup-close" type="button" aria-label="Close">&times;</button>
+        <div class="gde-done"><p class="eyebrow">${eyebrow}</p><h2>${title}</h2><p>${text}</p>
+        ${account ? `<a class="button" href="/account">View My Account</a>` : ""}
+        <button class="${account ? "gde-signup-later" : "button"}" type="button" data-close>Continue</button></div>`;
+      panel.querySelectorAll(".gde-signup-close,[data-close]").forEach((b) => b.addEventListener("click", () => closeSignup(false)));
+    };
+    const joinList = async () => { await api("subscribe", { source, page: location.pathname }); store.set("gdeSubscribed", "1"); };
+    // Logged in but never asked about the list: ask once, here.
+    const askList = () => {
+      panel.innerHTML = `<div class="gde-done"><p class="eyebrow">You're logged in</p><h2>Join the collector list?</h2>
+        <p>Emails about new collections, limited releases and collector offers. Unsubscribe any time.</p>
+        <div class="gde-join-actions"><button class="button" type="button" data-join="yes">Yes, add me</button>
+        <button class="gde-signup-later" type="button" data-join="no">No thanks</button></div><p class="gde-msg" aria-live="polite"></p></div>`;
+      panel.querySelectorAll("[data-join]").forEach((b) => b.addEventListener("click", async () => {
+        const yes = b.dataset.join === "yes", msg = panel.querySelector(".gde-msg");
+        panel.querySelectorAll("[data-join]").forEach((x) => (x.disabled = true));
+        try {
+          if (yes) await joinList(); else await api("decline", {});
+          finish(yes ? { eyebrow: "You're on the list", title: "Thank you", text: "You'll hear about the next collection first.", account: true }
+            : { eyebrow: "You're logged in", title: "Welcome back", text: "Your orders and collector status are in your account.", account: true });
+        } catch (error) {
+          panel.querySelectorAll("[data-join]").forEach((x) => (x.disabled = false));
+          msg.className = "gde-msg error"; msg.textContent = error.message;
+        }
+      }));
+    };
+
+    if (me.user) {
+      const button = popup.querySelector("#gdeJoinNow"), msg = popup.querySelector(".gde-msg");
+      button.addEventListener("click", async () => {
+        button.disabled = true; msg.className = "gde-msg"; msg.textContent = "Joining...";
+        try {
+          await joinList();
+          finish({ eyebrow: "You're on the list", title: "Thank you", text: "You'll hear about the next collection first." });
+        } catch (error) { button.disabled = false; msg.className = "gde-msg error"; msg.textContent = error.message; }
+      });
+      return;
+    }
+
+    const title = panel.querySelector("#gdeSignupTitle"), sub = panel.querySelector(".gde-signup-sub");
+    const heading = (t, withSub) => () => { title.textContent = t; sub.hidden = !withSub; };
+    authPanel(panel.querySelector(".gde-auth-box"), {
+      config, source,
+      headings: { login: heading("Log in", true), signup: heading("Create your account", true), code: heading("Check your email"), reset: heading("Reset your password") },
+      onSignedIn: async (user, created, list) => {
+        if (list.chosen) {
+          return finish({ eyebrow: created ? "Your account is ready" : "You're signed in", title: "Thank you", account: true,
+            text: `${list.subscribed ? "You'll hear about the next collection first. " : ""}Your orders and collector status are in your account.` });
+        }
+        let status = "none";
+        try { status = (await api("me")).listStatus || "none"; } catch {}
+        if (status === "subscribed") store.set("gdeSubscribed", "1");
+        if (status === "none") return askList();
+        finish({ eyebrow: "You're logged in", title: "Welcome back", text: "Your orders and collector status are in your account.", account: true });
       }
     });
   }
@@ -277,8 +457,7 @@
         <a class="gde-auth-logo" href="/" aria-label="GDE Collectibles home"></a>
         <h1 class="gde-auth-title">Collector Login</h1>
         <p class="gde-auth-sub">Track your orders, follow your FFL transfer and get the first look at new collections.</p>
-        <div class="gde-google" id="gdeGoogle">${config.googleClientId ? "" : `<p class="gde-note">Google sign-in is coming soon. Use your order number below for now.</p>`}</div>
-        <p class="gde-msg" id="gdeSignInMsg" aria-live="polite"></p>
+        <div class="gde-auth-box" id="gdeAuthBox"></div>
         <div class="gde-or"><span>or find an order</span></div>
         <form class="gde-auth-form" id="gdeLookup" novalidate>
           <label class="gde-sr" for="gdeLookupEmail">Email used at checkout</label>
@@ -289,33 +468,17 @@
           <p class="gde-msg" aria-live="polite"></p>
         </form>
         <p class="gde-auth-foot">Need help with an order? <a href="/contact">Contact us</a></p>
-        <p class="gde-auth-fine">We only receive your name and email from Google, never your password.</p>
+        <p class="gde-auth-fine">With Google we only receive your name and email, never your password.</p>
       </div>
       <section class="gde-orders" id="gdeLookupResult"></section>`;
     bindLookup();
-    if (config.googleClientId) loadGoogle(config.googleClientId);
-  }
-
-  function loadGoogle(clientId) {
-    const box = root.querySelector("#gdeGoogle"), msg = root.querySelector("#gdeSignInMsg");
-    const s = document.createElement("script");
-    s.src = "https://accounts.google.com/gsi/client"; s.async = true;
-    s.onerror = () => { msg.className = "gde-msg error"; msg.textContent = "Google sign-in could not load. Check your connection or ad blocker."; };
-    s.onload = () => {
-      google.accounts.id.initialize({
-        client_id: clientId,
-        ux_mode: "popup",
-        callback: async ({ credential }) => {
-          msg.className = "gde-msg"; msg.textContent = "Signing in...";
-          try { await api("google", { credential }); if (nextPage) { location.href = nextPage; return; } await load(); }
-          catch (error) { msg.className = "gde-msg error"; msg.textContent = error.message; }
-        }
-      });
-      // As wide as the column (Google's limit is 400 px), white like the site's own main buttons.
-      google.accounts.id.renderButton(box, { theme: "outline", size: "large", shape: "rectangular", text: "continue_with", logo_alignment: "center", width: Math.min(400, Math.floor(box.clientWidth) || 320) });
-      box.classList.add("ready");
-    };
-    document.head.append(s);
+    const title = root.querySelector(".gde-auth-title"), sub = root.querySelector(".gde-auth-sub");
+    const heading = (t, withSub) => () => { title.textContent = t; sub.hidden = !withSub; };
+    authPanel(root.querySelector("#gdeAuthBox"), {
+      config, source: "account",
+      headings: { login: heading("Collector Login", true), signup: heading("Create Account", true), code: heading("Check Your Email"), reset: heading("Reset Password") },
+      onSignedIn: async () => { if (nextPage) { location.href = nextPage; return; } await load(); }
+    });
   }
 
   // Signed in (user, Nov 8: same clean look as the login): one centered column with the site's menu back on top.

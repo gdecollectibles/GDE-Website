@@ -8,6 +8,18 @@
   const form = document.querySelector("#uniqueForm");
   if (!form) return;
   const API = "/api/custom-request";
+  // Spam guard (api/_formguard.js), same as the Contact form in script.js: a signed token fetched when the page opens.
+  let guardToken = "", guardAt = 0;
+  const loadGuard = () => fetch("/api/contact?token", { headers: { Accept: "application/json" } })
+    .then((r) => (r.ok ? r.json() : {})).then((j) => { if (j.token) { guardToken = j.token; guardAt = Date.now(); } }).catch(() => {});
+  const firstGuard = loadGuard();
+  const formToken = async () => {
+    await firstGuard;
+    if (!guardToken) await loadGuard();
+    const wait = guardAt + 3200 - Date.now();
+    if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+    return guardToken;
+  };
   const MAX_FILES = 4, MAX_BYTES = 700 * 1024;
   const LISTS = {
     models: ["Colt M1911", "Colt Government Model", "Colt Government Series 70", "Another model", "Not sure, recommend one"],
@@ -136,7 +148,8 @@
           "design", "collection", "message", "text", "slide", "frame", "engraving", "grips", "colorNotes", "budget", "when"].map((k) => [k, text(k)])),
         placement: data.getAll("placement"),
         contactPreference: data.getAll("contactPreference"),
-        files
+        files,
+        formToken: await formToken()
       };
       const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(body) });
       const result = await r.json().catch(() => ({}));

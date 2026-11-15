@@ -6,6 +6,7 @@
 //   gde:messages       message ids, newest first
 const crypto = require("node:crypto");
 const store = require("./_store");
+const guard = require("./_formguard");
 
 const PER_HOUR = 5;          // messages from one address in an hour
 const KEEP_SECONDS = 180 * 86400;
@@ -44,6 +45,8 @@ function clientIp(request) {
 
 module.exports = async function handler(request, response) {
   response.setHeader("Cache-Control", "no-store");
+  // GET /api/contact?token: the spam-guard token the Contact and Piece Unique pages fetch when they open (see _formguard.js).
+  if (request.method === "GET" && "token" in (request.query || {})) return response.status(200).json({ token: guard.issue() });
   if (request.method !== "POST") return response.status(405).json({ error: "Use POST." });
   // A plain form post (no JavaScript) goes back to the page instead of seeing JSON.
   const plain = !/^application\/json\b/i.test(String(request.headers["content-type"] || ""));
@@ -56,6 +59,9 @@ module.exports = async function handler(request, response) {
     const body = await readBody(request);
     // Left empty by people; filled in by spam bots, which then get a normal "thank you".
     if (clean(body.website, 200)) return reply(200, { ok: true });
+    const verdict = guard.check(body);
+    if (verdict.bot) { await store.cmd("HINCRBY", "gde:spam:blocked", `contact:${verdict.bot}`, 1).catch(() => {}); return reply(200, { ok: true }); }
+    if (verdict.error) return reply(400, { error: verdict.error });
 
     const record = {
       name: clean(body.name, 120),

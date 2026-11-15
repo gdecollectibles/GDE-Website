@@ -743,3 +743,15 @@ body.side-cart-locked{overflow:hidden}
 /* Phone menu (user, Nov 15): the cart line matches Account (same icon size, lettering and spacing, count beside the word),
    and the social icons sit under the cart */
 @media(max-width:760px){.site-nav .cart-nav{order:1;margin:0;padding:14px 0;min-height:0;gap:8px;justify-content:flex-start;align-self:flex-start;border-radius:0}.site-nav .cart-nav .cart-icon{width:18px;height:18px}.site-nav .cart-nav .cart-label{font-size:inherit;font-weight:400;letter-spacing:.16em}.site-nav .cart-nav .cart-count{position:static;top:auto;margin-left:2px;font-size:.72rem;color:var(--muted,#8e8e93)}.site-nav .nav-socials{order:2}}
+
+/* Header stays at the top while scrolling (user, Nov 15). Pages with the dark header keep its space (sticky); the
+   home page's header floats over the film (fixed) and turns solid once the page has scrolled (script.js adds
+   .scrolled). Sticky boxes below it sit under the header instead of behind it. */
+.site-header{position:fixed;top:0;left:0;right:0}
+.site-header.dark-header{position:sticky;top:0}
+.home-page .site-header.scrolled{background:rgba(10,10,10,.94);border-bottom-color:var(--line)}
+.home-page .site-header.scrolled>*{opacity:1}
+@media(min-width:761px){
+  .filters{top:104px;max-height:calc(100vh - 124px)}
+  .order-summary,.cart-summary,.payment-summary{top:109px}
+}

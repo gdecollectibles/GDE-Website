@@ -161,3 +161,33 @@
 /* Signup on phones (user, Nov 15): a centered popup card, not a full-width sheet */
 .gde-signup-panel{border-radius:14px}
 @media(max-width:760px){.gde-signup{place-items:center;padding:18px}.gde-signup-panel{width:100%;max-width:400px;padding:34px 22px 20px;border-width:1px;border-radius:14px}.gde-signup-panel h2{font-size:1.65rem;margin-bottom:10px}.gde-signup-panel>p{margin-bottom:18px;font-size:.88rem}.gde-signup .button{min-height:44px}.gde-signup-later{margin-top:12px}.gde-signup input:not([type=checkbox]){height:44px}.gde-signup .gde-fine{font-size:.78rem;margin-top:12px}.gde-signup .gde-msg:empty{display:none}}
+
+/* Log in / create account (popup and account page, user Nov 15): email + password, Google, "Create an account" under. */
+.gde-auth-box{text-align:left}
+.gde-auth-box .gde-auth-form{gap:10px}
+.gde-auth-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gde-auth-link{border:0;background:transparent;padding:0;color:var(--text,#f2f2f3);font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.gde-auth-link:hover{color:#fff}
+.gde-forgot{justify-self:end;font-size:.78rem;color:var(--muted,#8e8e93);margin:-2px 0 2px}
+.gde-auth-note{margin:0 0 4px;color:var(--muted,#8e8e93);font-size:.9rem;line-height:1.55;text-align:center}
+.gde-auth-note b{color:var(--text,#f2f2f3);font-weight:500;word-break:break-all}
+.gde-auth-switch{margin:18px 0 0;text-align:center;font-size:.86rem;color:var(--muted,#8e8e93)}
+.gde-auth-switch+.gde-auth-switch{margin-top:8px}
+.gde-auth-box .gde-or{margin:20px 0 16px}
+.gde-auth-box .gde-msg:empty{display:none}
+.gde-signup .gde-auth-form input{height:48px}
+.gde-signup .gde-auth-form .button{margin-top:4px}
+.gde-signup-panel{max-height:calc(100vh - 36px);max-height:calc(100svh - 36px);overflow-y:auto;overscroll-behavior:contain}
+.gde-signup-panel>p.gde-signup-sub{margin-bottom:20px}
+@media(max-width:760px){.gde-auth-pair{grid-template-columns:1fr}.gde-signup .gde-auth-form input{height:44px}.gde-signup-panel>p.gde-signup-sub{display:none}}
+.gde-signup .gde-auth-box+.gde-fine{margin-top:18px}
+/* "Email me" box under the password when creating an account (user, Nov 15) */
+.gde-check{display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:start;margin:4px 0 2px;color:var(--muted,#8e8e93);font-size:.8rem;line-height:1.5;text-align:left;cursor:pointer}
+.gde-check input{appearance:none;-webkit-appearance:none;width:18px;height:18px;margin:1px 0 0;border:1px solid var(--line-strong,#333336);border-radius:4px;background:transparent;display:grid;place-items:center;cursor:pointer}
+.gde-check input:checked{background:var(--text,#f2f2f3);border-color:var(--text,#f2f2f3)}
+.gde-check input:checked::after{content:"";width:9px;height:5px;border-left:2px solid #0a0a0a;border-bottom:2px solid #0a0a0a;transform:translateY(-1px) rotate(-45deg)}
+.gde-check input:focus-visible{outline:2px solid var(--text,#f2f2f3);outline-offset:2px}
+.gde-check:hover span{color:var(--text,#f2f2f3)}
+.gde-auth-form .gde-check input[type=checkbox]{width:18px;height:18px;min-height:0;padding:0}
+/* Rounded fields to match the buttons (user, Nov 15): popup, account page login and order lookup */
+.gde-auth-form input:not([type=checkbox]){border-radius:10px}
