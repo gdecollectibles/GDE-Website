@@ -191,3 +191,12 @@
 .gde-auth-form .gde-check input[type=checkbox]{width:18px;height:18px;min-height:0;padding:0}
 /* Rounded fields to match the buttons (user, Nov 15): popup, account page login and order lookup */
 .gde-auth-form input:not([type=checkbox]){border-radius:10px}
+/* Form buttons the same size as Google's button under them (user, Nov 15) */
+.gde-auth-box .gde-auth-form .button{min-height:40px;height:40px;margin-top:4px}
+/* Login page: a way back to the shop, top left (user, Nov 15; the page has no menu) */
+.gde-auth-back{position:fixed;top:22px;left:22px;z-index:5;display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px 0 12px;border:1px solid var(--line-strong,#333336);border-radius:10px;color:var(--text,#f2f2f3);font-size:.68rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:rgba(10,10,10,.6);transition:border-color .2s,background .2s}
+.gde-auth-back:hover{border-color:var(--text,#f2f2f3);background:#141416}
+.gde-auth-back svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.gde-signed-in .gde-auth-back{display:none}
+@media(max-width:560px){.gde-auth-back{position:absolute;top:14px;left:14px;height:34px;padding:0 12px 0 9px}}
+@media(max-width:560px){.gde-auth-mode .gde-account{padding-top:72px}}

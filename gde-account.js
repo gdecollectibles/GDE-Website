@@ -14,7 +14,7 @@
   const NO_POPUP = ["/checkout", "/payment-success", "/payment-cancel", "/cart", "/account", "/iframe-communicator"];
 
   const css = document.createElement("link");
-  css.rel = "stylesheet"; css.href = "account.css?v=20261115round";
+  css.rel = "stylesheet"; css.href = "account.css?v=20261115back2";
   document.head.append(css);
 
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -454,6 +454,7 @@
     document.body.classList.remove("gde-signed-in");
     document.body.classList.add("gde-auth-mode");
     root.innerHTML = `<div class="gde-auth">
+        <a class="gde-auth-back" href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Back to website</a>
         <a class="gde-auth-logo" href="/" aria-label="GDE Collectibles home"></a>
         <h1 class="gde-auth-title">Collector Login</h1>
         <p class="gde-auth-sub">Track your orders, follow your FFL transfer and get the first look at new collections.</p>
