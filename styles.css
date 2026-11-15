@@ -393,7 +393,7 @@ h1,h2,h3,.hero h1,.page-intro h1,.detail-copy h1,.form-column legend,.summary-co
 /* Left of the logo: Home, Collections, Gallery, Piece Unique. Socials opens the right side (user, Nov 12; Marketplaces removed). */
 @media(min-width:761px){
   .site-nav>:nth-child(3){margin-right:0}
-  .site-nav>a[href="gallery.html"]{margin-right:auto} /* Piece Unique moved to the right side (user, Nov 13) */
+  .site-nav>a[href="/gallery"],.site-nav>a[href="gallery.html"]{margin-right:auto} /* Piece Unique moved to the right side (user, Nov 13); clean links since Nov 15 */
 }
 .socials-menu .nav-dropdown-panel{width:190px}
 @media(max-width:760px){.socials-menu .nav-dropdown-panel{width:100%}}
@@ -726,7 +726,7 @@ body.side-cart-locked{overflow:hidden}
 @media(min-width:761px) and (max-width:980px){.site-nav{--nav-gap:10px;--icon-gap:12px}}
 /* Tablets and small laptops (761–1280px): no room right of the logo for Piece Unique, so there it stays the last link on the left. */
 @media(min-width:761px) and (max-width:1280px){
-  .site-nav>a[href="index.html"],.site-nav>.collections-menu,.site-nav>a[href="gallery.html"],.site-nav>a[href="piece-unique.html"]{order:-1}
-  .site-nav>a[href="gallery.html"]{margin-right:0}
-  .site-nav>a[href="piece-unique.html"]{margin-right:auto}
+  .site-nav>a[href="/"],.site-nav>a[href="index.html"],.site-nav>.collections-menu,.site-nav>a[href="/gallery"],.site-nav>a[href="gallery.html"],.site-nav>a[href="/piece-unique"],.site-nav>a[href="piece-unique.html"]{order:-1}
+  .site-nav>a[href="/gallery"],.site-nav>a[href="gallery.html"]{margin-right:0}
+  .site-nav>a[href="/piece-unique"],.site-nav>a[href="piece-unique.html"]{margin-right:auto}
 }
