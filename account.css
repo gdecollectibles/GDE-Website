@@ -157,3 +157,7 @@
   .gde-order-item .thumb-img{width:72px}
   .gde-order-item>b{grid-column:2}
 }
+
+/* Signup on phones (user, Nov 15): a centered popup card, not a full-width sheet */
+.gde-signup-panel{border-radius:14px}
+@media(max-width:760px){.gde-signup{place-items:center;padding:18px}.gde-signup-panel{width:100%;max-width:400px;padding:34px 22px 20px;border-width:1px;border-radius:14px}.gde-signup-panel h2{font-size:1.65rem;margin-bottom:10px}.gde-signup-panel>p{margin-bottom:18px;font-size:.88rem}.gde-signup .button{min-height:44px}.gde-signup-later{margin-top:12px}.gde-signup input:not([type=checkbox]){height:44px}.gde-signup .gde-fine{font-size:.78rem;margin-top:12px}.gde-signup .gde-msg:empty{display:none}}

@@ -730,3 +730,16 @@ body.side-cart-locked{overflow:hidden}
   .site-nav>a[href="/gallery"],.site-nav>a[href="gallery.html"]{margin-right:0}
   .site-nav>a[href="/piece-unique"],.site-nav>a[href="piece-unique.html"]{margin-right:auto}
 }
+
+/* Shop cards: name on one line. Big screens: "· model caliber" small and gray beside it, wrapping if needed. Smaller
+   screens: model and caliber as small gray bullets under the name (user, Nov 15) */
+.product-info h2 .card-name{display:block;white-space:nowrap}.product-info h2 .card-spec{display:block;margin-top:.45em;font-family:var(--sans);font-size:.74rem;font-weight:400;letter-spacing:.02em;line-height:1.5;color:var(--muted)}.product-info h2 .card-spec>span{display:block;white-space:nowrap}.product-info h2 .card-spec>span::before{content:"•  "}
+@media(max-width:760px){.product-info h2 .card-name{font-size:1.15rem}}
+@media(min-width:1900px){.product-info h2:has(.card-spec){display:flex;align-items:center;gap:.55em}.product-info h2 .card-name{flex:0 0 auto}.product-info h2 .card-spec{flex:1 1 7.5em;min-width:0;margin:0}.product-info h2 .card-spec>span{display:inline;white-space:normal}.product-info h2 .card-spec>span+span{white-space:nowrap}.product-info h2 .card-spec>span::before{content:none}.product-info h2 .card-spec>span:first-child::before{content:"· "}}
+
+/* Every button box has rounded corners, the same everywhere (user, Nov 15) */
+.button,.checkout-page .button,.side-cart-actions .button,.ff-row .button,.ref-link .button{border-radius:10px}
+
+/* Phone menu (user, Nov 15): the cart line matches Account (same icon size, lettering and spacing, count beside the word),
+   and the social icons sit under the cart */
+@media(max-width:760px){.site-nav .cart-nav{order:1;margin:0;padding:14px 0;min-height:0;gap:8px;justify-content:flex-start;align-self:flex-start;border-radius:0}.site-nav .cart-nav .cart-icon{width:18px;height:18px}.site-nav .cart-nav .cart-label{font-size:inherit;font-weight:400;letter-spacing:.16em}.site-nav .cart-nav .cart-count{position:static;top:auto;margin-left:2px;font-size:.72rem;color:var(--muted,#8e8e93)}.site-nav .nav-socials{order:2}}
