@@ -39,7 +39,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/about/",
@@ -50,7 +50,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/about",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/about",
@@ -61,7 +61,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/about",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/contact-us/",
@@ -72,7 +72,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/contact",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/contact-us",
@@ -83,7 +83,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/contact",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/firearms-customization/",
@@ -94,7 +94,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/piece-unique",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/firearms-customization",
@@ -105,7 +105,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/piece-unique",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/gun-gallery/",
@@ -116,7 +116,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gallery",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/gun-gallery",
@@ -127,7 +127,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gallery",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/collection-gallery/",
@@ -138,7 +138,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/collections",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/collection-gallery",
@@ -149,7 +149,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/collections",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product-category/guns/",
@@ -160,7 +160,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/collections",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product-category/guns",
@@ -171,7 +171,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/collections",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product-category/colt-stainless-steel-high-gloss-polish-with-24k-gold-icons/",
@@ -182,7 +182,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/collections",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product-category/colt-stainless-steel-high-gloss-polish-with-24k-gold-icons",
@@ -193,7 +193,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/collections",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/america-250-anniversary-signing-of-the-constitution/",
@@ -204,7 +204,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/signing-the-constitution",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/america-250-anniversary-signing-of-the-constitution",
@@ -215,7 +215,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/signing-the-constitution",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/americas-250th-anniversary-constitution/",
@@ -226,7 +226,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/signing-the-constitution",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/americas-250th-anniversary-constitution",
@@ -237,7 +237,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/signing-the-constitution",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/america-250-anniversary-uss-constitution/",
@@ -248,7 +248,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/uss-constitution",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/america-250-anniversary-uss-constitution",
@@ -259,7 +259,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/uss-constitution",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/remember-the-alamo/",
@@ -270,7 +270,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/remember-the-alamo",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/remember-the-alamo",
@@ -281,7 +281,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/remember-the-alamo",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/colt-45-acp-remember-the-alamo/",
@@ -292,7 +292,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/remember-the-alamo",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/colt-45-acp-remember-the-alamo",
@@ -303,7 +303,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/remember-the-alamo",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/america-250-anniversary-mount-rush-moore/",
@@ -314,7 +314,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/mount-rushmore-with-trump",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/america-250-anniversary-mount-rush-moore",
@@ -325,7 +325,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/mount-rushmore-with-trump",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/americas-250th-anniversary-mt-rushmore/",
@@ -336,7 +336,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/mount-rushmore-with-trump",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/americas-250th-anniversary-mt-rushmore",
@@ -347,7 +347,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/mount-rushmore-with-trump",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/el-alamo/",
@@ -358,7 +358,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/el-alamo",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/el-alamo",
@@ -369,7 +369,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/el-alamo",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/colt-38-super-el-alamo/",
@@ -380,7 +380,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/el-alamo",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/colt-38-super-el-alamo",
@@ -391,7 +391,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/el-alamo",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/america-250-anniversary-the-capital-white-house/",
@@ -402,7 +402,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/the-capitol",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/america-250-anniversary-the-capital-white-house",
@@ -413,7 +413,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/the-capitol",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/americas-250th-anniversary/",
@@ -424,7 +424,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/the-capitol",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/americas-250th-anniversary",
@@ -435,7 +435,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/the-capitol",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/charles-daly-45-acp-trump-47/",
@@ -446,7 +446,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/donald-trump-47th",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/charles-daly-45-acp-trump-47",
@@ -457,7 +457,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/donald-trump-47th",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/colt-45-acp-donal-trump/",
@@ -468,7 +468,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/donald-trump-47th",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/product/colt-45-acp-donal-trump",
@@ -479,7 +479,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/gun/donald-trump-47th",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/:path*/",
@@ -490,7 +490,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/:path*",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/:path*",
@@ -501,7 +501,7 @@
         }
       ],
       "destination": "https://www.gdecollectibles.com/:path*",
-      "permanent": true
+      "statusCode": 301
     }
   ]
 }
