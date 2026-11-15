@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="referrer" content="no-referrer">
+  <title>Unsubscribe | GDE Collectibles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Gloock&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css?v=20261115fixhdr">
+  <link rel="icon" href="favicon.ico?v=20261108" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261113"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261108">
+  <!-- Unsubscribe page (user, Nov 15): opened from the link in every email the inventory app sends. Unsubscribes on
+       open (api/unsubscribe.js), with a way back in. No sign-in, no menu, no age check or popup. -->
+  <style>
+    body{background:#000;color:var(--text,#f2f2f3);min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+    .unsub{width:100%;max-width:400px;text-align:center}
+    .unsub-logo{display:block;width:200px;height:76px;margin:0 auto 34px;background:url("gde-logo.svg") center/contain no-repeat;filter:invert(1)}
+    .unsub h1{font:600 1rem/1.3 var(--sans,Inter,Arial,sans-serif);letter-spacing:.22em;text-transform:uppercase;margin:0 0 16px}
+    .unsub p{color:var(--muted,#8e8e93);font-size:.95rem;line-height:1.6;margin:0 auto 26px;max-width:34ch}
+    .unsub p b{color:var(--text,#f2f2f3);font-weight:500}
+    .unsub .button{width:100%;min-height:44px;border-radius:10px;background:transparent;border:1px solid var(--text,#f2f2f3);color:var(--text,#f2f2f3)}
+    .unsub .button:hover{background:var(--text,#f2f2f3);color:#0a0a0a}
+    .unsub .home{display:inline-block;margin-top:22px;font-size:.85rem;color:var(--muted,#8e8e93);text-decoration:underline;text-underline-offset:3px}
+    .unsub .home:hover{color:var(--text,#f2f2f3)}
+    .unsub .err{color:#ff8b8b}
+  </style>
+</head>
+<body>
+  <main class="unsub">
+    <a class="unsub-logo" href="/" aria-label="GDE Collectibles home"></a>
+    <h1 id="title">Unsubscribing…</h1>
+    <p id="text">One moment.</p>
+    <button class="button" id="again" type="button" hidden>Resubscribe</button>
+    <a class="home" href="/">Go to gdecollectibles.com</a>
+  </main>
+  <script>
+    (() => {
+      const q = new URLSearchParams(location.search), e = q.get("e"), t = q.get("t");
+      // Keep the link's details out of the address bar (and out of anything shared from here).
+      if (e) history.replaceState(null, "", "/unsubscribe");
+      const title = document.getElementById("title"), text = document.getElementById("text"), again = document.getElementById("again");
+      const show = (h, p, bad) => { title.textContent = h; text.innerHTML = p; text.className = bad ? "err" : ""; };
+      async function go(resubscribe) {
+        again.disabled = true;
+        try {
+          const r = await fetch("/api/unsubscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ e, t, resubscribe }) });
+          const d = await r.json().catch(() => ({}));
+          if (!r.ok) throw new Error(d.error || "Something went wrong.");
+          const who = String(d.email || "").replace(/[<>&]/g, "");
+          if (d.status === "unsubscribed") {
+            show("You're unsubscribed", `We won't send <b>${who}</b> any more emails about new collections or offers. You'll still get messages about an order you place.`);
+            again.textContent = "Resubscribe"; again.onclick = () => go(true);
+          } else {
+            show("You're back on the list", `<b>${who}</b> will hear about the next collection first.`);
+            again.textContent = "Unsubscribe"; again.onclick = () => go(false);
+          }
+          again.hidden = false;
+        } catch (error) {
+          show("Couldn't unsubscribe", `${error.message} You can also reply to any of our emails, or write to info@gdecollectibles.com.`, true);
+        }
+        again.disabled = false;
+      }
+      if (!e || !t) show("Unsubscribe", "Use the unsubscribe link at the bottom of one of our emails, or write to info@gdecollectibles.com and we'll take you off.");
+      else go(false);
+    })();
+  </script>
+</body>
+</html>

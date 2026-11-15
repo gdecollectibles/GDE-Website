@@ -31,9 +31,9 @@ const { collectorStatus } = require("./_collector");
 const ffcode = require("./_ffcode");
 const referral = require("./_referral");
 const mail = require("./_mail");
+const { CONSENT, getSubscriber, saveSubscriber } = require("./_subscribers");
 const crypto = require("node:crypto");
 
-const CONSENT = "Emails from GDE Collectibles about new collections, limited releases and offers. Unsubscribe any time.";
 const EMAIL_RE = /^[^\s@<>()[\]\\,;:"]{1,64}@[A-Za-z0-9.-]{1,253}\.[A-Za-z]{2,24}$/;
 const INVOICE_RE = /^GDE-\d{6,16}$/;
 
@@ -118,22 +118,6 @@ function publicOrder(order) {
 // Orders placed with this email at checkout, or while signed in to this account.
 function ordersFor(email, all) {
   return all.filter((o) => (normEmail(o.form?.email) === email || normEmail(o.account) === email) && o.status !== "payment_error").map(publicOrder);
-}
-
-async function getSubscriber(email) {
-  const value = await store.cmd("GET", `gde:subscriber:${email}`);
-  try { return value ? JSON.parse(value) : null; } catch { return null; }
-}
-
-async function saveSubscriber(email, changes) {
-  const now = new Date().toISOString();
-  const old = (await getSubscriber(email)) || { email, createdAt: now };
-  const next = { ...old, ...changes, email, updatedAt: now };
-  await store.pipeline([
-    ["SET", `gde:subscriber:${email}`, JSON.stringify(next)],
-    ["ZADD", "gde:subscribers", Date.now(), email]
-  ]);
-  return next;
 }
 
 // ---- email + password accounts

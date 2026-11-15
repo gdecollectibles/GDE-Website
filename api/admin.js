@@ -15,6 +15,11 @@
 //   POST /api/admin?action=credit-decide  { id, decision: approved|declined, guns, note }
 //   POST /api/admin?action=credit-add     { email, guns, note }: guns added by hand (bought in person, checked by GDE)
 //   POST /api/admin?action=credit-remove  { email, entry }: takes one credit back (its request, if any, goes back to pending)
+// Customer emails (user, Nov 15; the app's CRM tab writes them, the Resend key stays here):
+//   POST /api/admin?action=send-email  { subject, body, buttonText?, buttonLink?, address, test?,
+//                                        recipients: [{ email, firstName }] (100 at most per call) }
+//        Each gets their own unsubscribe link (footer + one-click List-Unsubscribe header). Anyone whose record here
+//        says unsubscribed or declined is skipped (unless test). Answers { sent: [email], skipped: [{ email, why }], failed: [...] }.
 // Friends and family codes (_ffcode.js):
 //   POST /api/admin?action=ffcode-reset   { email }: clears a Legacy Club member's code so they can make a new one
 const crypto = require("node:crypto");
@@ -24,6 +29,8 @@ const store = require("./_store");
 const credits = require("./_credits");
 const { collectorStatus } = require("./_collector");
 const ffcode = require("./_ffcode");
+const mail = require("./_mail");
+const subscribers = require("./_subscribers");
 
 const AUTHORIZE_ENDPOINTS = {
   sandbox: "https://apitest.authorize.net/xml/v1/request.api",
@@ -241,6 +248,40 @@ module.exports = async function handler(request, response) {
       if (/^CR-/.test(entry.source)) await credits.reopen(entry.source);
       return response.status(200).json({ ok: true, removed: entry });
     }
+    if (action === "send-email" && request.method === "POST") {
+      const b = await readBody(request);
+      const address = String(b.address || "").trim();
+      if (address.length < 8) return response.status(400).json({ error: "Add GDE's mailing address first (it goes at the bottom of every email, by law)." });
+      if (!String(b.subject || "").trim() || !String(b.body || "").trim()) return response.status(400).json({ error: "The email needs a subject and a message." });
+      const list = Array.isArray(b.recipients) ? b.recipients.slice(0, 100) : [];
+      const sent = [], skipped = [], failed = [], outgoing = [], seen = new Set();
+      for (const r of list) {
+        const email = subscribers.normEmail(r?.email);
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || seen.has(email)) { skipped.push({ email, why: "bad or repeated email" }); continue; }
+        seen.add(email);
+        if (!b.test) {
+          const sub = await subscribers.getSubscriber(email);
+          if (sub?.status === "unsubscribed") { skipped.push({ email, why: "unsubscribed on the website" }); continue; }
+          // Left the "Email me" box empty at sign-up (or said no when asked): no promotional email, even if they bought.
+          if (sub?.status === "declined") { skipped.push({ email, why: "said no to emails on the website" }); continue; }
+        }
+        const content = mail.customerEmail({ ...b, address, firstName: r.firstName, unsubUrl: subscribers.unsubPage(email) });
+        outgoing.push({ email, message: {
+          to: [email], ...content, subject: (b.test ? "[Test] " : "") + content.subject,
+          headers: { "List-Unsubscribe": `<${subscribers.unsubOneClick(email)}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" }
+        } });
+      }
+      if (outgoing.length) {
+        try {
+          await mail.sendBatch(outgoing.map((o) => o.message));
+          sent.push(...outgoing.map((o) => o.email));
+        } catch (error) {
+          failed.push(...outgoing.map((o) => ({ email: o.email, error: error.message })));
+        }
+      }
+      return response.status(200).json({ sent, skipped, failed });
+    }
+
     if (action === "ffcode-reset" && request.method === "POST") {
       const code = await ffcode.clearCode((await readBody(request)).email);
       return code ? response.status(200).json({ ok: true, cleared: code }) : response.status(404).json({ error: "That account has no code." });
