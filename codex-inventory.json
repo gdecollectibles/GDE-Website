@@ -1,8 +1,8 @@
 {
   "products": {
-    "the-capital": {
-      "name": "The Capital",
-      "collection": "The Capital",
+    "the-capitol": {
+      "name": "The Capitol",
+      "collection": "The Capitol",
       "collectionNumber": "1 of 300",
       "type": "Pistol",
       "manufacturer": "Colt",

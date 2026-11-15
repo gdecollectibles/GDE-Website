@@ -12,7 +12,7 @@
   const LISTS = {
     models: ["Colt M1911", "Colt Government Model", "Colt Government Series 70", "Another model", "Not sure, recommend one"],
     calibers: [".45 ACP", ".38 Super", "9mm", "Another caliber", "Not sure"],
-    collections: ["The Capital", "Remember the Alamo", "Blue Finish", "US Constitution", "Mt. Rushmore", "USS Constitution",
+    collections: ["The Capitol", "Remember the Alamo", "Blue Finish", "US Constitution", "Mt. Rushmore", "USS Constitution",
       "America's 250 Anniversary", "Donald J Trump", "El Alamo", "Scrolls"],
     placements: ["Slide, left side", "Slide, right side", "Top of the slide", "Frame", "Grips", "Everywhere"],
     finishes: ["Polished stainless steel", "24K gold plated", "Nickel", "Royal blue", "Black", "Your choice", "Something else (tell us below)"],
@@ -32,7 +32,7 @@
   const DESIGN_TEXT = {
     own: { label: "Anything we should know about your design? <em>(optional)</em>", files: "Your design", hint: "Upload your artwork, logo or drawing. Pictures or PDFs, up to 4 files.", placeholder: "Size, which parts go where, anything to change." },
     gde: { label: "Tell us about the design", files: "Pictures <em>(optional)</em>", hint: "Anything that inspires you: a theme, a crest, a design you like. Pictures or PDFs, up to 4 files.", placeholder: "The theme, the story behind it, the style you like." },
-    collection: { label: "What would you like changed?", files: "Pictures <em>(optional)</em>", hint: "Anything that shows the change you want. Pictures or PDFs, up to 4 files.", placeholder: "e.g. The Capital, with my family name on the right side and black grips." }
+    collection: { label: "What would you like changed?", files: "Pictures <em>(optional)</em>", hint: "Anything that shows the change you want. Pictures or PDFs, up to 4 files.", placeholder: "e.g. The Capitol, with my family name on the right side and black grips." }
   };
   const showDesign = () => {
     const d = form.querySelector('input[name="design"]:checked')?.value || "gde";

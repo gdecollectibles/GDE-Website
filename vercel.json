@@ -24,6 +24,11 @@
       ],
       "destination": "/gun/:slug",
       "permanent": true
+    },
+    {
+      "source": "/gun/the-capital",
+      "destination": "/gun/the-capitol",
+      "permanent": true
     }
   ]
 }

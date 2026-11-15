@@ -1,7 +1,7 @@
 const products = {
-  "the-capital": {
-    "name": "The Capital",
-    "collection": "The Capital",
+  "the-capitol": {
+    "name": "The Capitol",
+    "collection": "The Capitol",
     "collectionNumber": "1 of 300",
     "type": "Pistol",
     "manufacturer": "Colt",
@@ -411,8 +411,11 @@ const productCollections = item => {
 };
 const displayCollections = item => productCollections(item).join(" · ");
 const collectionSlugs = item => productCollections(item).map(slug).join(" ");
+// Listings that changed key: carts and links saved under the old one still find the gun (Nov 15: The Capital -> The Capitol).
+const RENAMED = { "the-capital": "the-capitol" };
+const renamed = key => RENAMED[key] || key;
 const getCart = () => {
-  try { return JSON.parse(localStorage.getItem("gdeRequestCart")) || []; }
+  try { return [...new Set((JSON.parse(localStorage.getItem("gdeRequestCart")) || []).map(renamed))]; }
   catch { return []; }
 };
 const saveCart = cart => {
@@ -439,7 +442,7 @@ function currentRef() {
 }
 const incomingCart = new URLSearchParams(location.search).get("cart");
 if (incomingCart) {
-  const validIncoming = incomingCart.split(",").filter(item => isBuyable(products[item]));
+  const validIncoming = incomingCart.split(",").map(renamed).filter(item => isBuyable(products[item]));
   localStorage.setItem("gdeRequestCart", JSON.stringify([...new Set(validIncoming)]));
 }
 updateCartCount();
@@ -452,7 +455,7 @@ document.querySelectorAll(".site-nav").forEach(nav => {
       <div class="nav-dropdown-panel">
         <a href="/collections">All Collections</a>
         <p>Collections</p>
-        <a href="/gun/the-capital">The Capital</a>
+        <a href="/gun/the-capitol">The Capitol</a>
         <a href="/gun/remember-the-alamo">Remember the Alamo</a>
         <a href="/gun/blue-scroll-engraved">Blue Finish</a>
         <a href="/gun/signing-the-constitution">US Constitution</a>
@@ -670,7 +673,7 @@ if (cards.length || document.querySelector("#productGrid")) { // the Gallery pag
 }
 
 // Gun pages (gun/<slug>.html, made by website/seo_pages.py) name their gun on <body data-product>.
-const key = new URLSearchParams(location.search).get("product") || document.body?.dataset.product || null;
+const key = renamed(new URLSearchParams(location.search).get("product") || document.body?.dataset.product || "") || null;
 const product = (key && products[key]) || Object.values(products)[0];
 function setText(selector, text){ const el=document.querySelector(selector); if(el) el.textContent=text; }
 function applyProductPhoto(el, item, index = 0) {
@@ -911,7 +914,7 @@ function renderCart() {
 renderCart();
 
 if (document.querySelector("#checkoutSummaryItems")) {
-  const queryProduct = new URLSearchParams(location.search).get("product");
+  const queryProduct = renamed(new URLSearchParams(location.search).get("product") || "") || null;
   if (queryProduct && products[queryProduct]) addToCart(queryProduct);
   renderCheckoutSummary();
 }
