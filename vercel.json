@@ -482,6 +482,17 @@
       "permanent": true
     },
     {
+      "source": "/:path*/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/:path*",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {
