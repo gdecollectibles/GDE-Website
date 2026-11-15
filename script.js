@@ -418,7 +418,7 @@ const getCart = () => {
 const saveCart = cart => {
   localStorage.setItem("gdeRequestCart", JSON.stringify(cart));
   updateCartCount();
-  document.querySelectorAll(".cart-nav").forEach(link => link.href = cart.length ? `cart.html?cart=${cart.join(",")}` : "cart.html");
+  document.querySelectorAll(".cart-nav").forEach(link => link.href = cart.length ? `/cart?cart=${cart.join(",")}` : "/cart");
 };
 const updateCartCount = () => document.querySelectorAll(".cart-count").forEach(el => el.textContent = getCart().length);
 const cartIconMarkup = '<svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.1 10.1a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L21 8H7"/><circle cx="10" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/></svg><span class="cart-label">Cart</span><span class="cart-count">0</span>';
@@ -444,38 +444,38 @@ if (incomingCart) {
 }
 updateCartCount();
 document.querySelectorAll(".site-nav").forEach(nav => {
-  const collectionsLink = nav.querySelector('a[href="collections.html"]');
+  const collectionsLink = nav.querySelector('a[href="/collections"]');
   if (collectionsLink && !nav.querySelector(".collections-menu")) {
     const collectionMenu = document.createElement("div");
     collectionMenu.className = "nav-dropdown collections-menu";
     collectionMenu.innerHTML = `<button class="nav-dropdown-toggle" type="button" aria-expanded="false">Collections <span>&or;</span></button>
       <div class="nav-dropdown-panel">
-        <a href="collections.html">All Collections</a>
+        <a href="/collections">All Collections</a>
         <p>Collections</p>
-        <a href="gun/the-capital.html">The Capital</a>
-        <a href="gun/remember-the-alamo.html">Remember the Alamo</a>
-        <a href="gun/blue-scroll-engraved.html">Blue Finish</a>
-        <a href="gun/signing-the-constitution.html">US Constitution</a>
-        <a href="gun/mount-rushmore-with-trump.html">Mt. Rushmore</a>
-        <a href="gun/uss-constitution.html">USS Constitution</a>
-        <a href="gun/trump.html">America's 250 Anniversary</a>
-        <a href="gun/donald-trump-47th.html">Donald J Trump</a>
-        <a href="gun/el-alamo.html">El Alamo</a>
-        <a href="collections.html?collection=scrolls">Scrolls</a>
+        <a href="/gun/the-capital">The Capital</a>
+        <a href="/gun/remember-the-alamo">Remember the Alamo</a>
+        <a href="/gun/blue-scroll-engraved">Blue Finish</a>
+        <a href="/gun/signing-the-constitution">US Constitution</a>
+        <a href="/gun/mount-rushmore-with-trump">Mt. Rushmore</a>
+        <a href="/gun/uss-constitution">USS Constitution</a>
+        <a href="/gun/trump">America's 250 Anniversary</a>
+        <a href="/gun/donald-trump-47th">Donald J Trump</a>
+        <a href="/gun/el-alamo">El Alamo</a>
+        <a href="/collections?collection=scrolls">Scrolls</a>
       </div>`;
     collectionsLink.replaceWith(collectionMenu);
   }
   // Gallery tab (user, Nov 10): refinished guns not designed by GDE, kept apart from the collections. Every page gets it.
-  if (!nav.querySelector('a[href="gallery.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="gallery.html">Gallery</a>');
-  const galleryLink = nav.querySelector('a[href="gallery.html"]');
+  if (!nav.querySelector('a[href="/gallery"]')) nav.insertAdjacentHTML("beforeend", '<a href="/gallery">Gallery</a>');
+  const galleryLink = nav.querySelector('a[href="/gallery"]');
   galleryLink.classList.toggle("active", document.body.classList.contains("gallery-page"));
   // Piece Unique (user, Nov 13): custom-piece requests, on every page, left of the logo after Gallery.
-  if (!nav.querySelector('a[href="piece-unique.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="piece-unique.html">Piece Unique</a>');
-  const uniqueNavLink = nav.querySelector('a[href="piece-unique.html"]');
+  if (!nav.querySelector('a[href="/piece-unique"]')) nav.insertAdjacentHTML("beforeend", '<a href="/piece-unique">Piece Unique</a>');
+  const uniqueNavLink = nav.querySelector('a[href="/piece-unique"]');
   uniqueNavLink.classList.toggle("active", document.body.classList.contains("unique-page"));
   // Collectors page (user, Nov 12): collector tiers. Every page gets it, first on the right of the logo (user, Nov 12).
-  if (!nav.querySelector('a[href="collectors.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="collectors.html">Collectors</a>');
-  const collectorsLink = nav.querySelector('a[href="collectors.html"]');
+  if (!nav.querySelector('a[href="/collectors"]')) nav.insertAdjacentHTML("beforeend", '<a href="/collectors">Collectors</a>');
+  const collectorsLink = nav.querySelector('a[href="/collectors"]');
   collectorsLink.classList.toggle("active", document.body.classList.contains("collectors-page"));
   // Marketplaces menu (GunBroker, Guns International) removed (user, Nov 12).
   // Socials as icons (user, Nov 12): Instagram and Facebook sit after Contact, before the account icon. YouTube dropped (user, Nov 13).
@@ -487,15 +487,15 @@ document.querySelectorAll(".site-nav").forEach(nav => {
     </div>`);
   }
   // Compliance out of the header (user, Nov 12); it stays in the footer and on the home page.
-  nav.querySelectorAll('a[href="#compliance"], a[href="index.html#compliance"]').forEach(link => link.remove());
-  const homeLink = nav.querySelector('a[href="index.html"]');
+  nav.querySelectorAll('a[href="#compliance"], a[href="/#compliance"]').forEach(link => link.remove());
+  const homeLink = nav.querySelector('a[href="/"]');
   const collectionsMenu = nav.querySelector(".collections-menu");
   const socialsMenu = nav.querySelector(".nav-socials");
-  const contactLink = nav.querySelector('a[href="contact.html"], a[href="#contact"], a[href="index.html#contact"], a[href="#inquiry"]');
+  const contactLink = nav.querySelector('a[href="/contact"], a[href="#contact"], a[href="/#contact"], a[href="#inquiry"]');
   const headerAction = nav.querySelector(".button");
   // About page (user, Nov 12): every page gets it, just before Contact.
-  if (!nav.querySelector('a[href="about.html"]')) nav.insertAdjacentHTML("beforeend", '<a href="about.html">About</a>');
-  const aboutLink = nav.querySelector('a[href="about.html"]');
+  if (!nav.querySelector('a[href="/about"]')) nav.insertAdjacentHTML("beforeend", '<a href="/about">About</a>');
+  const aboutLink = nav.querySelector('a[href="/about"]');
   aboutLink.classList.toggle("active", document.body.classList.contains("about-page"));
   // Left of the logo: Home, Collections, Gallery. Right: Collectors, Piece Unique (moved right, user Nov 13), About, Contact,
   // social icons, then the account icon (added by gde-account.js just before the cart) and the cart (user, Nov 12).
@@ -518,29 +518,29 @@ document.addEventListener("pointerdown", event => {
     open.classList.remove("open"); open.querySelector(".nav-dropdown-toggle").setAttribute("aria-expanded","false");
   });
 });
-document.querySelectorAll('.site-nav a[href="#contact"], .site-nav a[href="index.html#contact"], .footer-links a[href="#contact"], .footer-links a[href="index.html#contact"], .site-nav a[href="#inquiry"]').forEach(link => link.href = "contact.html");
+document.querySelectorAll('.site-nav a[href="#contact"], .site-nav a[href="/#contact"], .footer-links a[href="#contact"], .footer-links a[href="/#contact"], .site-nav a[href="#inquiry"]').forEach(link => link.href = "/contact");
 document.querySelectorAll(".site-footer").forEach(footer => {
   const brandColumn = footer.querySelector(":scope > div:first-child");
   brandColumn?.querySelector(":scope > p")?.remove();
   const footerLinks = footer.querySelector(".footer-links");
   if (footerLinks) {
     footerLinks.innerHTML = `
-      <a href="index.html">Home</a>
-      <a href="collections.html">Collections</a>
-      <a href="gallery.html">Gallery</a>
-      <a href="collectors.html">Collectors</a>
-      <a href="piece-unique.html">Piece Unique</a>
-      <a href="about.html">About</a>
-      <a href="cart.html">Cart</a>
-      <a href="checkout.html">Checkout</a>
-      <a href="contact.html">Contact</a>
-      <a href="index.html#compliance">Compliance</a>
-      <a href="privacy.html">Privacy Policy</a>
-      <a href="terms.html">Terms of Service</a>
-      <a href="refund.html">Refund Policy</a>`;
+      <a href="/">Home</a>
+      <a href="/collections">Collections</a>
+      <a href="/gallery">Gallery</a>
+      <a href="/collectors">Collectors</a>
+      <a href="/piece-unique">Piece Unique</a>
+      <a href="/about">About</a>
+      <a href="/cart">Cart</a>
+      <a href="/checkout">Checkout</a>
+      <a href="/contact">Contact</a>
+      <a href="/#compliance">Compliance</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+      <a href="/refund">Refund Policy</a>`;
   }
   const legal = footer.querySelector(".footer-legal");
-  if (legal && !legal.querySelector(".footer-contact")) legal.insertAdjacentHTML("afterbegin", '<div class="footer-contact"><strong>Contact Us</strong><a href="tel:+17869313566">Phone: 1-786-931-3566</a><a href="mailto:info@gdecollectibles.com">Email: info@gdecollectibles.com</a><div><a href="privacy.html">Privacy Policy</a><span>|</span><a href="terms.html">Terms of Service</a></div></div>');
+  if (legal && !legal.querySelector(".footer-contact")) legal.insertAdjacentHTML("afterbegin", '<div class="footer-contact"><strong>Contact Us</strong><a href="tel:+17869313566">Phone: 1-786-931-3566</a><a href="mailto:info@gdecollectibles.com">Email: info@gdecollectibles.com</a><div><a href="/privacy">Privacy Policy</a><span>|</span><a href="/terms">Terms of Service</a></div></div>');
 });
 
 if (!sessionStorage.getItem("gdeAgeConfirmed")) {
@@ -556,7 +556,7 @@ if (!sessionStorage.getItem("gdeAgeConfirmed")) {
 if (!document.querySelector(".cart-page")) {
   const headerAction = document.querySelector(".site-nav .button");
   if (headerAction) {
-    headerAction.href = "cart.html";
+    headerAction.href = "/cart";
     headerAction.classList.add("cart-nav");
     headerAction.innerHTML = cartIconMarkup;
     updateCartCount();
@@ -567,7 +567,7 @@ if (!document.querySelector(".cart-page")) {
 document.querySelectorAll(".site-header .nav-toggle").forEach(toggle => {
   if (toggle.parentElement.querySelector(".header-cart")) return;
   const cart = getCart();
-  toggle.insertAdjacentHTML("beforebegin", `<a class="cart-nav header-cart" href="${cart.length ? `cart.html?cart=${cart.join(",")}` : "cart.html"}" aria-label="Cart">${cartIconMarkup}</a>`);
+  toggle.insertAdjacentHTML("beforebegin", `<a class="cart-nav header-cart" href="${cart.length ? `/cart?cart=${cart.join(",")}` : "/cart"}" aria-label="Cart">${cartIconMarkup}</a>`);
   updateCartCount();
 });
 document.querySelector(".nav-toggle")?.addEventListener("click", e => {
@@ -757,14 +757,14 @@ if (document.querySelector(".product-detail-page")) {
     if (request) {
       request.textContent = "Contact Us";
       request.classList.remove("add-to-cart");
-      request.addEventListener("click", () => location.href = "contact.html");
+      request.addEventListener("click", () => location.href = "/contact");
     }
   } else {
     if (!document.body.dataset.product) document.title = `${product.name} | GDE Collectibles`; // gun/<slug>.html keeps its longer search title
     setText("#detailCollection",displayCollections(product)); setText("#detailCollectionNumber",product.collectionNumber || ""); setText("#detailHeaderAvailability",product.availability); setText("#detailName",product.name); setText("#detailPrice",product.price); setText("#detailPlatform",product.platform); setText("#detailFinish",product.finish); setText("#detailAvailability",product.availability); setText("#detailDescription",product.description); document.querySelector("#serialCallout")?.classList.toggle("is-hidden", !product.collectionNumber); /* the sequence box only on numbered editions (user, Nov 13) */ setImage("#detailImage"); setProductGallery(product); setExtraSpecs(product);
     // "Piece Unique" link under the cart button: opens piece-unique.html starting from this gun (user, Nov 13).
     const uniqueLink = document.querySelector("#uniqueLink a");
-    if (uniqueLink) { const c = productCollections(product)[0] || ""; uniqueLink.href = `/piece-unique.html?${new URLSearchParams({ collection: c === "Gallery" ? "" : c, model: product.model || "", caliber: product.caliber || "", gun: [product.name, product.collectionNumber].filter(Boolean).join(", ") })}`; }
+    if (uniqueLink) { const c = productCollections(product)[0] || ""; uniqueLink.href = `/piece-unique?${new URLSearchParams({ collection: c === "Gallery" ? "" : c, model: product.model || "", caliber: product.caliber || "", gun: [product.name, product.collectionNumber].filter(Boolean).join(", ") })}`; }
     // Gallery guns (refinished, not designed by GDE) carry the same tag on their own page as on their card.
     if (product.refinished && !document.querySelector("#detailPrice + .not-gde-tag")) document.querySelector("#detailPrice")?.insertAdjacentHTML("afterend", '<p class="not-gde-tag">Not designed by GDE</p>');
     if (request) request.dataset.product=key || Object.keys(products)[0];
@@ -812,7 +812,7 @@ const sideCart = (() => {
       <div class="side-cart-foot">
         <div class="side-cart-subtotal"><span>Subtotal</span><strong></strong></div>
         <p class="side-cart-note">Firearms ship only to a licensed FFL dealer. Shipping, insurance and your dealer's FFL transfer fee are on us.</p>
-        <div class="side-cart-actions"><a class="button secondary side-cart-view" href="cart.html">View cart</a><a class="button side-cart-checkout" href="checkout.html">Checkout</a></div>
+        <div class="side-cart-actions"><a class="button secondary side-cart-view" href="/cart">View cart</a><a class="button side-cart-checkout" href="/checkout">Checkout</a></div>
       </div>
     </aside>
   </div>`);
@@ -825,13 +825,13 @@ const sideCart = (() => {
     root.querySelector(".side-cart-count").textContent = cart.length ? `(${cart.length})` : "";
     root.querySelector(".side-cart-items").innerHTML = cart.length ? cart.map(item => {
       const p = products[item];
-      return `<div class="side-cart-item"><a class="mini-image ${p.image}" href="gun/${item}.html"${productImageStyle(p)} tabindex="-1" aria-hidden="true"></a><div class="side-cart-copy"><a class="side-cart-name" href="gun/${item}.html">${p.name}</a><p>1 &times; ${p.soldOut ? "Sold Out" : p.price}</p></div><button type="button" class="side-cart-remove" data-product="${item}" aria-label="Remove ${p.name}">&times;</button></div>`;
-    }).join("") : '<div class="side-cart-empty"><p>Your cart is empty.</p><a class="text-link" href="collections.html">Browse collections <span>&rarr;</span></a></div>';
+      return `<div class="side-cart-item"><a class="mini-image ${p.image}" href="/gun/${item}"${productImageStyle(p)} tabindex="-1" aria-hidden="true"></a><div class="side-cart-copy"><a class="side-cart-name" href="/gun/${item}">${p.name}</a><p>1 &times; ${p.soldOut ? "Sold Out" : p.price}</p></div><button type="button" class="side-cart-remove" data-product="${item}" aria-label="Remove ${p.name}">&times;</button></div>`;
+    }).join("") : '<div class="side-cart-empty"><p>Your cart is empty.</p><a class="text-link" href="/collections">Browse collections <span>&rarr;</span></a></div>';
     root.querySelector(".side-cart-foot").hidden = !cart.length;
     root.querySelector(".side-cart-subtotal strong").textContent = `$${buyable.reduce((sum, item) => sum + priceNumber(products[item].price), 0).toLocaleString()}`;
-    root.querySelector(".side-cart-view").href = cart.length ? `cart.html?cart=${cart.join(",")}` : "cart.html";
+    root.querySelector(".side-cart-view").href = cart.length ? `/cart?cart=${cart.join(",")}` : "/cart";
     const checkout = root.querySelector(".side-cart-checkout");
-    checkout.href = buyable.length ? `checkout.html?cart=${buyable.join(",")}` : "checkout.html";
+    checkout.href = buyable.length ? `/checkout?cart=${buyable.join(",")}` : "/checkout";
     checkout.classList.toggle("disabled", !buyable.length);
     checkout.setAttribute("aria-disabled", String(!buyable.length));
   };
@@ -868,9 +868,9 @@ const sideCart = (() => {
   });
   return { open, render };
 })();
-const showCart = () => sideCart ? sideCart.open() : (location.href = "cart.html");
+const showCart = () => sideCart ? sideCart.open() : (location.href = "/cart");
 
-document.querySelectorAll('a[href^="checkout.html?product="]').forEach(link => {
+document.querySelectorAll('a[href^="/checkout?product="]').forEach(link => {
   const itemKey = new URL(link.href).searchParams.get("product");
   link.textContent = products[itemKey]?.soldOut ? "SOLD OUT" : "ADD TO CART";
   link.addEventListener("click", event => {
@@ -903,7 +903,7 @@ function renderCart() {
   const checkoutButton=document.querySelector("#checkoutButton");
   checkoutButton.classList.toggle("disabled",buyable.length===0);
   checkoutButton.setAttribute("aria-disabled",buyable.length===0);
-  checkoutButton.href=buyable.length ? `checkout.html?cart=${buyable.join(",")}` : "checkout.html";
+  checkoutButton.href=buyable.length ? `/checkout?cart=${buyable.join(",")}` : "/checkout";
   container.querySelectorAll(".remove-cart-item").forEach(button=>button.addEventListener("click",()=>{
     saveCart(getCart().filter(item=>item!==button.dataset.product)); renderCart();
   }));
@@ -941,7 +941,7 @@ function renderCollectorRow(pay) {
   let hint = document.querySelector("#summaryCollectorHint");
   if (c === null && !hint) {
     hint = document.createElement("p"); hint.id = "summaryCollectorHint"; hint.className = "summary-collector-hint";
-    hint.innerHTML = 'Collectors Club or Legacy Club member? <a href="account.html?next=checkout.html">Sign in</a> for your discount. <a href="collectors.html">What is this?</a>';
+    hint.innerHTML = 'Collectors Club or Legacy Club member? <a href="/account?next=checkout">Sign in</a> for your discount. <a href="/collectors">What is this?</a>';
     priceRow.closest("dl").after(hint);
   } else if (c !== null) hint?.remove();
 }
@@ -956,7 +956,7 @@ function renderCheckoutSummary() {
     setText("#summaryPrice",`$${(pay ? pay.total : listTotal).toLocaleString("en-US", { maximumFractionDigits: 2 })}`);
     renderCollectorRow(pay);
   } else {
-    summary.innerHTML='<div class="checkout-empty"><p>No collections selected.</p><a class="text-link" href="collections.html">Browse collections &rarr;</a></div>';
+    summary.innerHTML='<div class="checkout-empty"><p>No collections selected.</p><a class="text-link" href="/collections">Browse collections &rarr;</a></div>';
   }
 }
 
@@ -1094,7 +1094,7 @@ function showPaymentStep(session, onBack) {
           paid = true;
           localStorage.removeItem("gdeRequestCart");
           localStorage.removeItem("gdeCheckoutDetails");
-          location.href = `payment-success.html?order=${encodeURIComponent(session.invoiceNumber || r.orderInvoiceNumber || "")}`;
+          location.href = `/payment-success?order=${encodeURIComponent(session.invoiceNumber || r.orderInvoiceNumber || "")}`;
         } else {
           stepStatus.textContent = "The card was not accepted. Please check the details or try another card.";
         }
@@ -1116,7 +1116,7 @@ function renderPaymentSummary() {
   container.innerHTML = cart.length ? cart.map(item => {
     const p = products[item];
     return `<div class="checkout-summary-item"><div class="mini-image ${p.image}"${productImageStyle(p)}></div><div><h2>${p.name}</h2><p>${p.platform} · ${p.finish}</p><strong>${p.price}</strong></div></div>`;
-  }).join("") : '<div class="checkout-empty"><p>No collection selected.</p><a class="text-link" href="collections.html">Browse collections &rarr;</a></div>';
+  }).join("") : '<div class="checkout-empty"><p>No collection selected.</p><a class="text-link" href="/collections">Browse collections &rarr;</a></div>';
   document.querySelector("#paymentTotal").textContent = `$${cart.reduce((sum,item)=>sum+priceNumber(products[item].price),0).toLocaleString()}`;
 }
 document.querySelector("#authorizePayButton")?.addEventListener("click", event => {

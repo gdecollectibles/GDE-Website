@@ -1,5 +1,18 @@
 {
+  "cleanUrls": true,
   "redirects": [
+    {
+      "source": "/product",
+      "has": [
+        {
+          "type": "query",
+          "key": "product",
+          "value": "(?<slug>[a-z0-9-]+)"
+        }
+      ],
+      "destination": "/gun/:slug",
+      "permanent": true
+    },
     {
       "source": "/product.html",
       "has": [
@@ -9,7 +22,7 @@
           "value": "(?<slug>[a-z0-9-]+)"
         }
       ],
-      "destination": "/gun/:slug.html",
+      "destination": "/gun/:slug",
       "permanent": true
     }
   ]

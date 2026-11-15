@@ -10,8 +10,8 @@
 (() => {
   const API = "/api/account";
   const DISMISS_DAYS = 30;
-  const page = (location.pathname.split("/").pop() || "index.html").toLowerCase();
-  const NO_POPUP = ["checkout.html", "payment-success.html", "payment-cancel.html", "cart.html", "account.html", "iframe-communicator.html"];
+  const page = "/" + (location.pathname.split("/").pop() || "").toLowerCase().replace(/\.html$/, ""); // "/checkout", or "/" on the home page (clean links, Nov 15)
+  const NO_POPUP = ["/checkout", "/payment-success", "/payment-cancel", "/cart", "/account", "/iframe-communicator"];
 
   const css = document.createElement("link");
   css.rel = "stylesheet"; css.href = "account.css?v=20261112hdr";
@@ -36,9 +36,9 @@
   const nav = document.querySelector(".site-nav");
   if (nav && !nav.querySelector(".account-nav")) {
     const link = document.createElement("a");
-    link.href = "account.html"; link.className = "account-nav"; link.setAttribute("aria-label", "Account");
+    link.href = "/account"; link.className = "account-nav"; link.setAttribute("aria-label", "Account");
     link.innerHTML = '<svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4.2 4.3-6.3 8-6.3s6.8 2.1 8 6.3"/></svg><span>Account</span>';
-    if (page === "account.html") link.classList.add("active");
+    if (page === "/account") link.classList.add("active");
     const cart = nav.querySelector(".cart-nav");
     cart ? nav.insertBefore(link, cart) : nav.append(link);
   }
@@ -49,7 +49,7 @@
     a.addEventListener("click", (e) => { e.preventDefault(); openSignup("footer"); });
     footerLinks.append(a);
     const acct = document.createElement("a");
-    acct.href = "account.html"; acct.textContent = "My orders";
+    acct.href = "/account"; acct.textContent = "My orders";
     footerLinks.append(acct);
   }
 
@@ -82,7 +82,7 @@
         <button class="button" type="submit">Join the list</button>
         <p class="gde-msg" aria-live="polite"></p>
       </form>
-      <p class="gde-fine">Unsubscribe any time. We never share your email. <a href="privacy.html">Privacy</a></p>
+      <p class="gde-fine">Unsubscribe any time. We never share your email. <a href="/privacy">Privacy</a></p>
       <button class="gde-signup-later" type="button">No thanks</button>
     </div>`;
     document.body.append(popup);
@@ -145,17 +145,17 @@
     if (!signedIn) {
       return `<p class="eyebrow">Your status</p><h3>Sign in to see where you stand</h3>
         <p>Your collector status follows the email you sign in with. Guns already bought with that email count.</p>
-        <a class="button" href="account.html?next=collectors.html">Sign In</a>`;
+        <a class="button" href="/account?next=collectors">Sign In</a>`;
     }
     const nextLine = st.next ? ` Buy ${guns(st.next.toGo)} to join the ${st.next.name}, with ${st.next.percent}% off every purchase after that.` : "";
     if (st.collector) {
       return `<p class="eyebrow">Your status</p><h3>You're in the ${st.tierName}</h3>${pips(st)}
         <p>${st.guns} guns${st.referred ? `, ${st.referred} of them bought by friends through your link` : ""}. You get ${st.percent}% off every purchase, taken off at checkout while you're signed in.${nextLine}</p>
-        <a class="button" href="collections.html">Browse Collections</a>`;
+        <a class="button" href="/collections">Browse Collections</a>`;
     }
     return `<p class="eyebrow">Your status</p><h3>${st.guns} of ${st.next.guns} guns</h3>${pips(st)}
       <p>${st.referred ? `${st.referred} of your guns ${st.referred === 1 ? "was" : "were"} bought by friends through your link. ` : ""}${guns(st.next.toGo).replace(/^o/, "O")} and you join the ${st.next.name}, with ${st.next.percent}% off every purchase after that.${st.guns >= 1 ? " Friends who buy through your link count too." : ""}</p>
-      <a class="button" href="collections.html">Browse Collections</a>`;
+      <a class="button" href="/collections">Browse Collections</a>`;
   }
   window.gdeCollectorBox = collectorBox;
 
@@ -206,7 +206,7 @@
   }
 
   const statusBox = document.querySelector("#collectorStatus");
-  if (page === "checkout.html" || statusBox) {
+  if (page === "/checkout" || statusBox) {
     (async () => {
       let me = { user: null }, ready = false;
       try {
@@ -216,7 +216,7 @@
       } catch {}
       // null = signed out (checkout offers to sign in); undefined = accounts not working, so nothing is shown.
       window.gdeCollector = me.user ? me.collector : ready ? null : undefined;
-      if (page === "checkout.html" && ready) codeBox(me);
+      if (page === "/checkout" && ready) codeBox(me);
       if (typeof renderCheckoutSummary === "function") renderCheckoutSummary();
       if (statusBox && ready) {
         statusBox.innerHTML = collectorBox(me.collector, !!me.user);
@@ -228,9 +228,9 @@
   // ---- account page
   const root = document.querySelector("#gdeAccount");
   if (!root) return;
-  // After signing in from a link like account.html?next=checkout.html, go back there (this site's own pages only).
+  // After signing in from a link like /account?next=checkout, go back there (this site's own pages only).
   const next = new URLSearchParams(location.search).get("next");
-  const nextPage = next && /^[a-z0-9-]+\.html$/.test(next) ? next : null;
+  const nextPage = next && /^\/?[a-z0-9-]+(\.html)?$/.test(next) ? "/" + next.replace(/^\//, "").replace(/\.html$/, "") : null;
   // script.js's listings (a top-level const there, so readable by name here, not as window.products).
   const productsRef = typeof products === "object" ? products : null;
 
@@ -242,7 +242,7 @@
     const items = o.items.map((i) => {
       const p = productsRef?.[i.listing];
       const photo = Array.isArray(p?.photos) && p.photos[0] ? ` style="background-image:url('${esc(p.photos[0])}')"` : "";
-      const name = p ? `<a href="gun/${encodeURIComponent(i.listing)}.html">${esc(i.name)}</a>` : esc(i.name);
+      const name = p ? `<a href="/gun/${encodeURIComponent(i.listing)}">${esc(i.name)}</a>` : esc(i.name);
       return `<div class="gde-order-item"><div class="thumb-img"${photo}></div><div>${name}${p ? `<div class="gde-note">${esc(p.platform || "")}${p.finish ? " · " + esc(p.finish) : ""}</div>` : ""}</div><b>${money(i.price)}</b></div>`;
     }).join("");
     return `<article class="gde-order">
@@ -274,7 +274,7 @@
     document.body.classList.remove("gde-signed-in");
     document.body.classList.add("gde-auth-mode");
     root.innerHTML = `<div class="gde-auth">
-        <a class="gde-auth-logo" href="index.html" aria-label="GDE Collectibles home"></a>
+        <a class="gde-auth-logo" href="/" aria-label="GDE Collectibles home"></a>
         <h1 class="gde-auth-title">Collector Login</h1>
         <p class="gde-auth-sub">Track your orders, follow your FFL transfer and get the first look at new collections.</p>
         <div class="gde-google" id="gdeGoogle">${config.googleClientId ? "" : `<p class="gde-note">Google sign-in is coming soon. Use your order number below for now.</p>`}</div>
@@ -288,7 +288,7 @@
           <button class="button secondary" type="submit">Find My Order</button>
           <p class="gde-msg" aria-live="polite"></p>
         </form>
-        <p class="gde-auth-foot">Need help with an order? <a href="contact.html">Contact us</a></p>
+        <p class="gde-auth-foot">Need help with an order? <a href="/contact">Contact us</a></p>
         <p class="gde-auth-fine">We only receive your name and email from Google, never your password.</p>
       </div>
       <section class="gde-orders" id="gdeLookupResult"></section>`;
@@ -327,7 +327,7 @@
     const initial = esc((first || u.email || "?").charAt(0).toUpperCase());
     const orders = data.orders.length
       ? data.orders.map(orderHtml).join("")
-      : `<div class="gde-acct-empty"><p>No orders under ${esc(u.email)} yet.</p><a class="button secondary" href="collections.html">Browse Collections</a></div>`;
+      : `<div class="gde-acct-empty"><p>No orders under ${esc(u.email)} yet.</p><a class="button secondary" href="/collections">Browse Collections</a></div>`;
     root.innerHTML = `<div class="gde-acct">
         <header class="gde-acct-top">
           <div class="gde-avatar" aria-hidden="true">${u.picture ? `<img src="${esc(u.picture)}" alt="" referrerpolicy="no-referrer">` : ""}<span>${initial}</span></div>
@@ -338,7 +338,7 @@
         ${data.collector ? `<section class="gde-acct-section">
           <h2 class="gde-acct-label">Collector status</h2>
           <div class="collector-status in-account">${collectorBox(data.collector, true)}</div>
-          <p class="gde-acct-more"><a href="collectors.html">How collector status works</a></p>
+          <p class="gde-acct-more"><a href="/collectors">How collector status works</a></p>
         </section>` : ""}
         ${data.referral ? `<section class="gde-acct-section">
           <h2 class="gde-acct-label">Share your link</h2>
@@ -419,7 +419,7 @@
     }
     const out = c.usesLeft <= 0;
     return `<div class="ff-code-show"><strong>${esc(c.code)}</strong>${out ? "" : `<button class="gde-link-button" type="button" id="ffCopy">Copy</button>`}</div>
-      <p>${out ? `All ${c.limit} uses are used. <a href="contact.html">Contact us</a> and we'll set you up with a new code.`
+      <p>${out ? `All ${c.limit} uses are used. <a href="/contact">Contact us</a> and we'll set you up with a new code.`
         : `${c.usesLeft} of ${c.limit} uses left. Share it with friends and family: they get ${c.percent}% off their order.`}</p>`;
   }
   function bindFFCode() {

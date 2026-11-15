@@ -48,7 +48,7 @@ module.exports = async function handler(request, response) {
   // A plain form post (no JavaScript) goes back to the page instead of seeing JSON.
   const plain = !/^application\/json\b/i.test(String(request.headers["content-type"] || ""));
   const reply = (status, body) => plain
-    ? response.status(303).setHeader("Location", status === 200 ? "/contact.html?sent=1" : "/contact.html?error=1").end()
+    ? response.status(303).setHeader("Location", status === 200 ? "/contact?sent=1" : "/contact?error=1").end()
     : response.status(status).json(body);
   if (!store.configured()) return reply(503, { error: "The form is not working right now. Please call or email us instead." });
 

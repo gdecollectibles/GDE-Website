@@ -143,7 +143,7 @@
       if (!r.ok) throw new Error(result.error || "Your request could not be sent. Please try again.");
       form.innerHTML = `<div class="unique-done"><p class="eyebrow">Request received</p><h2>Thank you</h2>
         <p>We'll look at your piece and come back to you with what's possible, a price and a timeline.</p>
-        <a class="button" href="collections.html">Browse Collections</a></div>`;
+        <a class="button" href="/collections">Browse Collections</a></div>`;
       form.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
       button.disabled = false;

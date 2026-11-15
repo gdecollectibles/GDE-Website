@@ -23,7 +23,7 @@
       root.innerHTML = `<div class="credit-card credit-signin">
         <h2>Sign in first</h2>
         <p>Your guns are counted on your account, so sign in with the email you want them added to.</p>
-        <a class="button" href="account.html?next=collector-request.html">Sign In</a>
+        <a class="button" href="/account?next=collector-request">Sign In</a>
       </div>`;
       return;
     }
@@ -136,8 +136,8 @@
         const result = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(result.error || "Something went wrong. Please try again.");
         root.innerHTML = `<div class="credit-card credit-done"><p class="eyebrow">Request received</p><h2>Thank you</h2>
-          <p>We'll check your purchase and add it to your account. You'll see it on your <a href="account.html">account page</a> once it's approved.</p>
-          <a class="button" href="collectors.html">Back to Collectors</a></div>`;
+          <p>We'll check your purchase and add it to your account. You'll see it on your <a href="/account">account page</a> once it's approved.</p>
+          <a class="button" href="/collectors">Back to Collectors</a></div>`;
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (err) { button.disabled = false; error(err.message); }
     });

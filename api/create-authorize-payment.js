@@ -211,9 +211,9 @@ module.exports = async function handler(request, response) {
           setting: embedded ? [
             {
               settingName: "hostedPaymentReturnOptions",
-              settingValue: JSON.stringify({ showReceipt: false, url: `${origin}/payment-success.html`, urlText: "Continue", cancelUrl: `${origin}/payment-cancel.html`, cancelUrlText: "Cancel" })
+              settingValue: JSON.stringify({ showReceipt: false, url: `${origin}/payment-success`, urlText: "Continue", cancelUrl: `${origin}/payment-cancel`, cancelUrlText: "Cancel" })
             },
-            { settingName: "hostedPaymentIFrameCommunicatorUrl", settingValue: JSON.stringify({ url: `${origin}/iframe-communicator.html` }) },
+            { settingName: "hostedPaymentIFrameCommunicatorUrl", settingValue: JSON.stringify({ url: `${origin}/iframe-communicator` }) },
             { settingName: "hostedPaymentButtonOptions", settingValue: JSON.stringify({ text: `Pay $${amount.toLocaleString("en-US")}` }) },
             { settingName: "hostedPaymentStyleOptions", settingValue: JSON.stringify({ bgColor: "#0a0a0a" }) },
             { settingName: "hostedPaymentOrderOptions", settingValue: JSON.stringify({ show: false, merchantName: "GDE Collectibles" }) },
@@ -225,9 +225,9 @@ module.exports = async function handler(request, response) {
               settingName: "hostedPaymentReturnOptions",
               settingValue: JSON.stringify({
                 showReceipt: true,
-                url: `${origin}/payment-success.html`,
+                url: `${origin}/payment-success`,
                 urlText: "Return to GDE Collectibles",
-                cancelUrl: `${origin}/payment-cancel.html`,
+                cancelUrl: `${origin}/payment-cancel`,
                 cancelUrlText: "Cancel payment"
               })
             },

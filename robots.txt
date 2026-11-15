@@ -1,11 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /account.html
-Disallow: /cart.html
-Disallow: /checkout.html
-Disallow: /payment-success.html
-Disallow: /payment-cancel.html
-Disallow: /iframe-communicator.html
+# Account, cart, checkout and payment pages carry <meta name="robots" content="noindex">.
+# They are not blocked here on purpose: Google must crawl them to see that tag.
 
 Sitemap: https://www.gdecollectibles.com/sitemap.xml
