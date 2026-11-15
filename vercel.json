@@ -29,6 +29,468 @@
       "source": "/gun/the-capital",
       "destination": "/gun/the-capitol",
       "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/",
+      "permanent": true
+    },
+    {
+      "source": "/about/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/about",
+      "permanent": true
+    },
+    {
+      "source": "/about",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/about",
+      "permanent": true
+    },
+    {
+      "source": "/contact-us/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/contact",
+      "permanent": true
+    },
+    {
+      "source": "/contact-us",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/contact",
+      "permanent": true
+    },
+    {
+      "source": "/firearms-customization/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/piece-unique",
+      "permanent": true
+    },
+    {
+      "source": "/firearms-customization",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/piece-unique",
+      "permanent": true
+    },
+    {
+      "source": "/gun-gallery/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gallery",
+      "permanent": true
+    },
+    {
+      "source": "/gun-gallery",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gallery",
+      "permanent": true
+    },
+    {
+      "source": "/collection-gallery/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/collections",
+      "permanent": true
+    },
+    {
+      "source": "/collection-gallery",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/collections",
+      "permanent": true
+    },
+    {
+      "source": "/product-category/guns/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/collections",
+      "permanent": true
+    },
+    {
+      "source": "/product-category/guns",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/collections",
+      "permanent": true
+    },
+    {
+      "source": "/product-category/colt-stainless-steel-high-gloss-polish-with-24k-gold-icons/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/collections",
+      "permanent": true
+    },
+    {
+      "source": "/product-category/colt-stainless-steel-high-gloss-polish-with-24k-gold-icons",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/collections",
+      "permanent": true
+    },
+    {
+      "source": "/product/america-250-anniversary-signing-of-the-constitution/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/signing-the-constitution",
+      "permanent": true
+    },
+    {
+      "source": "/product/america-250-anniversary-signing-of-the-constitution",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/signing-the-constitution",
+      "permanent": true
+    },
+    {
+      "source": "/product/americas-250th-anniversary-constitution/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/signing-the-constitution",
+      "permanent": true
+    },
+    {
+      "source": "/product/americas-250th-anniversary-constitution",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/signing-the-constitution",
+      "permanent": true
+    },
+    {
+      "source": "/product/america-250-anniversary-uss-constitution/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/uss-constitution",
+      "permanent": true
+    },
+    {
+      "source": "/product/america-250-anniversary-uss-constitution",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/uss-constitution",
+      "permanent": true
+    },
+    {
+      "source": "/product/remember-the-alamo/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/remember-the-alamo",
+      "permanent": true
+    },
+    {
+      "source": "/product/remember-the-alamo",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/remember-the-alamo",
+      "permanent": true
+    },
+    {
+      "source": "/product/colt-45-acp-remember-the-alamo/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/remember-the-alamo",
+      "permanent": true
+    },
+    {
+      "source": "/product/colt-45-acp-remember-the-alamo",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/remember-the-alamo",
+      "permanent": true
+    },
+    {
+      "source": "/product/america-250-anniversary-mount-rush-moore/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/mount-rushmore-with-trump",
+      "permanent": true
+    },
+    {
+      "source": "/product/america-250-anniversary-mount-rush-moore",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/mount-rushmore-with-trump",
+      "permanent": true
+    },
+    {
+      "source": "/product/americas-250th-anniversary-mt-rushmore/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/mount-rushmore-with-trump",
+      "permanent": true
+    },
+    {
+      "source": "/product/americas-250th-anniversary-mt-rushmore",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/mount-rushmore-with-trump",
+      "permanent": true
+    },
+    {
+      "source": "/product/el-alamo/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/el-alamo",
+      "permanent": true
+    },
+    {
+      "source": "/product/el-alamo",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/el-alamo",
+      "permanent": true
+    },
+    {
+      "source": "/product/colt-38-super-el-alamo/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/el-alamo",
+      "permanent": true
+    },
+    {
+      "source": "/product/colt-38-super-el-alamo",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/el-alamo",
+      "permanent": true
+    },
+    {
+      "source": "/product/america-250-anniversary-the-capital-white-house/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/the-capitol",
+      "permanent": true
+    },
+    {
+      "source": "/product/america-250-anniversary-the-capital-white-house",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/the-capitol",
+      "permanent": true
+    },
+    {
+      "source": "/product/americas-250th-anniversary/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/the-capitol",
+      "permanent": true
+    },
+    {
+      "source": "/product/americas-250th-anniversary",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/the-capitol",
+      "permanent": true
+    },
+    {
+      "source": "/product/charles-daly-45-acp-trump-47/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/donald-trump-47th",
+      "permanent": true
+    },
+    {
+      "source": "/product/charles-daly-45-acp-trump-47",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/donald-trump-47th",
+      "permanent": true
+    },
+    {
+      "source": "/product/colt-45-acp-donal-trump/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/donald-trump-47th",
+      "permanent": true
+    },
+    {
+      "source": "/product/colt-45-acp-donal-trump",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/gun/donald-trump-47th",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?gundecoremporium\\.com"
+        }
+      ],
+      "destination": "https://www.gdecollectibles.com/:path*",
+      "permanent": true
     }
   ]
 }
