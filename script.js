@@ -425,15 +425,27 @@ const saveCart = cart => {
 };
 const updateCartCount = () => document.querySelectorAll(".cart-count").forEach(el => el.textContent = getCart().length);
 const cartIconMarkup = '<svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.1 10.1a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L21 8H7"/><circle cx="10" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/></svg><span class="cart-label">Cart</span><span class="cart-count">0</span>';
-const addToCart = itemKey => {
+// A random id for this browser, so GDE can tell one visitor adding several guns from several visitors (Nov 16).
+const visitorId = () => {
+  try {
+    let id = localStorage.getItem("gdeVisitor");
+    if (!/^[a-f0-9]{32}$/.test(id || "")) {
+      id = [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, "0")).join("");
+      localStorage.setItem("gdeVisitor", id);
+    }
+    return id;
+  } catch { return undefined; }
+};
+// track = false when the gun comes from a link (the checkout page), not a click on Add to cart.
+const addToCart = (itemKey, track = true) => {
   const cart = getCart();
   const isNew = !cart.includes(itemKey) && isBuyable(products[itemKey]);
   if (isNew) cart.push(itemKey);
   saveCart(cart);
   // Tells GDE which gun went in a cart (and who, when signed in); never holds up the page (Nov 16).
-  if (isNew) try {
+  if (isNew && track) try {
     fetch("/api/account?action=cart", { method: "POST", keepalive: true, credentials: "same-origin",
-      headers: { "Content-Type": "application/json" }, body: JSON.stringify({ product: itemKey }) }).catch(() => {});
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify({ product: itemKey, visitor: visitorId() }) }).catch(() => {});
   } catch {}
   return cart.includes(itemKey);
 };
@@ -927,7 +939,7 @@ renderCart();
 
 if (document.querySelector("#checkoutSummaryItems")) {
   const queryProduct = renamed(new URLSearchParams(location.search).get("product") || "") || null;
-  if (queryProduct && products[queryProduct]) addToCart(queryProduct);
+  if (queryProduct && products[queryProduct]) addToCart(queryProduct, false);
   renderCheckoutSummary();
 }
 // Collector clubs (3+ guns bought: Collectors Club, 5% off; 5+: Legacy Club, 10% off), on every gun.

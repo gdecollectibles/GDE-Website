@@ -16,7 +16,9 @@
 //   GET  /api/account?action=ffcode-check&code=<code>  checkout asks whether a code is good (5% off)
 //   POST /api/account?action=cart     { product }: a gun was just added to the cart (user, Nov 16: the owner sees who added
 //                                     what in the inventory app). Kept in gde:cartadds, newest first, the last 1000:
-//                                     { id, at, product, gun, email, name } (email and name only when signed in).
+//                                     { id, at, product, gun, email, name, visitor, device } (email and name only when
+//                                     signed in; visitor = the browser's random id). Counted once per visitor per gun
+//                                     per day; bots are ignored (Nov 16: the first day showed 40 adds, mostly repeats).
 // Stored next to the orders (see _store.js), one record per person, whether they joined the list, signed in, or both:
 //   gde:subscriber:<email>  { email, firstName, lastName, status: none|declined|subscribed|unsubscribed, account (signed in
 //                             with Google), source, verified, signedInAt, createdAt, updatedAt, consent }
@@ -82,6 +84,9 @@ async function allowed(request, what, limit) {
   const [, count] = await store.pipeline([["SET", key, 0, "EX", 3600, "NX"], ["INCR", key]]);
   return count <= limit;
 }
+
+// Crawlers, link previews and test tools that say what they are.
+const BOT = /bot|crawl|spider|slurp|facebookexternalhit|meta-external|preview|headless|lighthouse|pagespeed|python|curl|wget|httpclient|okhttp|axios|node-fetch|scrapy|phantom|puppeteer|playwright|selenium|vercel/i;
 
 const listSource = (value) => (["popup", "account", "footer", "checkout", "signup"].includes(value) ? value : "website");
 const normEmail = (value) => String(value || "").trim().toLowerCase().slice(0, 254);
@@ -319,10 +324,18 @@ module.exports = async function handler(request, response) {
       let products = {};
       try { products = JSON.parse(fs.readFileSync(path.join(process.cwd(), "codex-inventory.json"), "utf8")).products || {}; } catch {}
       if (!products[product]) return response.status(400).json({ error: "Unknown gun." });
+      const agent = String(request.headers["user-agent"] || "");
+      if (!agent || BOT.test(agent)) return response.status(200).json({ ok: true }); // bots don't count
       if (!(await allowed(request, "cart", 60))) return response.status(200).json({ ok: true }); // quietly drop floods
       const user = readSession(request);
+      const visitor = /^[a-f0-9]{16,32}$/.test(String(body.visitor || "")) ? body.visitor : null;
+      // once a day per person (or browser, or network when an old page sends no id) and gun
+      const who = user?.email || visitor || "ip:" + crypto.createHash("sha256").update(clientIp(request)).digest("hex").slice(0, 16);
+      const first = await store.cmd("SET", `gde:cartseen:${who}:${product}`, 1, "EX", 86400, "NX");
+      if (first !== "OK") return response.status(200).json({ ok: true });
+      const device = /iPad|Tablet/i.test(agent) ? "tablet" : /Mobi|iPhone|Android/i.test(agent) ? "phone" : "computer";
       const record = { id: crypto.randomBytes(8).toString("hex"), at: new Date().toISOString(), product, gun: products[product].name || product,
-        email: user?.email || null, name: user?.name || null };
+        email: user?.email || null, name: user?.name || null, visitor, device };
       await store.pipeline([["LPUSH", "gde:cartadds", JSON.stringify(record)], ["LTRIM", "gde:cartadds", 0, 999]]);
       return response.status(200).json({ ok: true });
     }

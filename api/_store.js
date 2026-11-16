@@ -5,6 +5,7 @@
 //   gde:orders          the invoice numbers, newest first
 //   gde:message:<id>    each Contact page message (api/contact.js); gde:messages the ids, newest first
 //   gde:cartadds        each gun added to a cart (api/account.js?action=cart), newest first, the last 1000
+//   gde:cartseen:<who>:<gun>  marks a cart add already counted today (expires after 24 h)
 // Files starting with "_" in api/ are helpers, not web addresses.
 // Vercel's Upstash integration sets KV_REST_API_URL / KV_REST_API_TOKEN (older ones UPSTASH_REDIS_REST_*).
 
