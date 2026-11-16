@@ -400,6 +400,22 @@ const applyLive = live => {
   }
 };
 const isBuyable = p => !!p && !p.availability.includes("Archive") && !p.soldOut;
+// Holiday sale (user, Nov 16; was "Christmas"): the listed price is the sale price. The "was" price shown struck through beside it is
+// the listed price ÷ 0.9, rounded to the nearest $100. Display only: buyers still pay the listed price. Ends on its own
+// on SALE.ends; to stop it sooner, set ends to a past date.
+const SALE = { label: "Holiday Discount", off: 0.10, ends: new Date("2026-12-26T00:00:00") };
+const saleOn = p => Date.now() < SALE.ends.getTime() && isBuyable(p);
+const wasPrice = p => `$${(Math.round(priceNumber(p.price) / (1 - SALE.off) / 100) * 100).toLocaleString("en-US")}`;
+// Sale banner just under the header on every page (user, Nov 16); it rides along with the sticky/fixed header.
+if (Date.now() < SALE.ends.getTime()) {
+  const header = document.querySelector(".site-header");
+  if (header && !header.querySelector(".sale-banner")) {
+    const words = `<span>${SALE.label} · ${Math.round(SALE.off * 100)}% off all purchases</span>`.repeat(12); // scrolls across on a loop (user, Nov 16)
+    header.insertAdjacentHTML("beforeend", `<a class="sale-banner" href="/collections" aria-label="${SALE.label}, ${Math.round(SALE.off * 100)}% off all purchases"><span class="sale-track" aria-hidden="true">${words}${words}</span></a>`);
+    document.documentElement.classList.add("has-sale-banner");
+  }
+}
+const priceHTML = p => p.soldOut ? "Sold Out" : saleOn(p) ? `<s class="was-price">${wasPrice(p)}</s> <span class="sale-price">${p.price}</span>` : p.price;
 let liveCatalogText = null;
 try { liveCatalogText = sessionStorage.getItem("gdeLiveCatalog"); applyLive(JSON.parse(liveCatalogText || "null")); } catch {}
 const slug = value => String(value || "").trim().toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -816,7 +832,9 @@ if (document.querySelector(".product-detail-page")) {
 function paintDetail() {
   const request=document.querySelector("#detailRequest");
   if (!document.querySelector(".product-detail-page") || !product) return;
-  setText("#detailPrice", product.soldOut ? "Sold Out" : product.price); setText("#detailAvailability",product.availability); setText("#detailHeaderAvailability",product.availability);
+  const detailPrice = document.querySelector("#detailPrice");
+  if (detailPrice) detailPrice.innerHTML = priceHTML(product);
+  setText("#detailAvailability",product.availability); setText("#detailHeaderAvailability",product.availability);
   if (!request) return;
   if (product.availability.includes("Archive")) { request.textContent="Archive - Unavailable"; request.disabled=true; }
   else if (product.soldOut) { request.textContent="Sold Out"; request.disabled=true; }
@@ -829,7 +847,7 @@ function paintCards() {
     if (!p) return;
     const card = link.closest(".product-card") || link.closest("article") || link.parentElement;
     const price = card?.querySelector(".price");
-    if (price) price.textContent = p.soldOut ? "Sold Out" : p.price;
+    if (price) price.innerHTML = priceHTML(p); // small old price over the sale price; no per-gun sale badge, the header banner says it (user, Nov 16)
     const tag = card?.querySelector(".card-availability");
     if (tag) tag.textContent = p.availability;
     if (card?.dataset.price) card.dataset.price = String(priceNumber(p.price));
@@ -867,7 +885,7 @@ const sideCart = (() => {
     root.querySelector(".side-cart-count").textContent = cart.length ? `(${cart.length})` : "";
     root.querySelector(".side-cart-items").innerHTML = cart.length ? cart.map(item => {
       const p = products[item];
-      return `<div class="side-cart-item"><a class="mini-image ${p.image}" href="/gun/${item}"${productImageStyle(p)} tabindex="-1" aria-hidden="true"></a><div class="side-cart-copy"><a class="side-cart-name" href="/gun/${item}">${p.name}</a><p>1 &times; ${p.soldOut ? "Sold Out" : p.price}</p></div><button type="button" class="side-cart-remove" data-product="${item}" aria-label="Remove ${p.name}">&times;</button></div>`;
+      return `<div class="side-cart-item"><a class="mini-image ${p.image}" href="/gun/${item}"${productImageStyle(p)} tabindex="-1" aria-hidden="true"></a><div class="side-cart-copy"><a class="side-cart-name" href="/gun/${item}">${p.name}</a><p>1 &times; ${priceHTML(p)}</p></div><button type="button" class="side-cart-remove" data-product="${item}" aria-label="Remove ${p.name}">&times;</button></div>`;
     }).join("") : '<div class="side-cart-empty"><p>Your cart is empty.</p><a class="text-link" href="/collections">Browse collections <span>&rarr;</span></a></div>';
     root.querySelector(".side-cart-foot").hidden = !cart.length;
     root.querySelector(".side-cart-subtotal strong").textContent = `$${buyable.reduce((sum, item) => sum + priceNumber(products[item].price), 0).toLocaleString()}`;
@@ -937,7 +955,7 @@ function renderCart() {
   document.querySelector("#emptyCart").classList.toggle("show", cart.length === 0);
   container.innerHTML = cart.map(item => {
     const p=products[item];
-    return `<article class="cart-item"><div class="cart-item-image ${p.image}"${productImageStyle(p)}></div><div class="cart-item-copy"><p class="meta">${p.collectionNumber || displayCollections(p)}</p><h2>${p.name}</h2><p>${p.platform} · ${p.finish} · ${p.availability}</p><span>FFL Transfer Required</span></div><div class="cart-item-price"><strong>${p.soldOut ? "Sold Out" : p.price}</strong><button type="button" class="remove-cart-item" data-product="${item}">Remove</button></div></article>`;
+    return `<article class="cart-item"><div class="cart-item-image ${p.image}"${productImageStyle(p)}></div><div class="cart-item-copy"><p class="meta">${p.collectionNumber || displayCollections(p)}</p><h2>${p.name}</h2><p>${p.platform} · ${p.finish} · ${p.availability}</p><span>FFL Transfer Required</span></div><div class="cart-item-price"><strong>${priceHTML(p)}</strong><button type="button" class="remove-cart-item" data-product="${item}">Remove</button></div></article>`;
   }).join("");
   const buyable = cart.filter(item => isBuyable(products[item]));
   const total = buyable.reduce((sum,item)=>sum+priceNumber(products[item].price),0);

@@ -755,3 +755,28 @@ body.side-cart-locked{overflow:hidden}
   .filters{top:104px;max-height:calc(100vh - 124px)}
   .order-summary,.cart-summary,.payment-summary{top:109px}
 }
+
+/* Holiday sale (user, Nov 16): script.js shows the old price small and struck through over the listed sale price (user, Nov 16).
+   The banner under the header says "Holiday Discount"; the guns carry no badge or tag (user, Nov 16). */
+.was-price{color:var(--muted,#8e8e93);font-size:.72em;text-decoration-thickness:1px;margin-right:6px}
+.product-info .price .was-price,.detail-price .was-price,.cart-item-price .was-price{display:block;margin:0 0 2px;font-size:.72em;line-height:1.2}
+.detail-price .was-price{font-size:.6em}
+.product-info .price:has(.was-price){align-self:end} /* beside the short spec lines, clear of long names */
+.sale-price{color:inherit}
+
+/* Holiday sale banner under the header (user, Nov 16): part of the header, so it stays with it while scrolling.
+   Sticky boxes and the first content move down by its height. */
+.sale-banner{position:absolute;left:0;right:0;top:100%;height:30px;display:flex;align-items:center;justify-content:flex-start;overflow:hidden;white-space:nowrap;background:#9e1b1b;color:#fff;font:600 .66rem/1 var(--sans);text-transform:uppercase;letter-spacing:.2em;opacity:1!important}
+.sale-banner:hover{background:#b52222}
+.has-sale-banner .site-header.dark-header{margin-bottom:30px}
+@media(min-width:761px){
+  .has-sale-banner .filters{top:134px;max-height:calc(100vh - 154px)}
+  .has-sale-banner .order-summary,.has-sale-banner .cart-summary,.has-sale-banner .payment-summary{top:139px}
+}
+/* The banner text scrolls right to left on a loop: two identical halves, moved by one half (user, Nov 16) */
+.sale-track{display:flex;flex:0 0 auto;animation:sale-scroll 60s linear infinite}
+.sale-track>span{padding:0 2.2em}
+.sale-track>span:after{content:"★";margin-left:4.4em;opacity:.8}
+.sale-banner:hover .sale-track{animation-play-state:paused}
+@keyframes sale-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.sale-track{animation:none}}
