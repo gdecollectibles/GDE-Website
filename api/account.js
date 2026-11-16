@@ -14,6 +14,9 @@
 //   POST /api/account?action=decline      signed in: "no thanks" to the list question asked after the first sign-in
 //   POST /api/account?action=ffcode-create { code }: a Legacy Club member makes their friends and family code (_ffcode.js)
 //   GET  /api/account?action=ffcode-check&code=<code>  checkout asks whether a code is good (5% off)
+//   POST /api/account?action=cart     { product }: a gun was just added to the cart (user, Nov 16: the owner sees who added
+//                                     what in the inventory app). Kept in gde:cartadds, newest first, the last 1000:
+//                                     { id, at, product, gun, email, name } (email and name only when signed in).
 // Stored next to the orders (see _store.js), one record per person, whether they joined the list, signed in, or both:
 //   gde:subscriber:<email>  { email, firstName, lastName, status: none|declined|subscribed|unsubscribed, account (signed in
 //                             with Google), source, verified, signedInAt, createdAt, updatedAt, consent }
@@ -33,6 +36,8 @@ const referral = require("./_referral");
 const mail = require("./_mail");
 const { CONSENT, getSubscriber, saveSubscriber } = require("./_subscribers");
 const crypto = require("node:crypto");
+const fs = require("node:fs");
+const path = require("node:path");
 
 const EMAIL_RE = /^[^\s@<>()[\]\\,;:"]{1,64}@[A-Za-z0-9.-]{1,253}\.[A-Za-z]{2,24}$/;
 const INVOICE_RE = /^GDE-\d{6,16}$/;
@@ -306,6 +311,20 @@ module.exports = async function handler(request, response) {
         subscribed: sub?.status === "subscribed",
         listStatus: sub?.status || "none"
       });
+    }
+
+    if (action === "cart" && post) {
+      const body = await readBody(request);
+      const product = String(body.product || "").slice(0, 80);
+      let products = {};
+      try { products = JSON.parse(fs.readFileSync(path.join(process.cwd(), "codex-inventory.json"), "utf8")).products || {}; } catch {}
+      if (!products[product]) return response.status(400).json({ error: "Unknown gun." });
+      if (!(await allowed(request, "cart", 60))) return response.status(200).json({ ok: true }); // quietly drop floods
+      const user = readSession(request);
+      const record = { id: crypto.randomBytes(8).toString("hex"), at: new Date().toISOString(), product, gun: products[product].name || product,
+        email: user?.email || null, name: user?.name || null };
+      await store.pipeline([["LPUSH", "gde:cartadds", JSON.stringify(record)], ["LTRIM", "gde:cartadds", 0, 999]]);
+      return response.status(200).json({ ok: true });
     }
 
     if (action === "ffcode-create" && post) {

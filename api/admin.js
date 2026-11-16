@@ -9,6 +9,7 @@
 //                                       api/custom-request.js save them; kind "custom" for the second), newest first
 //   GET  /api/admin?action=message-file&id=<id>&n=<n>  one reference picture of a custom request: { name, type, size, data (base64) }
 //   POST /api/admin?action=delete-message  { id }: removes one message and its pictures (deleted in the app)
+//   GET  /api/admin?action=cart-adds   guns added to carts (api/account.js?action=cart), newest first, the last 1000
 // Collector credit (guns bought outside the website, see _credits.js):
 //   GET  /api/admin?action=credit-requests          every request (without file contents) and every account's credited guns
 //   GET  /api/admin?action=credit-file&id=<id>&n=<n> one proof file: { name, type, size, data (base64) }
@@ -192,6 +193,11 @@ module.exports = async function handler(request, response) {
       const values = ids.length ? await store.cmd("MGET", ...ids.map((id) => `gde:message:${id}`)) : [];
       const messages = values.map((v) => { try { return JSON.parse(v); } catch { return null; } }).filter(Boolean);
       return response.status(200).json({ messages });
+    }
+    if (action === "cart-adds" && request.method === "GET") {
+      const values = await store.cmd("LRANGE", "gde:cartadds", 0, 999);
+      const adds = values.map((v) => { try { return JSON.parse(v); } catch { return null; } }).filter(Boolean);
+      return response.status(200).json({ adds });
     }
     if (action === "message-file" && request.method === "GET") {
       const q = new URL(request.url, "http://x").searchParams;

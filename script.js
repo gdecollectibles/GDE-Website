@@ -14,7 +14,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "Hand Polished & Hand 24K Gold Plated",
     "gripColor": "Composite - Pearl White with Colt Horse in gold",
-    "price": "$3,300",
+    "price": "$2,900",
     "availability": "Available",
     "image": "image-gold",
     "description": "The serial and sequence number in the pictures are not the ones on the gun you receive. Want a specific sequence number? Reach us however is easiest for you: call, text, email or the contact form. If it's available, we'll make sure it's yours.",
@@ -44,7 +44,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "Hand Polished & Hand 24K Gold Plated also on the frame",
     "gripColor": "Composite - Pearl Brown with Colt Horse in gold",
-    "price": "$3,300",
+    "price": "$2,900",
     "availability": "Available",
     "image": "image-gold",
     "description": "The serial and sequence number in the pictures are not the ones on the gun you receive. Want a specific sequence number? Reach us however is easiest for you: call, text, email or the contact form. If it's available, we'll make sure it's yours.",
@@ -72,7 +72,7 @@ const products = {
     "action": "Semi-Automatic",
     "finish": "Royal Blue with Full Scroll Engraving",
     "gripColor": "White pearl with gold rearing horse medallions",
-    "price": "$3,300",
+    "price": "$2,800",
     "availability": "Available",
     "image": "image-gold",
     "description": "Royal blued Colt Government Model in .38 Super with full scroll engraving on the slide and a polished silver barrel. Gold-plated hammer, trigger, safety, slide stop, screws and pins.",
@@ -102,7 +102,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "Hand Polished & Hand 24K Gold Plated",
     "gripColor": "S.S. - Black with 24K Gold Presidential Seal",
-    "price": "$3,300",
+    "price": "$2,700",
     "availability": "Available",
     "image": "image-gold",
     "description": "The serial and sequence number in the pictures are not the ones on the gun you receive. Want a specific sequence number? Reach us however is easiest for you: call, text, email or the contact form. If it's available, we'll make sure it's yours.",
@@ -132,7 +132,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "Hand Polished & Hand 24K Gold Plated",
     "gripColor": "S.S. - 24K Gold with Nickel Presidential Seal",
-    "price": "$3,300",
+    "price": "$2,700",
     "availability": "Available",
     "image": "image-gold",
     "description": "The serial and sequence number in the pictures are not the ones on the gun you receive. Want a specific sequence number? Reach us however is easiest for you: call, text, email or the contact form. If it's available, we'll make sure it's yours.",
@@ -162,7 +162,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "Hand Polished & Hand 24K Gold Plated",
     "gripColor": "Composite - Pearl Blue with Colt Horse in gold",
-    "price": "$3,300",
+    "price": "$2,700",
     "availability": "Available",
     "image": "image-gold",
     "description": "The serial and sequence number in the pictures are not the ones on the gun you receive. Want a specific sequence number? Reach us however is easiest for you: call, text, email or the contact form. If it's available, we'll make sure it's yours.",
@@ -192,7 +192,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "Hand Polished & Hand 24K Gold Plated",
     "gripColor": "Hand 24K gold plated with Nickel",
-    "price": "$3,500",
+    "price": "$2,700",
     "availability": "Available",
     "image": "image-gold",
     "description": "The serial and sequence number in the pictures are not the ones on the gun you receive. Want a specific sequence number? Reach us however is easiest for you: call, text, email or the contact form. If it's available, we'll make sure it's yours.",
@@ -222,7 +222,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "Hand Polished & Hand 24K Gold Plated",
     "gripColor": "S.S. - Black & Gold edges with Colorful, American FLAG",
-    "price": "$3,000",
+    "price": "$2,700",
     "availability": "Available",
     "image": "image-gold",
     "description": "The serial and sequence number in the pictures are not the ones on the gun you receive. Want a specific sequence number? Reach us however is easiest for you: call, text, email or the contact form. If it's available, we'll make sure it's yours.",
@@ -252,7 +252,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "Polished Stainless Steel with Gold-Filled Engraving",
     "gripColor": "Swirled brown pearl with Estados Unidos Mexicanos medallion",
-    "price": "$3,300",
+    "price": "$2,900",
     "availability": "Available",
     "image": "image-gold",
     "description": "The serial and sequence number in the pictures are not the ones on the gun you receive. Want a specific sequence number? Reach us however is easiest for you: call, text, email or the contact form. If it's available, we'll make sure it's yours.",
@@ -282,7 +282,7 @@ const products = {
     "frameMaterial": "Stainless Steel",
     "finish": "Polished Stainless Steel with Full Scroll Engraving",
     "gripColor": "Pearl white with gold Colt pony",
-    "price": "$2,500",
+    "price": "$2,300",
     "availability": "Available",
     "image": "image-gold",
     "description": "Polished stainless Colt 1911 in .38 Super with full scroll engraving on the slide and frame. Gold-plated hammer, trigger, safeties, slide stop, screws and grip medallion.",
@@ -310,7 +310,7 @@ const products = {
     "action": "Semi-Automatic",
     "finish": "Bright Polish with Full Floral Scroll Engraving",
     "gripColor": "Pearl with gold rearing horse medallions",
-    "price": "$2,500",
+    "price": "$2,300",
     "availability": "Available",
     "image": "image-gold",
     "description": "Bright polished Colt 1911 in .45 ACP with full-coverage floral scroll engraving on the slide and frame. Gold-plated hammer, trigger, safeties, slide stop, magazine release, sights, screws and pins.",
@@ -427,8 +427,14 @@ const updateCartCount = () => document.querySelectorAll(".cart-count").forEach(e
 const cartIconMarkup = '<svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.1 10.1a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L21 8H7"/><circle cx="10" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/></svg><span class="cart-label">Cart</span><span class="cart-count">0</span>';
 const addToCart = itemKey => {
   const cart = getCart();
-  if (!cart.includes(itemKey) && isBuyable(products[itemKey])) cart.push(itemKey);
+  const isNew = !cart.includes(itemKey) && isBuyable(products[itemKey]);
+  if (isNew) cart.push(itemKey);
   saveCart(cart);
+  // Tells GDE which gun went in a cart (and who, when signed in); never holds up the page (Nov 16).
+  if (isNew) try {
+    fetch("/api/account?action=cart", { method: "POST", keepalive: true, credentials: "same-origin",
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify({ product: itemKey }) }).catch(() => {});
+  } catch {}
   return cart.includes(itemKey);
 };
 // Share links (user, Nov 12): ?ref=<CODE> on any page is kept for 30 days and sent with the next checkout, so the
