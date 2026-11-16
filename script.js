@@ -425,6 +425,21 @@ const saveCart = cart => {
 };
 const updateCartCount = () => document.querySelectorAll(".cart-count").forEach(el => el.textContent = getCart().length);
 const cartIconMarkup = '<svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.1 10.1a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L21 8H7"/><circle cx="10" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/></svg><span class="cart-label">Cart</span><span class="cart-count">0</span>';
+// Where this visit came from (user, Nov 16: "add where it came from" to cart adds). Kept from the first page of the
+// visit, since the add usually happens a page or two later when the referrer is the site itself.
+const landing = (() => {
+  try {
+    const kept = JSON.parse(sessionStorage.getItem("gdeLanding") || "null");
+    if (kept) return kept;
+    const q = new URLSearchParams(location.search);
+    let ref = "";
+    try { const r = new URL(document.referrer); if (r.hostname !== location.hostname) ref = r.hostname; } catch {}
+    const info = { ref, utmSource: q.get("utm_source") || "", utmMedium: q.get("utm_medium") || "", utmCampaign: q.get("utm_campaign") || "",
+      fbclid: q.has("fbclid"), gclid: q.has("gclid") || q.has("gbraid") || q.has("wbraid") };
+    sessionStorage.setItem("gdeLanding", JSON.stringify(info));
+    return info;
+  } catch { return {}; }
+})();
 // A random id for this browser, so GDE can tell one visitor adding several guns from several visitors (Nov 16).
 const visitorId = () => {
   try {
@@ -445,7 +460,7 @@ const addToCart = (itemKey, track = true) => {
   // Tells GDE which gun went in a cart (and who, when signed in); never holds up the page (Nov 16).
   if (isNew && track) try {
     fetch("/api/account?action=cart", { method: "POST", keepalive: true, credentials: "same-origin",
-      headers: { "Content-Type": "application/json" }, body: JSON.stringify({ product: itemKey, visitor: visitorId() }) }).catch(() => {});
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify({ product: itemKey, visitor: visitorId(), landing }) }).catch(() => {});
   } catch {}
   return cart.includes(itemKey);
 };

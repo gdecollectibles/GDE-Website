@@ -19,6 +19,8 @@
 //                                     { id, at, product, gun, email, name, visitor, device } (email and name only when
 //                                     signed in; visitor = the browser's random id). Counted once per visitor per gun
 //                                     per day; bots are ignored (Nov 16: the first day showed 40 adds, mostly repeats).
+//                                     Also source (Instagram, Facebook, Google, Direct, a site), via (the Instagram /
+//                                     Facebook / TikTok app's own browser), ad (true for Google Ads or a paid utm), campaign.
 // Stored next to the orders (see _store.js), one record per person, whether they joined the list, signed in, or both:
 //   gde:subscriber:<email>  { email, firstName, lastName, status: none|declined|subscribed|unsubscribed, account (signed in
 //                             with Google), source, verified, signedInAt, createdAt, updatedAt, consent }
@@ -87,6 +89,24 @@ async function allowed(request, what, limit) {
 
 // Crawlers, link previews and test tools that say what they are.
 const BOT = /bot|crawl|spider|slurp|facebookexternalhit|meta-external|preview|headless|lighthouse|pagespeed|python|curl|wget|httpclient|okhttp|axios|node-fetch|scrapy|phantom|puppeteer|playwright|selenium|vercel/i;
+
+// Where a cart add came from: utm_source first, then the page that linked here, then the app it was opened in.
+const SOURCES = [[/(^|\.)instagram\.com$|^ig$|^instagram/i, "Instagram"], [/(^|\.)(facebook|fb)\.(com|me)$|^fb$|^facebook/i, "Facebook"],
+  [/(^|\.)google\.|^google/i, "Google"], [/(^|\.)bing\.com$|^bing/i, "Bing"], [/(^|\.)(t\.co|x\.com|twitter\.com)$|^twitter|^x$/i, "X"],
+  [/(^|\.)youtube\.com$|^youtu\.be$|^youtube/i, "YouTube"], [/(^|\.)tiktok\.com$|^tiktok/i, "TikTok"], [/(^|\.)(yahoo|duckduckgo)\./i, "Search"],
+  [/(^|\.)gdecollectibles\.com$/i, "Direct"]];
+function cartSource(landing, agent) {
+  const clean = (v, n) => String(v || "").replace(/[^\w .:/-]/g, "").trim().slice(0, n);
+  const l = landing && typeof landing === "object" ? landing : {};
+  const via = /Instagram/i.test(agent) ? "Instagram app" : /FBAN|FBAV|FB_IAB|FBIOS/i.test(agent) ? "Facebook app"
+    : /musical_ly|TikTok|BytedanceWebview/i.test(agent) ? "TikTok app" : /Snapchat/i.test(agent) ? "Snapchat app" : null;
+  const named = (v) => { const hit = SOURCES.find(([re]) => re.test(v)); return hit ? hit[1] : null; };
+  const utm = clean(l.utmSource, 40), ref = clean(l.ref, 80).toLowerCase();
+  const source = (utm && (named(utm) || utm)) || (ref && (named(ref) || ref)) || (via && via.replace(" app", ""))
+    || (l.gclid ? "Google" : l.fbclid ? "Facebook" : "Direct");
+  const ad = Boolean(l.gclid) || /^(cpc|ppc|paid|paidsocial|paid_social|paid-social|ads?|display)$/i.test(clean(l.utmMedium, 30));
+  return { source, via, ad, campaign: clean(l.utmCampaign, 60) || null };
+}
 
 const listSource = (value) => (["popup", "account", "footer", "checkout", "signup"].includes(value) ? value : "website");
 const normEmail = (value) => String(value || "").trim().toLowerCase().slice(0, 254);
@@ -335,7 +355,7 @@ module.exports = async function handler(request, response) {
       if (first !== "OK") return response.status(200).json({ ok: true });
       const device = /iPad|Tablet/i.test(agent) ? "tablet" : /Mobi|iPhone|Android/i.test(agent) ? "phone" : "computer";
       const record = { id: crypto.randomBytes(8).toString("hex"), at: new Date().toISOString(), product, gun: products[product].name || product,
-        email: user?.email || null, name: user?.name || null, visitor, device };
+        email: user?.email || null, name: user?.name || null, visitor, device, ...cartSource(body.landing, agent) };
       await store.pipeline([["LPUSH", "gde:cartadds", JSON.stringify(record)], ["LTRIM", "gde:cartadds", 0, 999]]);
       return response.status(200).json({ ok: true });
     }
