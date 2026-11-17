@@ -66,7 +66,7 @@ function welcomeEmail(firstName, { subscribed = false, unsubUrl = "" } = {}) {
 <style>@media (max-width:620px){.wrap{padding:0!important} .card{border-radius:0!important} .pad{padding-left:24px!important;padding-right:24px!important} .btn{padding:16px 18px!important;letter-spacing:.14em!important}}</style>
 </head><body style="margin:0;padding:0;background:#e8e2d7">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e8e2d7" style="background-color:#e8e2d7"><tr><td class="wrap" align="center" style="padding:32px 12px">
-<table role="presentation" class="card" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f3ede1" style="width:100%;max-width:600px;background-color:#f3ede1;border:1px solid #d4ccbd;border-radius:4px">
+<table role="presentation" class="card" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f7f4ed" style="width:100%;max-width:600px;background-color:#f7f4ed;border:1px solid #d4ccbd;border-radius:4px">
 <tr><td style="padding:10px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE}">
   <tr><td align="center" style="padding:40px 40px 6px"><img src="${SITE}/assets/email/welcome-logo-gold.png" width="170" alt="GDE Collectibles" style="display:block;width:170px;height:auto;border:0"></td></tr>
   <tr><td class="pad" style="padding:20px 52px 0">
@@ -75,7 +75,7 @@ function welcomeEmail(firstName, { subscribed = false, unsubUrl = "" } = {}) {
     ${p("Welcome to GDE Collectibles, and thank you for joining us. Your account is ready.")}
     ${p("We're a family-owned shop, and every gun we make is a limited, numbered piece. Being part of our community comes with a few things worth knowing:")}
   </td></tr>
-  <tr><td class="pad" style="padding:6px 52px 4px"><div style="border:1px solid #d4ccbd;background-color:#f8f3e9;padding:24px 24px 8px">
+  <tr><td class="pad" style="padding:6px 52px 4px"><div style="border:1px solid #d4ccbd;background-color:#fbf9f4;padding:24px 24px 8px">
     <p style="margin:0 0 18px;font-family:${SERIF};font-size:11px;line-height:1;letter-spacing:.3em;text-transform:uppercase;color:${GOLD}">Your membership</p>
     <table role="presentation" cellpadding="0" cellspacing="0">
     ${perk("I", "Follow your orders", "Every order you place shows in your account, from payment until your gun ships to your FFL dealer.")}
