@@ -24,13 +24,21 @@
 // Welcome email for people who signed up before it existed (user, Nov 17: "send the email to everyone that signed up",
 // accounts + email list; _mail.js welcomeEmail):
 //   GET  /api/admin?action=welcome-existing   who would get it and who is skipped, nothing is sent
-//   POST /api/admin?action=welcome-existing  { address, exclude?: [email] }: sends it from account@ (100 per Resend
+//   POST /api/admin?action=welcome-existing  { address, exclude?: [email], resend?: [email] }: sends it from account@
+//        (resend: also these, even if they already got it; still never to anyone unsubscribed) (100 per Resend
 //        batch) and marks each person welcomedAt, so nobody gets it twice (new sign-ups are marked by account.js).
 //        Accounts get the account version (existing); people only on the list get the list version, which is a
 //        marketing email: it needs GDE's mailing address and carries an Unsubscribe link + one-click header.
 //        Skipped: already welcomed, unsubscribed, or no account and not on the list.
 // Friends and family codes (_ffcode.js):
 //   POST /api/admin?action=ffcode-reset   { email }: clears a Legacy Club member's code so they can make a new one
+// GDE's own discount codes (_promo.js, user Nov 17):
+//   GET  /api/admin?action=promo-list     every code with its uses, paid orders, sales and what buyers saved
+//   POST /api/admin?action=promo-create   { code, kind: percent|amount, value, startsAt?, endsAt? (ISO times), maxUses?, note? }
+//   POST /api/admin?action=promo-set      { code, active?, startsAt?, endsAt? }: turns a code off or on, changes its times
+// Welcome offer (_welcome.js, user Nov 17: "$100 off your first purchase that lasts 30 days" for every new sign-up):
+//   GET  /api/admin?action=welcome-get    the settings, totals and the latest 100 welcome codes
+//   POST /api/admin?action=welcome-set    { active?, amount?, days?, address? }
 const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -38,6 +46,8 @@ const store = require("./_store");
 const credits = require("./_credits");
 const { collectorStatus } = require("./_collector");
 const ffcode = require("./_ffcode");
+const promo = require("./_promo");
+const welcomeOffer = require("./_welcome");
 const mail = require("./_mail");
 const subscribers = require("./_subscribers");
 
@@ -49,7 +59,8 @@ const RECHECK_DAYS = 8;            // how far back payments are looked up
 const UNPAID_AFTER_MS = 60 * 60 * 1000; // Authorize.net's payment page expires long before this
 
 // Everyone on the site's people list, split into who gets the welcome email now and who is skipped (and why).
-async function welcomeList() {
+// `resend`: emails to send again even though they already got it (user, Nov 17: their own Gmail as well).
+async function welcomeList(resend = new Set()) {
   const emails = (await store.cmd("ZRANGE", "gde:subscribers", 0, -1)) || [];
   const records = emails.length ? await store.pipeline(emails.map((e) => ["GET", `gde:subscriber:${e}`])) : [];
   const send = [], skipped = [];
@@ -58,7 +69,7 @@ async function welcomeList() {
     try { s = records[i] ? JSON.parse(records[i]) : null; } catch {}
     if (!s) return;
     const who = { email, firstName: s.firstName || "", account: !!s.account, status: s.status || "none" };
-    if (s.welcomedAt) skipped.push({ ...who, why: "already got the welcome email" });
+    if (s.welcomedAt && !resend.has(email)) skipped.push({ ...who, why: "already got the welcome email" });
     else if (s.status === "unsubscribed") skipped.push({ ...who, why: "unsubscribed" });
     else if (!s.account && s.status !== "subscribed") skipped.push({ ...who, why: "no account and not on the email list" });
     else send.push(who);
@@ -324,7 +335,8 @@ module.exports = async function handler(request, response) {
       const b = await readBody(request);
       const address = String(b.address || "").trim();
       const exclude = new Set((Array.isArray(b.exclude) ? b.exclude : []).map((e) => subscribers.normEmail(e)));
-      const { send } = await welcomeList();
+      const resend = new Set((Array.isArray(b.resend) ? b.resend : []).map((e) => subscribers.normEmail(e)));
+      const { send } = await welcomeList(resend);
       const list = send.filter((w) => !exclude.has(w.email));
       if (list.some((w) => !w.account) && address.length < 8) {
         return response.status(400).json({ error: "Add GDE's mailing address (the email-list version needs it, by law)." });
@@ -362,6 +374,30 @@ module.exports = async function handler(request, response) {
     if (action === "ffcode-reset" && request.method === "POST") {
       const code = await ffcode.clearCode((await readBody(request)).email);
       return code ? response.status(200).json({ ok: true, cleared: code }) : response.status(404).json({ error: "That account has no code." });
+    }
+    if (action === "promo-list" && request.method === "GET") {
+      return response.status(200).json({ codes: await promo.listPromos(), environment: authorizeSetup().environment });
+    }
+    if ((action === "promo-create" || action === "promo-set") && request.method === "POST") {
+      const b = await readBody(request);
+      try {
+        const code = action === "promo-create" ? await promo.createPromo(b) : await promo.updatePromo(b);
+        return response.status(200).json({ ok: true, code });
+      } catch (error) {
+        if (error.status) return response.status(error.status).json({ error: error.message });
+        throw error;
+      }
+    }
+    if (action === "welcome-get" && request.method === "GET") {
+      return response.status(200).json({ ...(await welcomeOffer.overview()), environment: authorizeSetup().environment });
+    }
+    if (action === "welcome-set" && request.method === "POST") {
+      try {
+        return response.status(200).json({ ok: true, settings: await welcomeOffer.saveSettings(await readBody(request)) });
+      } catch (error) {
+        if (error.status) return response.status(error.status).json({ error: error.message });
+        throw error;
+      }
     }
     if (action === "delete-order" && request.method === "POST") {
       const invoice = String((await readBody(request)).invoice || "");

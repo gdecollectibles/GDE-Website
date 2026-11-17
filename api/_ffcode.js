@@ -15,7 +15,7 @@ const { collectorStatus } = require("./_collector");
 const PERCENT = 5;
 const USES = 10;
 const CODE_RE = /^[A-Z0-9][A-Z0-9-]{2,18}[A-Z0-9]$/;
-const RESERVED = /^(GDE|ADMIN|TEST|FREE|DISCOUNT|COLLECTOR|LEGACY)$/;
+const RESERVED = /^(GDE|ADMIN|TEST|FREE|DISCOUNT|COLLECTOR|LEGACY)$|^WELCOME-/; // WELCOME-…: welcome codes (_welcome.js)
 
 const norm = (email) => String(email || "").trim().toLowerCase();
 const cleanCode = (code) => String(code || "").trim().toUpperCase().replace(/\s+/g, "");
@@ -44,6 +44,8 @@ async function createCode(email, wanted) {
   if (await store.cmd("GET", `gde:ffowner:${email}`)) fail("You already have a code. Contact us when it runs out and we'll set you up with a new one.", 409);
   if (!CODE_RE.test(code)) fail("Use 4 to 20 letters or numbers (dashes are fine in the middle).");
   if (RESERVED.test(code)) fail("That code is reserved. Try another one.");
+  // GDE's own discount codes (_promo.js) share the checkout box, so the names can't clash.
+  if (await store.cmd("EXISTS", `gde:promo:${code}`)) fail("That code is taken. Try another one.", 409);
   const record = { code, email, createdAt: new Date().toISOString(), active: true };
   // SET NX: a code name is never handed out twice, not even after it's cleared.
   const ok = await store.cmd("SET", `gde:ffcode:${code}`, JSON.stringify(record), "NX");

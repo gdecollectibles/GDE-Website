@@ -12,7 +12,7 @@ const PER_HOUR = 5;          // messages from one address in an hour
 const KEEP_SECONDS = 180 * 86400;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@.]{2,}$/;
 // The site's collections plus the Gallery (the Contact page's "Collections of interest" tick boxes); none ticked = general.
-const COLLECTIONS = ["The Capitol", "Remember the Alamo", "Blue Finish", "US Constitution", "Mt. Rushmore", "USS Constitution",
+const COLLECTIONS = ["The Capitol", "Remember the Alamo", "Nitrate Blue", "US Constitution", "Mt. Rushmore", "USS Constitution",
   "America's 250 Anniversary", "Donald J Trump", "El Alamo", "Scrolls", "Gallery"];
 const PREFERENCES = ["Call", "Text", "Email"]; // "How should we reach you?" (optional)
 

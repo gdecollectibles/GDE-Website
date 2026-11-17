@@ -339,8 +339,10 @@
   }
   window.gdeCollectorBox = collectorBox;
 
-  // ---- friends and family code at checkout (api/_ffcode.js): 5% off, only for buyers with no club discount of their
-  // own. Kept for the visit in sessionStorage; the payment API checks it again before taking the payment.
+  // ---- discount code at checkout: GDE's own codes (api/_promo.js; a club member gets whichever saves more) or a
+  // friends and family code (api/_ffcode.js; 5% off, only for buyers with no club discount of their own), or the
+  // buyer's welcome code (api/_welcome.js; filled in for a signed-in buyer who has one, unless they removed it).
+  // Kept for the visit in sessionStorage; the payment API checks it again before taking the payment.
   function codeBox(me) {
     const summary = document.querySelector("#purchaseForm .order-summary dl");
     if (!summary || document.querySelector("#ffCodeBox")) return;
@@ -351,37 +353,58 @@
     const apply = (c) => {
       window.gdeFFCode = c;
       try { c ? sessionStorage.setItem("gdeFFCode", JSON.stringify(c)) : sessionStorage.removeItem("gdeFFCode"); } catch {}
-      if (typeof renderCheckoutSummary === "function") renderCheckoutSummary();
       draw();
+      if (typeof renderCheckoutSummary === "function") renderCheckoutSummary();
     };
+    const club = me.collector?.collector ? me.collector : null;
     function draw() {
-      if (me.collector?.collector) {
-        box.innerHTML = `<p class="ff-note">Your ${esc(me.collector.tierName)} discount is applied. Friends and family codes are for buyers who aren't in a club.</p>`;
-        return;
-      }
       const c = window.gdeFFCode;
+      const clubNote = club ? `<p class="ff-note">Your ${esc(club.tierName)} discount is applied. A discount code only replaces it if the code saves you more.</p>` : "";
       box.innerHTML = c
-        ? `<p class="ff-applied"><span>Code <b>${esc(c.code)}</b> applied</span><button type="button" class="gde-link-button" id="ffRemove">Remove</button></p>`
-        : `<details class="ff-enter"><summary>Have a friends and family code?</summary>
-            <div class="ff-row"><label class="gde-sr" for="ffCodeInput">Friends and family code</label><input id="ffCodeInput" autocomplete="off" autocapitalize="characters" maxlength="20" placeholder="Code"><button type="button" class="button button-small" id="ffApply">Apply</button></div>
+        ? `<p class="ff-applied"><span>Code <b>${esc(c.code)}</b> applied${c.label ? ` (${esc(c.label)})` : ""}</span><button type="button" class="gde-link-button" id="ffRemove">Remove</button></p>
+           <p class="ff-note" id="ffBest" hidden></p>`
+        : `${clubNote}<details class="ff-enter"><summary>Have a discount code?</summary>
+            <div class="ff-row"><label class="gde-sr" for="ffCodeInput">Discount code</label><input id="ffCodeInput" autocomplete="off" autocapitalize="characters" maxlength="20" placeholder="Code"><button type="button" class="button button-small" id="ffApply">Apply</button></div>
             <p class="gde-msg" id="ffMsg" aria-live="polite"></p></details>`;
-      box.querySelector("#ffRemove")?.addEventListener("click", () => apply(null));
+      box.querySelector("#ffRemove")?.addEventListener("click", () => {
+        try { sessionStorage.setItem("gdeCodeRemoved", "1"); } catch {}
+        apply(null);
+      });
       const input = box.querySelector("#ffCodeInput"), msg = box.querySelector("#ffMsg");
       const go = async () => {
         const code = input.value.trim();
         if (!code) return;
         msg.className = "gde-msg"; msg.textContent = "Checking...";
         try {
-          const r = await fetch(`${API}?action=ffcode-check&code=${encodeURIComponent(code)}`, { credentials: "same-origin" });
+          // The email typed so far: welcome codes only work with the email they were sent to.
+          const email = document.querySelector('#purchaseForm [name="email"]')?.value.trim() || "";
+          const r = await fetch(`${API}?action=code-check&code=${encodeURIComponent(code)}${email ? `&email=${encodeURIComponent(email)}` : ""}`, { credentials: "same-origin" });
           const result = await r.json().catch(() => ({}));
           if (!r.ok) throw new Error(result.error || "That code isn't valid.");
-          apply({ code: result.code, percent: result.percent });
+          if (result.type === "ffcode" && club) throw new Error(`Friends and family codes are for buyers who aren't in a club. Your ${club.tierName} discount is already applied.`);
+          apply({ type: result.type, code: result.code, kind: result.kind, value: result.value, percent: result.percent, label: result.label });
         } catch (error) { msg.className = "gde-msg error"; msg.textContent = error.message; }
       };
       box.querySelector("#ffApply")?.addEventListener("click", go);
       input?.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); go(); } });
     }
-    window.gdeFFCode = me.collector?.collector ? null : saved;
+    // Called by the order summary (script.js) with what the buyer pays: says so when the club discount beats the code.
+    window.gdeCodeNote = (pay) => {
+      const note = box.querySelector("#ffBest");
+      if (!note) return;
+      const clubWins = !!(club && window.gdeFFCode && pay && !pay.code);
+      note.hidden = !clubWins;
+      note.textContent = clubWins ? `Your ${club.tierName} discount saves you more than this code, so that's the one used.` : "";
+    };
+    // A friends and family code saved earlier doesn't apply to a club member; GDE's own codes and welcome codes do.
+    window.gdeFFCode = club && !["promo", "welcome"].includes(saved?.type) ? null : saved;
+    // A signed-in buyer's own welcome code goes in by itself (they can remove it).
+    const w = me.welcomeOffer;
+    let removed = false;
+    try { removed = sessionStorage.getItem("gdeCodeRemoved") === "1"; } catch {}
+    if (!window.gdeFFCode && !removed && w?.usable) {
+      window.gdeFFCode = { type: "welcome", code: w.code, kind: "amount", value: w.amount, label: w.label };
+    }
     draw();
   }
 
@@ -499,6 +522,14 @@
           <h1>${first ? `Welcome, ${esc(first)}` : "Welcome"}</h1>
           <p class="gde-acct-email">${esc(u.email)}<span aria-hidden="true">·</span><button class="gde-link-button" id="gdeSignOut" type="button">Sign out</button></p>
         </header>
+        ${data.welcomeOffer?.usable ? `<section class="gde-acct-section">
+          <h2 class="gde-acct-label">Your welcome gift</h2>
+          <div class="ff-code welcome-gift">
+            <p>${esc(data.welcomeOffer.label)} your first gun. It's filled in for you at checkout while you're signed in.</p>
+            <div class="ff-code-show"><strong>${esc(data.welcomeOffer.code)}</strong></div>
+            <p class="gde-note">Good until ${esc(new Date(data.welcomeOffer.endsAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }))}, once, with ${esc(u.email)}.</p>
+          </div>
+        </section>` : ""}
         ${data.collector ? `<section class="gde-acct-section">
           <h2 class="gde-acct-label">Collector status</h2>
           <div class="collector-status in-account">${collectorBox(data.collector, true)}</div>

@@ -60,9 +60,8 @@ const products = {
     ]
   },
   "blue-scroll-engraved": {
-    "name": "Blue Scroll Engraved Colt 1911 38 Super",
-    "collection": "Blue Finish",
-    "collectionNumber": "",
+    "name": "Nitrate Blue Scrolls",
+    "collection": "Nitrate Blue",
     "type": "Pistol",
     "manufacturer": "Colt",
     "model": "Colt Government Model Series 70",
@@ -238,7 +237,7 @@ const products = {
     ]
   },
   "el-alamo": {
-    "name": "El Alamo Gold Engraved Colt 1911",
+    "name": "El Alamo",
     "collection": "El Alamo",
     "collectionNumber": "50 of 300",
     "type": "Pistol",
@@ -268,9 +267,8 @@ const products = {
     ]
   },
   "gold-accent-scroll": {
-    "name": "Gold Accent Scroll Colt 1911 38 Super",
+    "name": "Gold Accent Scroll",
     "collection": "Scrolls",
-    "collectionNumber": "",
     "type": "Pistol",
     "manufacturer": "Colt",
     "model": "Colt Government Model",
@@ -298,9 +296,8 @@ const products = {
     ]
   },
   "scroll-engraved-pearl": {
-    "name": "Scroll Engraved Pearl Colt 1911",
+    "name": "Scroll Engraved Pearl",
     "collection": "Scrolls",
-    "collectionNumber": "",
     "type": "Pistol",
     "manufacturer": "Colt",
     "model": "Colt M1911",
@@ -326,9 +323,8 @@ const products = {
     ]
   },
   "gold-skull-engraved": {
-    "name": "Gold Skull Engraved Colt 1911",
+    "name": "Gold Skulls",
     "collection": "Gallery",
-    "collectionNumber": "",
     "type": "Pistol",
     "manufacturer": "Colt",
     "model": "Colt Government Model",
@@ -357,9 +353,8 @@ const products = {
     "refinished": true
   },
   "gold-white-house-masonic": {
-    "name": "Gold White House Masonic Colt 1911",
+    "name": "White House Masonic",
     "collection": "Gallery",
-    "collectionNumber": "",
     "type": "Pistol",
     "manufacturer": "Colt",
     "model": "Colt Government Model",
@@ -506,7 +501,7 @@ document.querySelectorAll(".site-nav").forEach(nav => {
         <p>Collections</p>
         <a href="/gun/the-capitol">The Capitol</a>
         <a href="/gun/remember-the-alamo">Remember the Alamo</a>
-        <a href="/gun/blue-scroll-engraved">Blue Finish</a>
+        <a href="/gun/blue-scroll-engraved">Nitrate Blue</a>
         <a href="/gun/signing-the-constitution">US Constitution</a>
         <a href="/gun/mount-rushmore-with-trump">Mt. Rushmore</a>
         <a href="/gun/uss-constitution">USS Constitution</a>
@@ -978,15 +973,25 @@ if (document.querySelector("#checkoutSummaryItems")) {
 // Collector clubs (3+ guns bought: Collectors Club, 5% off; 5+: Legacy Club, 10% off), on every gun.
 // gde-account.js sets window.gdeCollector from the signed-in
 // account; the payment API works the discount out again on its own, rounding each gun to the cent the same way.
-// A friends and family code (window.gdeFFCode, set by gde-account.js) gives 5% only when there is no club discount.
+// The code in the checkout box (window.gdeFFCode, set by gde-account.js) is GDE's own discount code (type "promo",
+// percent or dollars off; a club member gets whichever saves more) or a friends and family code (5%, only when there
+// is no club discount). Never two discounts at once. api/_promo.js works it out again the same way.
 function collectorTotal(prices) {
+  if (!prices.length) return null;
   const club = window.gdeCollector?.collector ? window.gdeCollector : null;
-  const ff = !club && window.gdeFFCode ? window.gdeFFCode : null;
-  const c = club ? { tierName: club.tierName, percent: club.percent } : ff ? { tierName: `Code ${ff.code}`, percent: ff.percent } : null;
-  if (!c || !prices.length) return null;
+  const code = window.gdeFFCode || null;
+  const cents = (n) => Math.round(n * 100) / 100;
   const list = prices.reduce((sum, price) => sum + price, 0);
-  const total = Math.round(prices.reduce((sum, price) => sum + Math.round(price * (100 - c.percent)) / 100, 0) * 100) / 100;
-  return { name: c.tierName, percent: c.percent, list, total, off: Math.round((list - total) * 100) / 100 };
+  const pct = (p) => cents(prices.reduce((sum, price) => sum + Math.round(price * (100 - p)) / 100, 0));
+  const options = [];
+  if (club) options.push({ name: club.tierName, label: `${club.percent}% off`, total: pct(club.percent), code: false });
+  if (code && (code.type === "promo" || code.type === "welcome" || !club)) {
+    const total = code.kind === "amount" ? cents(list - Math.min(code.value, list)) : pct(code.value ?? code.percent);
+    options.push({ name: `Code ${code.code}`, label: code.label || `${code.value ?? code.percent}% off`, total, code: true });
+  }
+  if (!options.length) return null;
+  const best = options.reduce((a, b) => (b.total < a.total ? b : a));
+  return { ...best, list, off: cents(list - best.total) };
 }
 function renderCollectorRow(pay) {
   const priceRow = document.querySelector("#summaryPrice")?.closest(".summary-price");
@@ -995,8 +1000,9 @@ function renderCollectorRow(pay) {
   const c = window.gdeCollector;
   if (pay) {
     if (!row) { row = document.createElement("div"); row.id = "summaryCollector"; row.className = "summary-collector"; priceRow.before(row); }
-    row.innerHTML = `<dt>${pay.name} (${pay.percent}% off)</dt><dd>&minus;$${pay.off.toLocaleString("en-US", { maximumFractionDigits: 2 })}</dd>`;
+    row.innerHTML = `<dt>${pay.name} (${pay.label})</dt><dd>&minus;$${pay.off.toLocaleString("en-US", { maximumFractionDigits: 2 })}</dd>`;
   } else row?.remove();
+  window.gdeCodeNote?.(pay);
   // Signed out: a quiet reminder that collectors sign in to get their discount.
   let hint = document.querySelector("#summaryCollectorHint");
   if (c === null && !hint) {

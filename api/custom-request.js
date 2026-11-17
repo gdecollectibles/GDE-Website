@@ -24,7 +24,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@.]{2,}$/;
 const MODELS = ["Colt M1911", "Colt Government Model", "Colt Government Series 70", "Another model", "Not sure, recommend one"];
 const CALIBERS = [".45 ACP", ".38 Super", "9mm", "Another caliber", "Not sure"];
 const DESIGNS = { own: "Their own design", gde: "GDE designs it", collection: "Start from a collection" };
-const COLLECTIONS = ["The Capitol", "Remember the Alamo", "Blue Finish", "US Constitution", "Mt. Rushmore", "USS Constitution",
+const COLLECTIONS = ["The Capitol", "Remember the Alamo", "Nitrate Blue", "US Constitution", "Mt. Rushmore", "USS Constitution",
   "America's 250 Anniversary", "Donald J Trump", "El Alamo", "Scrolls"];
 const PLACEMENTS = ["Slide, left side", "Slide, right side", "Top of the slide", "Frame", "Grips", "Everywhere"];
 const FINISHES = ["Polished stainless steel", "24K gold plated", "Nickel", "Royal blue", "Black", "Your choice", "Something else (tell us below)"];

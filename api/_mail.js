@@ -42,7 +42,9 @@ function sendCode(to, code, purpose) {
 //   account: false, someone only on the email list: a marketing email by law, so it carries GDE's mailing address and
 //   an Unsubscribe link, and invites them to make an account instead of saying theirs is ready.
 const SITE = "https://www.gdecollectibles.com"; // www: the bare domain answers with a redirect first
-function welcomeEmail(firstName, { subscribed = false, unsubUrl = "", account = true, existing = false, address = "" } = {}) {
+// offer: the welcome offer (_welcome.js, Nov 17: $100 off a first purchase for 30 days), shown as a gift box under
+// the greeting, with the code; it also goes in the subject.
+function welcomeEmail(firstName, { subscribed = false, unsubUrl = "", account = true, existing = false, address = "", offer = null } = {}) {
   const name = escHtml(String(firstName || "").trim()) || "there";
   const listOnly = !account;
   if (listOnly) subscribed = true; // only people on the list get this version
@@ -58,7 +60,10 @@ function welcomeEmail(firstName, { subscribed = false, unsubUrl = "", account = 
   const newsText = subscribed
     ? "You're on our collector list, so you'll be the first to know when a new collection is released, along with limited editions, discounts and collector offers."
     : `Want to be the first to know when a new collection is released, and hear about discounts and collector offers? Turn on Email Alerts in your account: ${SITE}/account`;
-  const subject = "Welcome to GDE Collectibles";
+  const giftAmount = offer ? `$${Number(offer.amount).toLocaleString("en-US", { maximumFractionDigits: 2 })}` : "";
+  const giftUntil = offer ? new Date(offer.endsAt).toLocaleDateString("en-US", { timeZone: "America/New_York", month: "long", day: "numeric", year: "numeric" }) : "";
+  const giftHow = offer ? `Enter it at checkout by ${giftUntil}. It works once, on your first gun, with this email address.` : "";
+  const subject = offer ? `Welcome to GDE Collectibles: ${giftAmount} off your first gun` : "Welcome to GDE Collectibles";
   // Design C, "Letter" (user picked it Nov 17; previews and history in clients/gde/docs/email-templates/): ivory and
   // gold, gold logo, "Your membership" box I-IV, gold button, contact rows, RP signature. Images live on the site in
   // assets/email/. Gmail drops a shorthand td background, so the button colour is set as bgcolor + background-color.
@@ -87,6 +92,11 @@ function welcomeEmail(firstName, { subscribed = false, unsubUrl = "", account = 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 26px"><tr><td style="border-top:1px solid ${GOLD};width:45%"></td><td align="center" style="font-family:${SERIF};font-size:12px;line-height:1;color:${GOLD};padding:0 10px;white-space:nowrap">&#9670;</td><td style="border-top:1px solid ${GOLD};width:45%"></td></tr></table>
     ${p(`Dear ${name},`)}
     ${p(hello)}
+    ${offer ? `<div style="margin:4px 0 24px;border:1px solid ${GOLD};background-color:#fbf9f4;padding:22px 20px;text-align:center">
+      <p style="margin:0 0 10px;font-family:${SERIF};font-size:11px;line-height:1;letter-spacing:.3em;text-transform:uppercase;color:${GOLD}">Your welcome gift</p>
+      <p style="margin:0 0 14px;font-family:Gloock,${SERIF};font-size:26px;line-height:1.25;color:${INK}">${giftAmount} off your first gun</p>
+      <p style="margin:0 0 14px"><span style="display:inline-block;padding:10px 18px;border:1px dashed ${GOLD};font-family:'Courier New',monospace;font-size:20px;font-weight:700;letter-spacing:.12em;color:${INK}">${escHtml(offer.code)}</span></p>
+      <p style="margin:0;font-family:${SERIF};font-size:14px;line-height:1.6;color:${SOFT}">${giftHow}</p></div>` : ""}
     ${p("We're a family-owned shop, and every gun we make is a limited, numbered piece. Being part of our community comes with a few things worth knowing:")}
   </td></tr>
   <tr><td class="pad" style="padding:6px 52px 4px"><div style="border:1px solid #d4ccbd;background-color:#fbf9f4;padding:24px 24px 8px">
@@ -127,7 +137,11 @@ function welcomeEmail(firstName, { subscribed = false, unsubUrl = "", account = 
   const text = `Dear ${String(firstName || "").trim() || "there"},
 
 ${hello}
-
+${offer ? `
+YOUR WELCOME GIFT: ${giftAmount} off your first gun
+Code: ${offer.code}
+${giftHow}
+` : ""}
 We're a family-owned shop, and every gun we make is a limited, numbered piece. Being part of our community comes with a few things worth knowing:
 
 ${listOnly

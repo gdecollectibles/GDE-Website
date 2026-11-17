@@ -24,7 +24,7 @@
   const LISTS = {
     models: ["Colt M1911", "Colt Government Model", "Colt Government Series 70", "Another model", "Not sure, recommend one"],
     calibers: [".45 ACP", ".38 Super", "9mm", "Another caliber", "Not sure"],
-    collections: ["The Capitol", "Remember the Alamo", "Blue Finish", "US Constitution", "Mt. Rushmore", "USS Constitution",
+    collections: ["The Capitol", "Remember the Alamo", "Nitrate Blue", "US Constitution", "Mt. Rushmore", "USS Constitution",
       "America's 250 Anniversary", "Donald J Trump", "El Alamo", "Scrolls"],
     placements: ["Slide, left side", "Slide, right side", "Top of the slide", "Frame", "Grips", "Everywhere"],
     finishes: ["Polished stainless steel", "24K gold plated", "Nickel", "Royal blue", "Black", "Your choice", "Something else (tell us below)"],

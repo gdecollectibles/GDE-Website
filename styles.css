@@ -766,8 +766,12 @@ body.side-cart-locked{overflow:hidden}
 
 /* Holiday sale banner under the header (user, Nov 16): part of the header, so it stays with it while scrolling.
    Sticky boxes and the first content move down by its height. */
-.sale-banner{position:absolute;left:0;right:0;top:100%;height:30px;display:flex;align-items:center;justify-content:flex-start;overflow:hidden;white-space:nowrap;background:#9e1b1b;color:#fff;font:600 .66rem/1 var(--sans);text-transform:uppercase;letter-spacing:.2em;opacity:1!important}
+.sale-banner{position:absolute;left:0;right:0;top:100%;height:30px;display:flex;align-items:center;justify-content:flex-start;overflow:hidden;white-space:nowrap;background:#9e1b1b;color:#fff;font:600 .66rem/1 var(--sans);text-transform:uppercase;letter-spacing:.2em}
 .sale-banner:hover{background:#b52222}
+/* Home page (user, Nov 17): the banner fades with the header: faint over the film, full on hover or once scrolled,
+   and see-through like the scrolled header. */
+.home-page .sale-banner{background:rgba(158,27,27,.94)}
+.home-page .sale-banner:hover{background:rgba(181,34,34,.94)}
 .has-sale-banner .site-header.dark-header{margin-bottom:30px}
 @media(min-width:761px){
   .has-sale-banner .filters{top:134px;max-height:calc(100vh - 154px)}

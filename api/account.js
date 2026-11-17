@@ -13,7 +13,12 @@
 //   POST /api/account?action=unsubscribe  signed in: leaves the email list
 //   POST /api/account?action=decline      signed in: "no thanks" to the list question asked after the first sign-in
 //   POST /api/account?action=ffcode-create { code }: a Legacy Club member makes their friends and family code (_ffcode.js)
-//   GET  /api/account?action=ffcode-check&code=<code>  checkout asks whether a code is good (5% off)
+//   GET  /api/account?action=code-check&code=<code>  checkout asks whether a code is good: GDE's own discount codes
+//        (_promo.js) or a friends and family code. { type: promo|ffcode, code, kind: percent|amount, value, label }.
+//        ffcode-check is the old name, kept for pages still open from before Nov 17. &email= the email typed at
+//        checkout, for welcome codes (_welcome.js), which only work with the email they were sent to (type welcome).
+// Welcome offer (_welcome.js, Nov 17): a new account (google, verify) or email-list join (subscribe) gets a personal
+// $100 code in the welcome email; "me" returns it as welcomeOffer.
 //   POST /api/account?action=cart     { product }: a gun was just added to the cart (user, Nov 16: the owner sees who added
 //                                     what in the inventory app). Kept in gde:cartadds, newest first, the last 1000:
 //                                     { id, at, product, gun, email, name, visitor, device } (email and name only when
@@ -38,6 +43,8 @@ const store = require("./_store");
 const { COOKIE, SESSION_DAYS, secret, makeSession, readSession } = require("./_session");
 const { collectorStatus } = require("./_collector");
 const ffcode = require("./_ffcode");
+const promo = require("./_promo");
+const welcomeOffer = require("./_welcome");
 const referral = require("./_referral");
 const mail = require("./_mail");
 const { CONSENT, getSubscriber, saveSubscriber, unsubPage } = require("./_subscribers");
@@ -237,13 +244,34 @@ async function signIn(request, response, email, names = {}) {
 
 // The welcome email (_mail.js), once per person: only when this sign-in made their first account. `before` is their
 // record from before this sign-in; accounts made before Nov 17 already have account: true, so they never get one.
+// A new account also gets the welcome offer (_welcome.js: $100 off a first purchase, 30 days), in the same email;
+// someone who already had the welcome email (email list) but never an offer gets the email again, with the offer.
 async function welcome(before, email, firstName) {
-  if (before?.account || before?.welcomedAt) return;
+  if (before?.account) return; // signing in again (Google comes through here every time): not a new account
+  let offer = null;
+  try { offer = await welcomeOffer.giveOffer(email, "account"); } catch (error) { console.error("Welcome offer", error); }
+  if (before?.welcomedAt && !offer) return;
   // Called after the "Email me" choice is saved, so the email knows whether they're on the list.
   const subscribed = (await getSubscriber(email))?.status === "subscribed";
   let unsubUrl = "";
   try { if (subscribed) unsubUrl = unsubPage(email); } catch {}
-  if (await mail.sendWelcome(email, firstName, { subscribed, unsubUrl })) await saveSubscriber(email, { welcomedAt: new Date().toISOString() });
+  if (await mail.sendWelcome(email, firstName, { subscribed, unsubUrl, offer })) await saveSubscriber(email, { welcomedAt: new Date().toISOString() });
+}
+
+// Joining the email list (user, Nov 17): the welcome offer too, in the welcome email. Someone with no account gets the
+// email-list version, a marketing email that must carry GDE's mailing address (the app sends it with the offer
+// settings), so without an address nobody on the list alone is given a code they'd never hear about.
+async function welcomeListJoin(email, firstName, user) {
+  try {
+    const s = await welcomeOffer.settings();
+    if (!user && String(s.address || "").length < 8) return;
+    const offer = await welcomeOffer.giveOffer(email, user ? "account" : "list");
+    if (!offer) return;
+    let unsubUrl = "";
+    try { unsubUrl = unsubPage(email); } catch {}
+    const list = user ? { subscribed: true, unsubUrl, existing: true, offer } : { subscribed: true, unsubUrl, account: false, address: s.address, offer };
+    if (await mail.sendWelcome(email, firstName, list)) await saveSubscriber(email, { welcomedAt: new Date().toISOString() });
+  } catch (error) { console.error("Welcome offer (list)", error); }
 }
 
 module.exports = async function handler(request, response) {
@@ -359,6 +387,7 @@ module.exports = async function handler(request, response) {
         orders: ordersFor(user.email, all),
         collector,
         ffCode: collector.tier === "legacy" ? await ffcode.codeFor(user.email, all) : null,
+        welcomeOffer: await welcomeOffer.offerFor(user.email, all),
         referral: await referral.linkOf(user.email, collector),
         subscribed: sub?.status === "subscribed",
         listStatus: sub?.status || "none"
@@ -394,11 +423,22 @@ module.exports = async function handler(request, response) {
       return response.status(200).json({ ok: true, ffCode: await ffcode.createCode(user.email, (await readBody(request)).code) });
     }
 
-    if (action === "ffcode-check" && !post) {
+    // One box at checkout for both kinds: GDE's own codes (_promo.js) first, then friends and family codes.
+    if ((action === "code-check" || action === "ffcode-check") && !post) {
       if (!(await allowed(request, "ffcheck", 30))) return response.status(429).json({ error: "Too many tries. Please wait a while." });
       const user = readSession(request);
-      const result = await ffcode.checkCode(new URL(request.url, "http://x").searchParams.get("code"), user?.email);
-      return response.status(result.ok ? 200 : 404).json(result.ok ? { ok: true, code: result.code, percent: result.percent, usesLeft: result.usesLeft } : { error: result.error });
+      const wanted = new URL(request.url, "http://x").searchParams.get("code");
+      const orders = await store.listOrders();
+      const typed = normEmail(new URL(request.url, "http://x").searchParams.get("email"));
+      const p = (await promo.checkPromo(wanted, orders))
+        || (await welcomeOffer.checkWelcome(wanted, [user?.email, EMAIL_RE.test(typed) ? typed : ""], orders));
+      if (p) {
+        return response.status(p.ok ? 200 : 404).json(p.ok ? { ok: true, type: p.welcome ? "welcome" : "promo", code: p.code, endsAt: p.endsAt || null, kind: p.kind, value: p.value, label: p.label,
+          ...(p.kind === "percent" ? { percent: p.value } : {}) } : { error: p.error });
+      }
+      const result = await ffcode.checkCode(wanted, user?.email, orders);
+      return response.status(result.ok ? 200 : 404).json(result.ok ? { ok: true, type: "ffcode", code: result.code, kind: "percent", value: result.percent,
+        percent: result.percent, label: `${result.percent}% off`, usesLeft: result.usesLeft } : { error: result.error });
     }
 
     if (action === "logout" && post) {
@@ -439,6 +479,7 @@ module.exports = async function handler(request, response) {
         verified: !!(user || old?.verified), ...signupPlace(old, request),
         consent: { text: CONSENT, at: new Date().toISOString(), page: String(body.page || "").slice(0, 200) }
       });
+      await welcomeListJoin(email, cleanName(body.firstName) || old?.firstName || (user?.name || "").split(" ")[0] || "", user);
       return response.status(200).json({ ok: true, already: old?.status === "subscribed" });
     }
 

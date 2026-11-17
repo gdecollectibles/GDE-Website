@@ -4,6 +4,8 @@ const store = require("./_store");
 const { readSession } = require("./_session");
 const { collectorStatus, discounted } = require("./_collector");
 const ffcode = require("./_ffcode");
+const promo = require("./_promo");
+const welcomeOffer = require("./_welcome");
 const referral = require("./_referral");
 
 const AUTHORIZE_ENDPOINTS = {
@@ -119,27 +121,41 @@ module.exports = async function handler(request, response) {
       try { collector = await collectorStatus(session.email); } catch (error) { console.error(error); }
     }
     const isCollector = !!collector?.collector;
-    // A friends and family code (5%, _ffcode.js) only when the buyer has no club discount of their own: the two never add up.
-    let code = null;
-    if (!isCollector && body.code) {
-      code = await ffcode.checkCode(body.code, session?.email);
-      if (!code.ok) return response.status(400).json({ error: code.error });
+    const listPrices = cart.map(id => priceNumber(inventory[id].price));
+    const sum = (prices) => Math.round(prices.reduce((s, p) => s + p, 0) * 100) / 100;
+    // One discount per order, never two added up:
+    //   - GDE's own codes (_promo.js) and the welcome codes (_welcome.js): a club member gets whichever saves more
+    //   - a friends and family code (5%, _ffcode.js) only when the buyer has no club discount of their own
+    let code = null, promoCode = null;
+    let unitPrices = isCollector ? listPrices.map(p => discounted(p, collector.percent)) : listPrices;
+    if (body.code) {
+      const orders = await store.listOrders();
+      const promoCheck = (await promo.checkPromo(body.code, orders))
+        || (await welcomeOffer.checkWelcome(body.code, [session?.email, body.customer?.email || "-"], orders));
+      if (promoCheck && !promoCheck.ok) return response.status(400).json({ error: promoCheck.error });
+      if (promoCheck) {
+        const withCode = promo.applyTo(listPrices, promoCheck);
+        if (sum(withCode) <= 0) return response.status(400).json({ error: "That code is worth more than this order. Please call us at 1-786-931-3566." });
+        if (sum(withCode) < sum(unitPrices)) { promoCode = promoCheck; unitPrices = withCode; }
+      } else if (!isCollector) {
+        code = await ffcode.checkCode(body.code, session?.email, orders);
+        if (!code.ok) return response.status(400).json({ error: code.error });
+        unitPrices = listPrices.map(p => discounted(p, code.percent));
+      }
     }
-    const percent = isCollector ? collector.percent : code ? code.percent : 0;
     // A friend's share link (_referral.js): no discount, but the guns also count toward the link owner's club.
     // A link that's unknown or the buyer's own is simply ignored.
     let ref = null;
     if (body.ref) {
       try { ref = await referral.ownerOf(body.ref, session?.email, body.customer?.email); } catch (error) { console.error(error); }
     }
-    const items = cart.map(id => {
-      const listPrice = priceNumber(inventory[id].price);
-      return { id, product: inventory[id], listPrice, unitPrice: percent ? discounted(listPrice, percent) : listPrice };
-    });
-    const amount = Math.round(items.reduce((sum, item) => sum + item.unitPrice, 0) * 100) / 100;
-    const listTotal = items.reduce((sum, item) => sum + item.listPrice, 0);
-    const savedAmount = Math.round((listTotal - amount) * 100) / 100;
-    const discount = isCollector
+    const items = cart.map((id, i) => ({ id, product: inventory[id], listPrice: listPrices[i], unitPrice: unitPrices[i] }));
+    const amount = sum(unitPrices);
+    const savedAmount = Math.round((sum(listPrices) - amount) * 100) / 100;
+    const discount = promoCode
+      ? { type: promoCode.welcome ? "welcome" : "promo", name: promoCode.welcome ? `Welcome code ${promoCode.code}` : `Code ${promoCode.code}`, code: promoCode.code, kind: promoCode.kind, value: promoCode.value,
+          ...(promoCode.kind === "percent" ? { percent: promoCode.value } : {}), label: promoCode.label, amount: savedAmount }
+      : isCollector
       ? { type: collector.tier, name: collector.tierName, percent: collector.percent, amount: savedAmount, guns: collector.guns }
       : code ? { type: "ffcode", name: `Friends and family code ${code.code}`, code: code.code, owner: code.owner, percent: code.percent, amount: savedAmount } : null;
     if (!Number.isFinite(amount) || amount <= 0) {
@@ -163,6 +179,7 @@ module.exports = async function handler(request, response) {
       items: items.map(item => ({ listing: item.id, name: item.product.name, price: item.unitPrice, ...(discount ? { listPrice: item.listPrice } : {}) })),
       ...(discount ? { discount } : {}),
       ...(code ? { ffCode: code.code } : {}),
+      ...(promoCode ? { promoCode: promoCode.code } : {}),
       ...(ref ? { referredBy: ref.owner, ref: ref.code } : {}),
       ...(session ? { account: session.email } : {}),
       form: cleanForm(customer)
@@ -182,7 +199,7 @@ module.exports = async function handler(request, response) {
           amount: amount.toFixed(2),
           order: {
             invoiceNumber,
-            description: `GDE Collectibles order: ${items.map(item => item.product.name).join(", ")}${discount ? ` (${discount.name}, ${discount.percent}% off)` : ""}`.slice(0, 255)
+            description: `GDE Collectibles order: ${items.map(item => item.product.name).join(", ")}${discount ? ` (${discount.name}, ${discount.label || `${discount.percent}% off`})` : ""}`.slice(0, 255)
           },
           lineItems: {
             lineItem: items.map(item => ({
