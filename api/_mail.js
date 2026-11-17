@@ -64,8 +64,8 @@ function welcomeEmail(firstName, { subscribed = false, unsubUrl = "" } = {}) {
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only">
 <title>${subject}</title>
 <style>@media (max-width:620px){.wrap{padding:0!important} .card{border-radius:0!important} .pad{padding-left:24px!important;padding-right:24px!important} .btn{padding:16px 18px!important;letter-spacing:.14em!important}}</style>
-</head><body style="margin:0;padding:0;background:#e8e2d7">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e8e2d7" style="background-color:#e8e2d7"><tr><td class="wrap" align="center" style="padding:32px 12px">
+</head><body style="margin:0;padding:0;background:#ffffff">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="background-color:#ffffff"><tr><td class="wrap" align="center" style="padding:32px 12px">
 <table role="presentation" class="card" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f7f4ed" style="width:100%;max-width:600px;background-color:#f7f4ed;border:1px solid #d4ccbd;border-radius:4px">
 <tr><td style="padding:10px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE}">
   <tr><td align="center" style="padding:40px 40px 6px"><img src="${SITE}/assets/email/welcome-logo-gold.png" width="170" alt="GDE Collectibles" style="display:block;width:170px;height:auto;border:0"></td></tr>
