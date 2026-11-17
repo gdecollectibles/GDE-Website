@@ -101,7 +101,7 @@ module.exports = async function handler(request, response) {
       when: clean(body.when, 80),
       prefer: list(body.contactPreference, PREFERENCES).join(", ")
     };
-    if (!design) return response.status(400).json({ error: "Choose whose design it is: yours, ours, or one of our collections." });
+    if (!design) return response.status(400).json({ error: "Choose whose design it is: yours or ours." });
     if (design === "collection" && !record.collection) return response.status(400).json({ error: "Choose which collection to start from." });
     if (!record.name) return response.status(400).json({ error: "Please enter your name." });
     if (!EMAIL_PATTERN.test(record.email)) return response.status(400).json({ error: "Please check your email address. It should look like name@example.com." });

@@ -1,9 +1,9 @@
 // piece-unique.html, "Piece Unique" (user, Nov 13, 2026): someone asks GDE for a custom piece: the gun (model, caliber),
-// whose design (their own, GDE designs it, or a collection changed), where it goes, the colors and finish.
+// whose design (their own, or GDE designs it; "start from a collection" removed Nov 16, 2026), where it goes, the colors and finish.
 // Pictures are shrunk here as JPEG (each under 700 KB); PDFs go as they are if small enough. Sends to
 // /api/custom-request, which saves it with the Contact messages; the GDE app shows it in Website inquiries.
 // The option lists below are checked again in api/custom-request.js: change both together.
-// From a gun page: ?collection=<name>&model=<model>&caliber=<caliber>&gun=<gun, number> starts from that gun.
+// From a gun page: ?model=<model>&caliber=<caliber>&gun=<gun, number> starts from that gun (?collection is ignored).
 (() => {
   const form = document.querySelector("#uniqueForm");
   if (!form) return;
@@ -37,14 +37,12 @@
   pills("#modelOptions", "radio", "model", LISTS.models);
   pills("#caliberOptions", "radio", "caliber", LISTS.calibers);
   pills("#placementOptions", "checkbox", "placement", LISTS.placements);
-  form.collection.insertAdjacentHTML("beforeend", LISTS.collections.map((c) => `<option>${esc(c)}</option>`).join(""));
   form.querySelectorAll("select[data-list]").forEach((sel) => { sel.innerHTML = `<option value="">Choose</option>${LISTS[sel.dataset.list].map((v) => `<option>${esc(v)}</option>`).join("")}`; });
 
   // What the design questions say depends on whose design it is.
   const DESIGN_TEXT = {
     own: { label: "Anything we should know about your design? <em>(optional)</em>", files: "Your design", hint: "Upload your artwork, logo or drawing. Pictures or PDFs, up to 4 files.", placeholder: "Size, which parts go where, anything to change." },
-    gde: { label: "Tell us about the design", files: "Pictures <em>(optional)</em>", hint: "Anything that inspires you: a theme, a crest, a design you like. Pictures or PDFs, up to 4 files.", placeholder: "The theme, the story behind it, the style you like." },
-    collection: { label: "What would you like changed?", files: "Pictures <em>(optional)</em>", hint: "Anything that shows the change you want. Pictures or PDFs, up to 4 files.", placeholder: "e.g. The Capitol, with my family name on the right side and black grips." }
+    gde: { label: "Tell us about the design", files: "Pictures <em>(optional)</em>", hint: "Anything that inspires you: a theme, a crest, a design you like. Pictures or PDFs, up to 4 files.", placeholder: "The theme, the story behind it, the style you like." }
   };
   const showDesign = () => {
     const d = form.querySelector('input[name="design"]:checked')?.value || "gde";
@@ -53,7 +51,6 @@
     form.message.placeholder = t.placeholder;
     form.querySelector("#filesTitle").innerHTML = t.files;
     form.querySelector("#filesHint").textContent = t.hint;
-    form.querySelector("#collectionWrap").hidden = d !== "collection";
   };
   form.querySelectorAll('input[name="design"]').forEach((r) => r.addEventListener("change", showDesign));
   const showOther = () => {
@@ -75,8 +72,6 @@
   if (!pick("model", model) && /series 70/i.test(model)) pick("model", "Colt Government Series 70");
   else if (!form.querySelector('input[name="model"]:checked') && /government/i.test(model)) pick("model", "Colt Government Model");
   pick("caliber", params.get("caliber"));
-  const startCollection = LISTS.collections.find((c) => c.toLowerCase() === (params.get("collection") || "").toLowerCase());
-  if (startCollection) { pick("design", "collection"); form.collection.value = startCollection; }
   if (params.get("gun")) form.gunDetails.value = `Starting from: ${params.get("gun")}`.slice(0, 300);
   showDesign(); showOther();
 
@@ -126,11 +121,9 @@
     e.preventDefault();
     const fail = (text, field) => { msg.className = "form-message error"; msg.textContent = text; field?.focus?.({ preventScroll: false }); };
     const design = form.querySelector('input[name="design"]:checked')?.value;
-    if (!design) return fail("Choose whose design it is: yours, ours, or one of our collections.", form.querySelector('input[name="design"]'));
+    if (!design) return fail("Choose whose design it is: yours or ours.", form.querySelector('input[name="design"]'));
     if (design === "own" && !chosen.length && !form.message.value.trim()) return fail("Upload your design, or tell us about it.", form.files);
     if (design === "gde" && !form.message.value.trim()) return fail("Tell us about the design you'd like.", form.message);
-    if (design === "collection" && !form.collection.value) return fail("Choose which collection to start from.", form.collection);
-    if (design === "collection" && !form.message.value.trim()) return fail("Tell us what you'd like changed.", form.message);
     if (!form.name.value.trim()) return fail("Please enter your name.", form.name);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@.]{2,}$/.test(form.email.value.trim())) return fail("Please check your email address. It should look like name@example.com.", form.email);
     if (!form.phone.value.trim()) return fail("Please enter your phone number.", form.phone);
@@ -145,7 +138,7 @@
       const text = (k) => String(data.get(k) || "");
       const body = {
         ...Object.fromEntries(["website", "name", "email", "phone", "state", "model", "modelOther", "caliber", "caliberOther", "gunDetails",
-          "design", "collection", "message", "text", "slide", "frame", "engraving", "grips", "colorNotes", "budget", "when"].map((k) => [k, text(k)])),
+          "design", "message", "text", "slide", "frame", "engraving", "grips", "colorNotes", "budget", "when"].map((k) => [k, text(k)])),
         placement: data.getAll("placement"),
         contactPreference: data.getAll("contactPreference"),
         files,
