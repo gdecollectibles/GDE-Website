@@ -24,7 +24,8 @@
 //                                     Also country (US), region (TX) and city from Vercel's IP location (Nov 17).
 // Stored next to the orders (see _store.js), one record per person, whether they joined the list, signed in, or both:
 //   gde:subscriber:<email>  { email, firstName, lastName, status: none|declined|subscribed|unsubscribed, account (signed in
-//                             with Google), source, verified, signedInAt, createdAt, updatedAt, consent }
+//                             with Google), source, verified, signedInAt, createdAt, updatedAt, consent,
+//                             country, region, city (where they signed up from, by IP; Nov 17) }
 //   gde:subscribers         sorted set of emails, by last change (the inventory app pulls them through /api/admin)
 //   gde:pw:<email>          { salt, hash, createdAt, updatedAt }: the password of an email + password account (scrypt).
 //                           Only made after the emailed code proves the email is theirs, so orders and club discounts
@@ -91,8 +92,11 @@ async function allowed(request, what, limit) {
 // Crawlers, link previews and test tools that say what they are.
 const BOT = /bot|crawl|spider|slurp|facebookexternalhit|meta-external|preview|headless|lighthouse|pagespeed|python|curl|wget|httpclient|okhttp|axios|node-fetch|scrapy|phantom|puppeteer|playwright|selenium|vercel/i;
 
-// Where in the world a cart add came from (user, Nov 17: "which country they are adding it from"): Vercel's own
-// location headers for the visitor's IP. country = two-letter code (US), region = state/province code (TX), city.
+// Where in the world a cart add or sign-up came from (user, Nov 17: "which country they are adding it from", then "the
+// same for the sign up, even the google ones"): Vercel's own location headers for the visitor's IP.
+// country = two-letter code (US), region = state/province code (TX), city.
+// Sign-ups keep the first place seen (signupPlace): an account from before Nov 17 gets one at its next sign-in.
+const signupPlace = (old, request) => (old?.country ? {} : cartPlace(request));
 function cartPlace(request) {
   const h = (name, n) => { let v = String(request.headers[name] || ""); try { v = decodeURIComponent(v); } catch {} return v.replace(/[^\p{L}\p{N} .'-]/gu, "").trim().slice(0, n) || null; };
   const country = h("x-vercel-ip-country", 2);
@@ -226,7 +230,7 @@ async function signIn(request, response, email, names = {}) {
   await saveSubscriber(email, {
     account: true, verified: true, signedInAt: new Date().toISOString(), firstName, lastName,
     signupVia: old?.signupVia || (old?.account ? "google" : "password"), // the inventory app's Customers note says which
-    status: old?.status || "none", source: old?.source || "account"
+    status: old?.status || "none", source: old?.source || "account", ...signupPlace(old, request)
   });
   return { email: user.email, name: user.name, picture: "" };
 }
@@ -254,7 +258,7 @@ module.exports = async function handler(request, response) {
       await saveSubscriber(user.email, {
         account: true, verified: true, signedInAt: new Date().toISOString(), signupVia: old?.signupVia || "google",
         firstName: old?.firstName || firstName, lastName: old?.lastName || lastName,
-        status: old?.status || "none", source: old?.source || "account"
+        status: old?.status || "none", source: old?.source || "account", ...signupPlace(old, request)
       });
       return response.status(200).json({ ok: true, user: { email: user.email, name: user.name, picture: user.picture } });
     }
@@ -418,7 +422,7 @@ module.exports = async function handler(request, response) {
         status: "subscribed",
         firstName: cleanName(body.firstName) || old?.firstName || (user?.name || "").split(" ")[0] || "",
         source: old?.source || source,
-        verified: !!(user || old?.verified),
+        verified: !!(user || old?.verified), ...signupPlace(old, request),
         consent: { text: CONSENT, at: new Date().toISOString(), page: String(body.page || "").slice(0, 200) }
       });
       return response.status(200).json({ ok: true, already: old?.status === "subscribed" });

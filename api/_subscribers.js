@@ -1,7 +1,8 @@
 // One record per person who has an account or is (or was) on the email list, shared by account.js, unsubscribe.js
 // and admin.js. The inventory app pulls changed records through /api/admin?action=subscribers.
 //   gde:subscriber:<email>  { email, firstName, lastName, status: none|declined|subscribed|unsubscribed, account,
-//                             signupVia, source, verified, signedInAt, createdAt, updatedAt, consent, unsubscribedAt }
+//                             signupVia, source, verified, signedInAt, createdAt, updatedAt, consent, unsubscribedAt,
+//                             country, region, city (where they signed up from, by IP; Nov 17, see account.js) }
 //   gde:subscribers         sorted set of emails, by last change
 const crypto = require("node:crypto");
 const store = require("./_store");
