@@ -21,6 +21,7 @@
 //                                     per day; bots are ignored (Nov 16: the first day showed 40 adds, mostly repeats).
 //                                     Also source (Instagram, Facebook, Google, Direct, a site), via (the Instagram /
 //                                     Facebook / TikTok app's own browser), ad (true for Google Ads or a paid utm), campaign.
+//                                     Also country (US), region (TX) and city from Vercel's IP location (Nov 17).
 // Stored next to the orders (see _store.js), one record per person, whether they joined the list, signed in, or both:
 //   gde:subscriber:<email>  { email, firstName, lastName, status: none|declined|subscribed|unsubscribed, account (signed in
 //                             with Google), source, verified, signedInAt, createdAt, updatedAt, consent }
@@ -89,6 +90,14 @@ async function allowed(request, what, limit) {
 
 // Crawlers, link previews and test tools that say what they are.
 const BOT = /bot|crawl|spider|slurp|facebookexternalhit|meta-external|preview|headless|lighthouse|pagespeed|python|curl|wget|httpclient|okhttp|axios|node-fetch|scrapy|phantom|puppeteer|playwright|selenium|vercel/i;
+
+// Where in the world a cart add came from (user, Nov 17: "which country they are adding it from"): Vercel's own
+// location headers for the visitor's IP. country = two-letter code (US), region = state/province code (TX), city.
+function cartPlace(request) {
+  const h = (name, n) => { let v = String(request.headers[name] || ""); try { v = decodeURIComponent(v); } catch {} return v.replace(/[^\p{L}\p{N} .'-]/gu, "").trim().slice(0, n) || null; };
+  const country = h("x-vercel-ip-country", 2);
+  return { country: country && /^[A-Z]{2}$/.test(country) ? country : null, region: h("x-vercel-ip-country-region", 8), city: h("x-vercel-ip-city", 60) };
+}
 
 // Where a cart add came from: utm_source first, then the page that linked here, then the app it was opened in.
 const SOURCES = [[/(^|\.)instagram\.com$|^ig$|^instagram/i, "Instagram"], [/(^|\.)(facebook|fb)\.(com|me)$|^fb$|^facebook/i, "Facebook"],
@@ -355,7 +364,7 @@ module.exports = async function handler(request, response) {
       if (first !== "OK") return response.status(200).json({ ok: true });
       const device = /iPad|Tablet/i.test(agent) ? "tablet" : /Mobi|iPhone|Android/i.test(agent) ? "phone" : "computer";
       const record = { id: crypto.randomBytes(8).toString("hex"), at: new Date().toISOString(), product, gun: products[product].name || product,
-        email: user?.email || null, name: user?.name || null, visitor, device, ...cartSource(body.landing, agent) };
+        email: user?.email || null, name: user?.name || null, visitor, device, ...cartSource(body.landing, agent), ...cartPlace(request) };
       await store.pipeline([["LPUSH", "gde:cartadds", JSON.stringify(record)], ["LTRIM", "gde:cartadds", 0, 999]]);
       return response.status(200).json({ ok: true });
     }
