@@ -40,7 +40,7 @@ const { collectorStatus } = require("./_collector");
 const ffcode = require("./_ffcode");
 const referral = require("./_referral");
 const mail = require("./_mail");
-const { CONSENT, getSubscriber, saveSubscriber } = require("./_subscribers");
+const { CONSENT, getSubscriber, saveSubscriber, unsubPage } = require("./_subscribers");
 const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -235,6 +235,17 @@ async function signIn(request, response, email, names = {}) {
   return { email: user.email, name: user.name, picture: "" };
 }
 
+// The welcome email (_mail.js), once per person: only when this sign-in made their first account. `before` is their
+// record from before this sign-in; accounts made before Nov 17 already have account: true, so they never get one.
+async function welcome(before, email, firstName) {
+  if (before?.account || before?.welcomedAt) return;
+  // Called after the "Email me" choice is saved, so the email knows whether they're on the list.
+  const subscribed = (await getSubscriber(email))?.status === "subscribed";
+  let unsubUrl = "";
+  try { if (subscribed) unsubUrl = unsubPage(email); } catch {}
+  if (await mail.sendWelcome(email, firstName, { subscribed, unsubUrl })) await saveSubscriber(email, { welcomedAt: new Date().toISOString() });
+}
+
 module.exports = async function handler(request, response) {
   response.setHeader("Cache-Control", "no-store");
   const action = new URL(request.url, "http://x").searchParams.get("action");
@@ -260,6 +271,7 @@ module.exports = async function handler(request, response) {
         firstName: old?.firstName || firstName, lastName: old?.lastName || lastName,
         status: old?.status || "none", source: old?.source || "account", ...signupPlace(old, request)
       });
+      await welcome(old, user.email, old?.firstName || firstName);
       return response.status(200).json({ ok: true, user: { email: user.email, name: user.name, picture: user.picture } });
     }
 
@@ -289,6 +301,7 @@ module.exports = async function handler(request, response) {
       const pending = await useCode("signup", email, body.code);
       const now = new Date().toISOString();
       await store.cmd("SET", `gde:pw:${email}`, JSON.stringify({ salt: pending.salt, hash: pending.hash, createdAt: now, updatedAt: now }));
+      const before = await getSubscriber(email);
       const user = await signIn(request, response, email, pending);
       const old = await getSubscriber(email);
       if (pending.emails) {
@@ -299,6 +312,7 @@ module.exports = async function handler(request, response) {
       } else if (!old || old.status === "none") {
         await saveSubscriber(email, { status: "declined" }); // left the box unticked: account only, no promotional email
       }
+      await welcome(before, email, old?.firstName || pending.firstName);
       return response.status(200).json({ ok: true, user, created: true, subscribed: !!pending.emails || old?.status === "subscribed" });
     }
 

@@ -33,6 +33,122 @@ function sendCode(to, code, purpose) {
   return send({ to, subject, text, html });
 }
 
+// ---- the welcome email, sent once when someone first makes an account (email code or Google; account.js, Nov 17)
+// An account email (from account@): it opens with the account, so it stays an account email, not a promotion.
+// "New collections first" (user, Nov 17: updates on new collections, discounts): people who ticked "Email me" are told
+// they'll get them, with a link to stop; everyone else is shown where to turn on Email Alerts (account page).
+const SITE = "https://www.gdecollectibles.com"; // www: the bare domain answers with a redirect first
+function welcomeEmail(firstName, { subscribed = false, unsubUrl = "" } = {}) {
+  const name = escHtml(String(firstName || "").trim()) || "there";
+  const stop = subscribed && unsubUrl ? unsubUrl : "";
+  const newsText = subscribed
+    ? "You're on our collector list, so you'll be the first to know when a new collection is released, along with limited editions, discounts and collector offers."
+    : `Want to be the first to know when a new collection is released, and hear about discounts and collector offers? Turn on Email Alerts in your account: ${SITE}/account`;
+  const subject = "Welcome to GDE Collectibles";
+  // Design C, "Letter" (user picked it Nov 17; previews and history in clients/gde/docs/email-templates/): ivory and
+  // gold, gold logo, "Your membership" box I-IV, gold button, contact rows, RP signature. Images live on the site in
+  // assets/email/. Gmail drops a shorthand td background, so the button colour is set as bgcolor + background-color.
+  const GOLD = "#a9864a", INK = "#2b2a27", SOFT = "#55524b", MUTED = "#8a857a", LINE = "#e3dccd";
+  const SERIF = "Georgia,'Times New Roman',serif";
+  const p = (s) => `<p style="margin:0 0 18px;font-family:${SERIF};font-size:17px;line-height:1.7;color:${INK}">${s}</p>`;
+  const perk = (n, title, s) => `<tr><td valign="top" style="padding:0 14px 16px 0;font-family:Gloock,${SERIF};font-size:20px;line-height:1.2;color:${GOLD}">${n}</td>
+      <td style="padding:0 0 16px"><p style="margin:0 0 4px;font-family:${SERIF};font-size:12px;font-weight:700;line-height:1.4;letter-spacing:.16em;text-transform:uppercase;color:${INK}">${title}</p>
+      <p style="margin:0;font-family:${SERIF};font-size:15px;line-height:1.6;color:${SOFT}">${s}</p></td></tr>`;
+  const row = (label, href, value) => `<tr><td style="padding:9px 0;border-bottom:1px solid ${LINE};font-family:${SERIF};font-size:11px;line-height:1.5;letter-spacing:.16em;text-transform:uppercase;color:${MUTED}">${label}</td>
+      <td align="right" style="padding:9px 0;border-bottom:1px solid ${LINE};font-family:${SERIF};font-size:15px;line-height:1.5"><a href="${href}" style="color:${INK};text-decoration:none">${value}</a></td></tr>`;
+  const link = (href, label) => `<a href="${href}" style="color:${INK}">${label}</a>`;
+  const news = subscribed
+    ? "You're on our collector list, so you'll be the first to know when a new collection is released, along with limited editions, discounts and collector offers."
+    : `Want to be the first to know when a new collection is released, and hear about discounts and collector offers? ${link(`${SITE}/account`, "Turn on Email Alerts")} in your account.`;
+  const html = `<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only">
+<title>${subject}</title>
+<style>@media (max-width:620px){.wrap{padding:0!important} .card{border-radius:0!important} .pad{padding-left:24px!important;padding-right:24px!important} .btn{padding:16px 18px!important;letter-spacing:.14em!important}}</style>
+</head><body style="margin:0;padding:0;background:#e8e2d7">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e8e2d7" style="background-color:#e8e2d7"><tr><td class="wrap" align="center" style="padding:32px 12px">
+<table role="presentation" class="card" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f3ede1" style="width:100%;max-width:600px;background-color:#f3ede1;border:1px solid #d4ccbd;border-radius:4px">
+<tr><td style="padding:10px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE}">
+  <tr><td align="center" style="padding:40px 40px 6px"><img src="${SITE}/assets/email/welcome-logo-gold.png" width="170" alt="GDE Collectibles" style="display:block;width:170px;height:auto;border:0"></td></tr>
+  <tr><td class="pad" style="padding:20px 52px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 26px"><tr><td style="border-top:1px solid ${GOLD};width:45%"></td><td align="center" style="font-family:${SERIF};font-size:12px;line-height:1;color:${GOLD};padding:0 10px;white-space:nowrap">&#9670;</td><td style="border-top:1px solid ${GOLD};width:45%"></td></tr></table>
+    ${p(`Dear ${name},`)}
+    ${p("Welcome to GDE Collectibles, and thank you for joining us. Your account is ready.")}
+    ${p("We're a family-owned shop, and every gun we make is a limited, numbered piece. Being part of our community comes with a few things worth knowing:")}
+  </td></tr>
+  <tr><td class="pad" style="padding:6px 52px 4px"><div style="border:1px solid #d4ccbd;background-color:#f8f3e9;padding:24px 24px 8px">
+    <p style="margin:0 0 18px;font-family:${SERIF};font-size:11px;line-height:1;letter-spacing:.3em;text-transform:uppercase;color:${GOLD}">Your membership</p>
+    <table role="presentation" cellpadding="0" cellspacing="0">
+    ${perk("I", "Follow your orders", "Every order you place shows in your account, from payment until your gun ships to your FFL dealer.")}
+    ${perk("II", "Collectors Club", "Your third gun puts you in the Collectors Club: 5% off every gun after it. At five guns you join the Legacy Club: 10% off, plus a code that gives your friends and family 5% off.")}
+    ${perk("III", "Piece Unique", `Want something one of a kind? ${link(`${SITE}/piece-unique`, "Tell us your idea")} and we'll design it with you.`)}
+    ${perk("IV", "New collections first", news)}
+    </table></div></td></tr>
+  <tr><td class="pad" style="padding:28px 52px 0">
+    ${p("Every gun is made to order and ships to the licensed FFL dealer of your choice. Shipping and insurance are included.")}
+  </td></tr>
+  <tr><td align="center" style="padding:8px 52px 34px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td bgcolor="${GOLD}" style="background-color:${GOLD}">
+    <a class="btn" href="${SITE}/collections" style="display:inline-block;padding:16px 28px;white-space:nowrap;background-color:${GOLD};border:1px solid ${GOLD};font-family:Georgia,serif;font-size:12px;font-weight:700;line-height:12px;letter-spacing:.2em;text-transform:uppercase;color:#ffffff;text-decoration:none">See the collections</a></td></tr></table></td></tr>
+  <tr><td class="pad" style="padding:0 52px">
+    ${p("We're always happy to talk with our community. Whether it's a question about a gun, a number or your dealer, or you just want to say hello, reach out any way you like:")}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;border-top:1px solid ${LINE}">
+    ${row("Call or text", "tel:+17869313566", "1-786-931-3566")}
+    ${row("WhatsApp", "https://wa.me/17869313566", "1-786-931-3566")}
+    ${row("Email", "mailto:info@gdecollectibles.com", "info@gdecollectibles.com")}
+    ${row("Instagram", "https://www.instagram.com/gdecollectibles/", "@gdecollectibles")}
+    ${row("Facebook", "https://www.facebook.com/gdecollectibles", "GDE Collectibles")}
+    </table>
+    ${p("We'd love to hear from you.")}
+    <p style="margin:0 0 4px;font-family:${SERIF};font-size:17px;font-style:italic;line-height:1.7;color:${INK}">With gratitude,</p>
+    <img src="${SITE}/assets/email/welcome-signature.png" width="140" alt="RP" style="display:block;width:140px;height:auto;border:0;margin:4px 0">
+    <p style="margin:0 0 36px;font-family:${SERIF};font-size:15px;line-height:1.6;color:${SOFT}">The GDE Collectibles family</p>
+  </td></tr>
+  <tr><td class="pad" style="padding:20px 52px 30px;border-top:1px solid ${LINE};font-family:${SERIF};font-size:12px;line-height:1.6;color:${MUTED}">
+    Family owned · Gun Decor Emporium LLC · <a href="${SITE}" style="color:${MUTED}">gdecollectibles.com</a><br>
+    You're getting this because you just created an account on gdecollectibles.com. <a href="${SITE}/account" style="color:${MUTED}">Your account</a>${stop ? ` · <a href="${escHtml(stop)}" style="color:${MUTED}">Stop update emails</a>` : ""}</td></tr>
+</table></td></tr>
+</table>
+</td></tr></table></body></html>`;
+  const text = `Dear ${String(firstName || "").trim() || "there"},
+
+Welcome to GDE Collectibles, and thank you for joining us. Your account is ready.
+
+We're a family-owned shop, and every gun we make is a limited, numbered piece. Being part of our community comes with a few things worth knowing:
+
+- Follow your orders: every order you place shows in your account, from payment until your gun ships to your FFL dealer.
+- Collectors Club: your third gun puts you in the Collectors Club, 5% off every gun after it. At five guns you join the Legacy Club: 10% off, plus a code that gives your friends and family 5% off.
+- Piece Unique: want something one of a kind? Tell us your idea and we'll design it with you: ${SITE}/piece-unique
+- New collections first: ${newsText}
+
+Every gun is made to order and ships to the licensed FFL dealer of your choice. Shipping and insurance are included.
+
+See the collections: ${SITE}/collections
+
+We're always happy to talk with our community. Whether it's a question about a gun, a number or your dealer, or you just want to say hello, reach out any way you like:
+
+- Call or text: 1-786-931-3566
+- WhatsApp: 1-786-931-3566
+- Email: reply to this email, or info@gdecollectibles.com
+- Instagram: @gdecollectibles
+- Facebook: facebook.com/gdecollectibles
+
+We'd love to hear from you.
+
+With gratitude,
+The GDE Collectibles family
+
+--
+Family owned · Gun Decor Emporium LLC · gdecollectibles.com
+You're getting this because you just created an account on gdecollectibles.com.${stop ? `\nStop update emails: ${stop}` : ""}`;
+  return { subject, html, text };
+}
+
+// Sends it; a failed welcome email never stops the sign-up.
+async function sendWelcome(to, firstName, list = {}) {
+  if (!configured()) return false;
+  try { await send({ to, ...welcomeEmail(firstName, list) }); return true; }
+  catch (e) { console.error("Welcome email", to, e.message); return false; }
+}
+
 // ---- customer emails sent from the inventory app (admin.js "send-email", user Nov 15)
 // From news@ (a Workspace alias; replies go to info@). MAIL_FROM_NEWS in Vercel can change it.
 const NEWS_FROM = () => process.env.MAIL_FROM_NEWS || "GDE Collectibles <news@gdecollectibles.com>";
@@ -77,4 +193,4 @@ async function sendBatch(emails) {
   return (result.data || []).map((d) => d.id);
 }
 
-module.exports = { configured, send, sendCode, customerEmail, sendBatch };
+module.exports = { configured, send, sendCode, welcomeEmail, sendWelcome, customerEmail, sendBatch };
