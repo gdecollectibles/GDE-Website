@@ -37,10 +37,24 @@ function sendCode(to, code, purpose) {
 // An account email (from account@): it opens with the account, so it stays an account email, not a promotion.
 // "New collections first" (user, Nov 17: updates on new collections, discounts): people who ticked "Email me" are told
 // they'll get them, with a link to stop; everyone else is shown where to turn on Email Alerts (account page).
+// Three versions (user, Nov 17: "send the email to everyone that signed up", accounts + email list):
+//   new account (account.js, at sign-up) | existing: true, an account made before the welcome email existed |
+//   account: false, someone only on the email list: a marketing email by law, so it carries GDE's mailing address and
+//   an Unsubscribe link, and invites them to make an account instead of saying theirs is ready.
 const SITE = "https://www.gdecollectibles.com"; // www: the bare domain answers with a redirect first
-function welcomeEmail(firstName, { subscribed = false, unsubUrl = "" } = {}) {
+function welcomeEmail(firstName, { subscribed = false, unsubUrl = "", account = true, existing = false, address = "" } = {}) {
   const name = escHtml(String(firstName || "").trim()) || "there";
+  const listOnly = !account;
+  if (listOnly) subscribed = true; // only people on the list get this version
   const stop = subscribed && unsubUrl ? unsubUrl : "";
+  const stopLabel = listOnly ? "Unsubscribe" : "Stop update emails";
+  const hello = listOnly ? "Welcome to GDE Collectibles, and thank you for joining our collector list."
+    : existing ? "Welcome to GDE Collectibles, and thank you for joining us."
+    : "Welcome to GDE Collectibles, and thank you for joining us. Your account is ready.";
+  const why = listOnly ? "You're getting this because you joined the GDE Collectibles email list."
+    : existing ? "You're getting this because you have an account on gdecollectibles.com."
+    : "You're getting this because you just created an account on gdecollectibles.com.";
+  const addr = String(address || "").trim();
   const newsText = subscribed
     ? "You're on our collector list, so you'll be the first to know when a new collection is released, along with limited editions, discounts and collector offers."
     : `Want to be the first to know when a new collection is released, and hear about discounts and collector offers? Turn on Email Alerts in your account: ${SITE}/account`;
@@ -72,13 +86,15 @@ function welcomeEmail(firstName, { subscribed = false, unsubUrl = "" } = {}) {
   <tr><td class="pad" style="padding:20px 52px 0">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 26px"><tr><td style="border-top:1px solid ${GOLD};width:45%"></td><td align="center" style="font-family:${SERIF};font-size:12px;line-height:1;color:${GOLD};padding:0 10px;white-space:nowrap">&#9670;</td><td style="border-top:1px solid ${GOLD};width:45%"></td></tr></table>
     ${p(`Dear ${name},`)}
-    ${p("Welcome to GDE Collectibles, and thank you for joining us. Your account is ready.")}
+    ${p(hello)}
     ${p("We're a family-owned shop, and every gun we make is a limited, numbered piece. Being part of our community comes with a few things worth knowing:")}
   </td></tr>
   <tr><td class="pad" style="padding:6px 52px 4px"><div style="border:1px solid #d4ccbd;background-color:#fbf9f4;padding:24px 24px 8px">
     <p style="margin:0 0 18px;font-family:${SERIF};font-size:11px;line-height:1;letter-spacing:.3em;text-transform:uppercase;color:${GOLD}">Your membership</p>
     <table role="presentation" cellpadding="0" cellspacing="0">
-    ${perk("I", "Follow your orders", "Every order you place shows in your account, from payment until your gun ships to your FFL dealer.")}
+    ${listOnly
+      ? perk("I", "Your own account", `${link(`${SITE}/account`, "Create a free account")} to follow every order, from payment until your gun ships to your FFL dealer.`)
+      : perk("I", "Follow your orders", "Every order you place shows in your account, from payment until your gun ships to your FFL dealer.")}
     ${perk("II", "Collectors Club", "Your third gun puts you in the Collectors Club: 5% off every gun after it. At five guns you join the Legacy Club: 10% off, plus a code that gives your friends and family 5% off.")}
     ${perk("III", "Piece Unique", `Want something one of a kind? ${link(`${SITE}/piece-unique`, "Tell us your idea")} and we'll design it with you.`)}
     ${perk("IV", "New collections first", news)}
@@ -103,18 +119,20 @@ function welcomeEmail(firstName, { subscribed = false, unsubUrl = "" } = {}) {
     <p style="margin:0 0 36px;font-family:${SERIF};font-size:15px;line-height:1.6;color:${SOFT}">The GDE Collectibles family</p>
   </td></tr>
   <tr><td class="pad" style="padding:20px 52px 30px;border-top:1px solid ${LINE};font-family:${SERIF};font-size:12px;line-height:1.6;color:${MUTED}">
-    Family owned · Gun Decor Emporium LLC · <a href="${SITE}" style="color:${MUTED}">gdecollectibles.com</a><br>
-    You're getting this because you just created an account on gdecollectibles.com. <a href="${SITE}/account" style="color:${MUTED}">Your account</a>${stop ? ` · <a href="${escHtml(stop)}" style="color:${MUTED}">Stop update emails</a>` : ""}</td></tr>
+    Family owned · Gun Decor Emporium LLC${addr ? ` · ${escHtml(addr)}` : ""} · <a href="${SITE}" style="color:${MUTED}">gdecollectibles.com</a><br>
+    ${why}${listOnly ? "" : ` <a href="${SITE}/account" style="color:${MUTED}">Your account</a>`}${stop ? `${listOnly ? " " : " · "}<a href="${escHtml(stop)}" style="color:${MUTED}">${stopLabel}</a>` : ""}</td></tr>
 </table></td></tr>
 </table>
 </td></tr></table></body></html>`;
   const text = `Dear ${String(firstName || "").trim() || "there"},
 
-Welcome to GDE Collectibles, and thank you for joining us. Your account is ready.
+${hello}
 
 We're a family-owned shop, and every gun we make is a limited, numbered piece. Being part of our community comes with a few things worth knowing:
 
-- Follow your orders: every order you place shows in your account, from payment until your gun ships to your FFL dealer.
+${listOnly
+  ? `- Your own account: create a free account to follow every order, from payment until your gun ships to your FFL dealer: ${SITE}/account`
+  : "- Follow your orders: every order you place shows in your account, from payment until your gun ships to your FFL dealer."}
 - Collectors Club: your third gun puts you in the Collectors Club, 5% off every gun after it. At five guns you join the Legacy Club: 10% off, plus a code that gives your friends and family 5% off.
 - Piece Unique: want something one of a kind? Tell us your idea and we'll design it with you: ${SITE}/piece-unique
 - New collections first: ${newsText}
@@ -137,8 +155,8 @@ With gratitude,
 The GDE Collectibles family
 
 --
-Family owned · Gun Decor Emporium LLC · gdecollectibles.com
-You're getting this because you just created an account on gdecollectibles.com.${stop ? `\nStop update emails: ${stop}` : ""}`;
+Family owned · Gun Decor Emporium LLC${addr ? ` · ${addr}` : ""} · gdecollectibles.com
+${why}${stop ? `\n${stopLabel}: ${stop}` : ""}`;
   return { subject, html, text };
 }
 

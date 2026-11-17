@@ -21,6 +21,14 @@
 //                                        recipients: [{ email, firstName }] (100 at most per call) }
 //        Each gets their own unsubscribe link (footer + one-click List-Unsubscribe header). Anyone whose record here
 //        says unsubscribed or declined is skipped (unless test). Answers { sent: [email], skipped: [{ email, why }], failed: [...] }.
+// Welcome email for people who signed up before it existed (user, Nov 17: "send the email to everyone that signed up",
+// accounts + email list; _mail.js welcomeEmail):
+//   GET  /api/admin?action=welcome-existing   who would get it and who is skipped, nothing is sent
+//   POST /api/admin?action=welcome-existing  { address, exclude?: [email] }: sends it from account@ (100 per Resend
+//        batch) and marks each person welcomedAt, so nobody gets it twice (new sign-ups are marked by account.js).
+//        Accounts get the account version (existing); people only on the list get the list version, which is a
+//        marketing email: it needs GDE's mailing address and carries an Unsubscribe link + one-click header.
+//        Skipped: already welcomed, unsubscribed, or no account and not on the list.
 // Friends and family codes (_ffcode.js):
 //   POST /api/admin?action=ffcode-reset   { email }: clears a Legacy Club member's code so they can make a new one
 const crypto = require("node:crypto");
@@ -39,6 +47,24 @@ const AUTHORIZE_ENDPOINTS = {
 };
 const RECHECK_DAYS = 8;            // how far back payments are looked up
 const UNPAID_AFTER_MS = 60 * 60 * 1000; // Authorize.net's payment page expires long before this
+
+// Everyone on the site's people list, split into who gets the welcome email now and who is skipped (and why).
+async function welcomeList() {
+  const emails = (await store.cmd("ZRANGE", "gde:subscribers", 0, -1)) || [];
+  const records = emails.length ? await store.pipeline(emails.map((e) => ["GET", `gde:subscriber:${e}`])) : [];
+  const send = [], skipped = [];
+  emails.forEach((email, i) => {
+    let s = null;
+    try { s = records[i] ? JSON.parse(records[i]) : null; } catch {}
+    if (!s) return;
+    const who = { email, firstName: s.firstName || "", account: !!s.account, status: s.status || "none" };
+    if (s.welcomedAt) skipped.push({ ...who, why: "already got the welcome email" });
+    else if (s.status === "unsubscribed") skipped.push({ ...who, why: "unsubscribed" });
+    else if (!s.account && s.status !== "subscribed") skipped.push({ ...who, why: "no account and not on the email list" });
+    else send.push(who);
+  });
+  return { send, skipped };
+}
 
 function keyMatches(given) {
   const want = process.env.GDE_ADMIN_KEY || "";
@@ -286,6 +312,51 @@ module.exports = async function handler(request, response) {
         }
       }
       return response.status(200).json({ sent, skipped, failed });
+    }
+
+    if (action === "welcome-existing" && request.method === "GET") {
+      const { send, skipped } = await welcomeList();
+      return response.status(200).json({ willSend: send, skipped,
+        counts: { accounts: send.filter((w) => w.account).length, listOnly: send.filter((w) => !w.account).length, skipped: skipped.length } });
+    }
+    if (action === "welcome-existing" && request.method === "POST") {
+      if (!mail.configured()) return response.status(503).json({ error: "RESEND_API_KEY is not set in Vercel." });
+      const b = await readBody(request);
+      const address = String(b.address || "").trim();
+      const exclude = new Set((Array.isArray(b.exclude) ? b.exclude : []).map((e) => subscribers.normEmail(e)));
+      const { send } = await welcomeList();
+      const list = send.filter((w) => !exclude.has(w.email));
+      if (list.some((w) => !w.account) && address.length < 8) {
+        return response.status(400).json({ error: "Add GDE's mailing address (the email-list version needs it, by law)." });
+      }
+      // One run at a time, so a double click can't send twice.
+      if (!(await store.cmd("SET", "gde:welcome-existing:lock", "1", "EX", 300, "NX"))) {
+        return response.status(409).json({ error: "A welcome send is already running. Try again in a few minutes." });
+      }
+      const from = process.env.MAIL_FROM || "GDE Collectibles <account@gdecollectibles.com>";
+      const sent = [], failed = [];
+      try {
+        for (let i = 0; i < list.length; i += 100) {
+          const chunk = list.slice(i, i + 100);
+          const messages = chunk.map((w) => {
+            const onList = w.status === "subscribed";
+            const unsubUrl = onList ? subscribers.unsubPage(w.email) : "";
+            const c = mail.welcomeEmail(w.firstName, { subscribed: onList, unsubUrl, account: w.account, existing: w.account, address });
+            return { from, to: [w.email], subject: c.subject, html: c.html, text: c.text,
+              ...(unsubUrl ? { headers: { "List-Unsubscribe": `<${subscribers.unsubOneClick(w.email)}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } } : {}) };
+          });
+          try {
+            await mail.sendBatch(messages);
+            const at = new Date().toISOString();
+            for (const w of chunk) { await subscribers.saveSubscriber(w.email, { welcomedAt: at }); sent.push(w.email); }
+          } catch (error) {
+            failed.push(...chunk.map((w) => ({ email: w.email, error: error.message })));
+          }
+        }
+      } finally {
+        await store.cmd("DEL", "gde:welcome-existing:lock");
+      }
+      return response.status(200).json({ sent, failed, excluded: [...exclude] });
     }
 
     if (action === "ffcode-reset" && request.method === "POST") {
