@@ -39,6 +39,7 @@
 // Welcome offer (_welcome.js, user Nov 17: "$100 off your first purchase that lasts 30 days" for every new sign-up):
 //   GET  /api/admin?action=welcome-get    the settings, totals and the latest 100 welcome codes
 //   POST /api/admin?action=welcome-set    { active?, amount?, days?, address? }
+//   POST /api/admin?action=welcome-cancel-all  every unused welcome code stops working (kept, marked cancelled; Nov 18)
 const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -390,6 +391,9 @@ module.exports = async function handler(request, response) {
     }
     if (action === "welcome-get" && request.method === "GET") {
       return response.status(200).json({ ...(await welcomeOffer.overview()), environment: authorizeSetup().environment });
+    }
+    if (action === "welcome-cancel-all" && request.method === "POST") {
+      return response.status(200).json({ ok: true, ...(await welcomeOffer.cancelAll()) });
     }
     if (action === "welcome-set" && request.method === "POST") {
       try {

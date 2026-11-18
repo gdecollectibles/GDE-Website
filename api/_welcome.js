@@ -92,8 +92,9 @@ async function offerFor(email, orders) {
   const used = usesOf(code, orders) > 0;
   const expired = Date.now() >= Date.parse(r.endsAt);
   const bought = hasBought(r.email, orders);
-  return { code, amount: r.amount, label: label({ kind: "amount", value: r.amount }), endsAt: r.endsAt, used, expired, bought,
-    usable: !used && !expired && !bought };
+  const cancelled = !!r.cancelledAt;
+  return { code, amount: r.amount, label: label({ kind: "amount", value: r.amount }), endsAt: r.endsAt, used, expired, bought, cancelled,
+    usable: !used && !expired && !bought && !cancelled };
 }
 
 // Is this a welcome code, and good for this buyer right now? null = not a welcome code.
@@ -105,6 +106,7 @@ async function checkWelcome(wanted, buyerEmails, orders) {
   const r = parse(await store.cmd("GET", `gde:welcome:${code}`));
   const no = (error) => ({ ok: false, error });
   if (!r?.email) return no("That code isn't valid.");
+  if (r.cancelledAt) return no("That welcome offer has ended, so the code no longer works.");
   const emails = buyerEmails.map(norm).filter(Boolean);
   if (emails.length && !emails.includes(r.email)) {
     const [name, domain] = r.email.split("@");
@@ -130,16 +132,34 @@ async function overview(orders) {
   const list = values.map(parse).filter((r) => r?.email).map((r) => {
     const os = byCode.get(r.code) || [], paid = os.find((o) => o.status === "paid");
     return { code: r.code, email: r.email, amount: r.amount, via: r.via, createdAt: r.createdAt, endsAt: r.endsAt,
-      status: paid ? "used" : os.some((o) => o.status === "awaiting_payment") ? "checkout" : now >= Date.parse(r.endsAt) ? "expired" : "open",
+      status: paid ? "used" : r.cancelledAt ? "cancelled" : os.some((o) => o.status === "awaiting_payment") ? "checkout" : now >= Date.parse(r.endsAt) ? "expired" : "open",
       invoice: paid?.invoice || null, sale: paid ? Number(paid.amount) : 0, saved: paid ? Number(paid.discount?.amount) || 0 : 0 };
   });
   const used = list.filter((r) => r.status === "used");
   return {
     settings: { active: s.active, amount: s.amount, days: s.days, address: s.address, running: running(s), changedAt: s.changedAt || null },
     totals: { given: list.length, open: list.filter((r) => r.status === "open").length, used: used.length,
-      expired: list.filter((r) => r.status === "expired").length, sales: cents(used.reduce((t, r) => t + r.sale, 0)), saved: cents(used.reduce((t, r) => t + r.saved, 0)) },
+      expired: list.filter((r) => r.status === "expired").length, cancelled: list.filter((r) => r.status === "cancelled").length, sales: cents(used.reduce((t, r) => t + r.sale, 0)), saved: cents(used.reduce((t, r) => t + r.saved, 0)) },
     codes: list.slice(0, 100)
   };
 }
 
-module.exports = { CODE_RE, settings, running, saveSettings, giveOffer, offerFor, checkWelcome, overview };
+// Cancels every welcome code not yet used (user, Nov 18: "make them not work, I'm not going to do that promotion
+// anymore"). The records stay, marked cancelledAt, so the app still shows who got one; a used code is left as it is.
+async function cancelAll(orders) {
+  orders = orders || (await store.listOrders());
+  const codes = (await store.cmd("LRANGE", "gde:welcomes", 0, -1)) || [];
+  if (!codes.length) return { cancelled: [] };
+  const values = await store.cmd("MGET", ...codes.map((c) => `gde:welcome:${c}`));
+  const now = new Date().toISOString(), cancelled = [], writes = [];
+  values.map(parse).forEach((r) => {
+    if (!r?.email || r.cancelledAt) return;
+    if (orders.some((o) => o.promoCode === r.code && o.status === "paid")) return;
+    writes.push(["SET", `gde:welcome:${r.code}`, JSON.stringify({ ...r, cancelledAt: now })]);
+    cancelled.push(r.code);
+  });
+  if (writes.length) await store.pipeline(writes);
+  return { cancelled };
+}
+
+module.exports = { CODE_RE, settings, running, saveSettings, giveOffer, offerFor, checkWelcome, overview, cancelAll };
