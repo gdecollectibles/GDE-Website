@@ -1120,6 +1120,13 @@ if (document.querySelector("#proceedToPayment")) {
     startAuthorizeCheckout({button: paymentLink, status, cart, customer, resetText, embedded: false});
   });
 }
+// US only (user, Nov 18, 2026): a visitor browsing from outside the US sees the "United States only" notice on arrival.
+// It only informs; the server refuses any billing or FFL address outside the US, so a US buyer abroad can still pay.
+if (document.querySelector("#usOnlyNote")) {
+  fetch("/api/create-authorize-payment", { cache: "no-store" }).then(r => r.ok ? r.json() : {}).then(({ country }) => {
+    if (country && country !== "US") document.querySelector("#usOnlyNote").style.display = "";
+  }).catch(() => {});
+}
 // Step 04 of checkout: Authorize.net's card form inside the page (Accept Hosted in a frame). The frame reports its
 // height, a cancel or the result through iframe-communicator.html, which calls CommunicationHandler below.
 function showPaymentStep(session, onBack) {

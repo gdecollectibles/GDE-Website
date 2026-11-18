@@ -49,6 +49,19 @@ function cleanText(value, maxLength = 255) {
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@.]{2,}$/;
 
+// US only (user, Nov 18, 2026: "people can only purchase if they are in the US"). Decided by address, not by where the
+// buyer is browsing from (the user's choice, so a US buyer travelling abroad can still pay): the billing address and the
+// FFL dealer's address must both be a US state (or DC) with a US ZIP code. The checkout page lists only these states.
+const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
+  "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky",
+  "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana",
+  "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
+  "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah",
+  "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"].map(s => s.toLowerCase());
+const US_ZIP = /^\d{5}(-?\d{4})?$/;
+const isUSCountry = (value) => !value || /^(united states( of america)?|us|usa)$/i.test(value);
+const inUS = (country, state, zip) => isUSCountry(country) && US_STATES.includes(String(state || "").toLowerCase()) && US_ZIP.test(zip || "");
+
 // The buyer's details, trimmed, and a plain message for anything that would stop the checkout further on.
 function checkCustomer(customer) {
   const clean = {};
@@ -56,6 +69,12 @@ function checkCustomer(customer) {
   if (clean.email) clean.email = clean.email.replace(/\s+/g, "");
   if (!EMAIL_PATTERN.test(clean.email || "")) {
     return { error: "Please check your email address. It should look like name@example.com." };
+  }
+  if (!inUS(clean.country, clean.state, clean.zip)) {
+    return { error: "GDE Collectibles sells only to buyers in the United States. Please enter a US billing address with its state and 5-digit ZIP code. Questions? Call us at 1-786-931-3566." };
+  }
+  if (!inUS(clean.fflCountry, clean.fflState, clean.fflZip)) {
+    return { error: "Firearms ship only to a licensed FFL dealer in the United States. Please enter the dealer's US address with its state and 5-digit ZIP code." };
   }
   return { customer: clean };
 }
@@ -88,6 +107,13 @@ function readBody(request) {
 }
 
 module.exports = async function handler(request, response) {
+  // The country the visitor is browsing from (Vercel's IP location), for the checkout page's US-only notice.
+  // Only a notice: what decides a purchase is the billing and FFL address (checkCustomer).
+  if (request.method === "GET") {
+    const country = String(request.headers["x-vercel-ip-country"] || "").toUpperCase();
+    response.setHeader("Cache-Control", "no-store");
+    return response.status(200).json({ country: /^[A-Z]{2}$/.test(country) ? country : null });
+  }
   if (request.method !== "POST") {
     return response.status(405).json({ error: "Use POST to create a payment session." });
   }
