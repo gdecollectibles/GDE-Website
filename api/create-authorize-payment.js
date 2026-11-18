@@ -58,6 +58,7 @@ const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Co
   "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
   "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah",
   "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"].map(s => s.toLowerCase());
+const NO_SHIP_STATES = ["alaska", "hawaii"];
 const US_ZIP = /^\d{5}(-?\d{4})?$/;
 const isUSCountry = (value) => !value || /^(united states( of america)?|us|usa)$/i.test(value);
 const inUS = (country, state, zip) => isUSCountry(country) && US_STATES.includes(String(state || "").toLowerCase()) && US_ZIP.test(zip || "");
@@ -75,6 +76,10 @@ function checkCustomer(customer) {
   }
   if (!inUS(clean.fflCountry, clean.fflState, clean.fflZip)) {
     return { error: "Firearms ship only to a licensed FFL dealer in the United States. Please enter the dealer's US address with its state and 5-digit ZIP code." };
+  }
+  // Terms of Service (Nov 18, 2026): no shipping to Alaska or Hawaii. The checkout's FFL state list leaves them out too.
+  if (NO_SHIP_STATES.includes(clean.fflState.toLowerCase())) {
+    return { error: "We do not currently ship to Alaska or Hawaii. Please choose an FFL dealer in another US state, or call us at 1-786-931-3566." };
   }
   return { customer: clean };
 }
