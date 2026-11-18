@@ -47,7 +47,7 @@ const promo = require("./_promo");
 const welcomeOffer = require("./_welcome");
 const referral = require("./_referral");
 const mail = require("./_mail");
-const { CONSENT, getSubscriber, saveSubscriber, unsubPage } = require("./_subscribers");
+const { CONSENT, getSubscriber, saveSubscriber, unsubPage, unsubOneClick } = require("./_subscribers");
 const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -253,23 +253,27 @@ async function welcome(before, email, firstName) {
   if (before?.welcomedAt && !offer) return;
   // Called after the "Email me" choice is saved, so the email knows whether they're on the list.
   const subscribed = (await getSubscriber(email))?.status === "subscribed";
-  let unsubUrl = "";
-  try { if (subscribed) unsubUrl = unsubPage(email); } catch {}
-  if (await mail.sendWelcome(email, firstName, { subscribed, unsubUrl, offer })) await saveSubscriber(email, { welcomedAt: new Date().toISOString() });
+  let unsubUrl = "", oneClick = "";
+  try { if (subscribed || offer) { unsubUrl = unsubPage(email); oneClick = unsubOneClick(email); } } catch {}
+  // With the offer it's a marketing email: GDE's mailing address and an unsubscribe link, whatever they ticked.
+  const address = offer ? (await welcomeOffer.settings()).address : "";
+  if (await mail.sendWelcome(email, firstName, { subscribed, unsubUrl, oneClick, offer, address })) await saveSubscriber(email, { welcomedAt: new Date().toISOString() });
 }
 
 // Joining the email list (user, Nov 17): the welcome offer too, in the welcome email. Someone with no account gets the
 // email-list version, a marketing email that must carry GDE's mailing address (the app sends it with the offer
 // settings), so without an address nobody on the list alone is given a code they'd never hear about.
+// With the offer off (user, Nov 18: "make it automatic"), it's the plain welcome email, once per person (welcomedAt),
+// still only with the address on it.
 async function welcomeListJoin(email, firstName, user) {
   try {
     const s = await welcomeOffer.settings();
-    if (!user && String(s.address || "").length < 8) return;
-    const offer = await welcomeOffer.giveOffer(email, user ? "account" : "list");
-    if (!offer) return;
-    let unsubUrl = "";
-    try { unsubUrl = unsubPage(email); } catch {}
-    const list = user ? { subscribed: true, unsubUrl, existing: true, offer } : { subscribed: true, unsubUrl, account: false, address: s.address, offer };
+    const before = await getSubscriber(email);
+    const offer = await welcomeOffer.giveOffer(email, user ? "account" : "list"); // none until the address is set
+    if (!offer && (before?.welcomedAt || String(s.address || "").trim().length < 8)) return;
+    let unsubUrl = "", oneClick = "";
+    try { unsubUrl = unsubPage(email); oneClick = unsubOneClick(email); } catch {}
+    const list = user ? { subscribed: true, unsubUrl, oneClick, existing: true, offer, address: s.address } : { subscribed: true, unsubUrl, oneClick, account: false, address: s.address, offer };
     if (await mail.sendWelcome(email, firstName, list)) await saveSubscriber(email, { welcomedAt: new Date().toISOString() });
   } catch (error) { console.error("Welcome offer (list)", error); }
 }
@@ -284,7 +288,10 @@ module.exports = async function handler(request, response) {
   }
   try {
     if (action === "config" && !post) {
-      return response.status(200).json({ googleClientId: process.env.GOOGLE_CLIENT_ID || null, ready: store.configured() && !!secret(), emailLogin: mail.configured() });
+      // welcome: the sign-up offer while it's on (_welcome.js), so the popup and footer can advertise it; null when off.
+      let welcome = null;
+      try { if (store.configured()) { const s = await welcomeOffer.settings(); if (welcomeOffer.running(s)) welcome = { amount: s.amount, days: s.days }; } } catch {}
+      return response.status(200).json({ googleClientId: process.env.GOOGLE_CLIENT_ID || null, ready: store.configured() && !!secret(), emailLogin: mail.configured(), welcome });
     }
     if (!store.configured() || !secret()) return response.status(503).json({ error: "Accounts are not set up yet. Please try again later." });
 

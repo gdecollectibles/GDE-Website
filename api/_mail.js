@@ -6,12 +6,12 @@ const REPLY_TO = () => process.env.MAIL_REPLY_TO || "info@gdecollectibles.com";
 
 const configured = () => !!process.env.RESEND_API_KEY;
 
-async function send({ to, subject, text, html }) {
+async function send({ to, subject, text, html, headers }) {
   if (!configured()) throw Object.assign(new Error("Email sign-up isn't available yet. Please continue with Google."), { status: 503 });
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: FROM(), to: [to], reply_to: REPLY_TO(), subject, text, html })
+    body: JSON.stringify({ from: FROM(), to: [to], reply_to: REPLY_TO(), subject, text, html, ...(headers ? { headers } : {}) })
   });
   if (!response.ok) {
     console.error("Resend", response.status, await response.text().catch(() => ""));
@@ -48,8 +48,9 @@ function welcomeEmail(firstName, { subscribed = false, unsubUrl = "", account = 
   const name = escHtml(String(firstName || "").trim()) || "there";
   const listOnly = !account;
   if (listOnly) subscribed = true; // only people on the list get this version
-  const stop = subscribed && unsubUrl ? unsubUrl : "";
-  const stopLabel = listOnly ? "Unsubscribe" : "Stop update emails";
+  // With the offer it's a marketing email whatever they ticked: always an unsubscribe link (and the address, below).
+  const stop = (subscribed || offer) && unsubUrl ? unsubUrl : "";
+  const stopLabel = listOnly || (offer && !subscribed) ? "Unsubscribe" : "Stop update emails";
   const hello = listOnly ? "Welcome to GDE Collectibles, and thank you for joining our collector list."
     : existing ? "Welcome to GDE Collectibles, and thank you for joining us."
     : "Welcome to GDE Collectibles, and thank you for joining us. Your account is ready.";
@@ -177,7 +178,10 @@ ${why}${stop ? `\n${stopLabel}: ${stop}` : ""}`;
 // Sends it; a failed welcome email never stops the sign-up.
 async function sendWelcome(to, firstName, list = {}) {
   if (!configured()) return false;
-  try { await send({ to, ...welcomeEmail(firstName, list) }); return true; }
+  // One-click unsubscribe header too (list.oneClick, _subscribers.js), like the CRM emails, whenever there's a link.
+  const headers = list.oneClick && list.unsubUrl && (list.subscribed || list.offer)
+    ? { "List-Unsubscribe": `<${list.oneClick}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } : undefined;
+  try { await send({ to, ...welcomeEmail(firstName, list), headers }); return true; }
   catch (e) { console.error("Welcome email", to, e.message); return false; }
 }
 

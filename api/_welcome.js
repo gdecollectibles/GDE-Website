@@ -27,6 +27,10 @@ const fail = (message, status = 400) => { throw Object.assign(new Error(message)
 const cleanCode = (code) => String(code || "").trim().toUpperCase().replace(/\s+/g, "");
 
 async function settings() { return { ...DEFAULTS, ...(parse(await store.cmd("GET", "gde:welcome:settings")) || {}) }; }
+// Every offer email is a marketing email and must carry GDE's mailing address (user, Nov 18: "i cant send emails
+// without the address"), so the offer only runs once the app has sent one: no codes, no popup or footer ads before.
+const hasAddress = (s) => String(s.address || "").trim().length >= 8;
+const running = (s) => !!(s.active && hasAddress(s));
 
 async function saveSettings(b) {
   const s = await settings();
@@ -61,7 +65,7 @@ async function giveOffer(email, via, orders) {
   const s = await settings();
   const have = await store.cmd("GET", `gde:welcomeowner:${email}`);
   if (have) return null;
-  if (!s.active) return null;
+  if (!running(s)) return null;
   if (hasBought(email, orders || (await store.listOrders()))) return null;
   // Claim the email first, so two sign-ups at once can't make two codes.
   if (!(await store.cmd("SET", `gde:welcomeowner:${email}`, "pending", "NX"))) return null;
@@ -131,11 +135,11 @@ async function overview(orders) {
   });
   const used = list.filter((r) => r.status === "used");
   return {
-    settings: { active: s.active, amount: s.amount, days: s.days, address: s.address, changedAt: s.changedAt || null },
+    settings: { active: s.active, amount: s.amount, days: s.days, address: s.address, running: running(s), changedAt: s.changedAt || null },
     totals: { given: list.length, open: list.filter((r) => r.status === "open").length, used: used.length,
       expired: list.filter((r) => r.status === "expired").length, sales: cents(used.reduce((t, r) => t + r.sale, 0)), saved: cents(used.reduce((t, r) => t + r.saved, 0)) },
     codes: list.slice(0, 100)
   };
 }
 
-module.exports = { CODE_RE, settings, saveSettings, giveOffer, offerFor, checkWelcome, overview };
+module.exports = { CODE_RE, settings, running, saveSettings, giveOffer, offerFor, checkWelcome, overview };

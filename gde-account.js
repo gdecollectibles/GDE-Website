@@ -14,7 +14,7 @@
   const NO_POPUP = ["/checkout", "/payment-success", "/payment-cancel", "/cart", "/account", "/iframe-communicator"];
 
   const css = document.createElement("link");
-  css.rel = "stylesheet"; css.href = "account.css?v=20261115back2";
+  css.rel = "stylesheet"; css.href = "account.css?v=20261117gift2";
   document.head.append(css);
 
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -53,6 +53,44 @@
     footerLinks.append(acct);
   }
 
+  // ---- the welcome offer (api/_welcome.js, user Nov 17: "make the pop up advertise it, and bottom"): a new account or
+  // email-list sign-up gets a personal code for money off a first gun. Advertised in the popup and at the bottom of
+  // every page while GDE has it on (config.welcome; null when off). Kept for the visit so each page doesn't ask again.
+  const giftMoney = (n) => `$${Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+  let configP = null;
+  function siteConfig() {
+    if (!configP) {
+      configP = (async () => {
+        try { const c = JSON.parse(sessionStorage.getItem("gdeConfig")); if (c && Date.now() - c.at < 10 * 60000) return c.config; } catch {}
+        const config = await api("config");
+        try { sessionStorage.setItem("gdeConfig", JSON.stringify({ at: Date.now(), config })); } catch {}
+        return config;
+      })().catch(() => ({})).then((c) => ({ ...c, welcome: c.welcome === undefined ? (LOCAL_PREVIEW ? WELCOME_DEFAULT : null) : c.welcome }));
+    }
+    return configP;
+  }
+  // When the site can't say (no answer, or a server from before the offer): no ad on the real site (the offer may be
+  // off or waiting for GDE's mailing address); on the local preview, which has no server, it's shown as it will look.
+  const WELCOME_DEFAULT = { amount: 100, days: 30 };
+  const LOCAL_PREVIEW = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  const giftLine = (w) => `${giftMoney(w.amount)} off your first gun`;
+  const giftTerms = (w) => `New sign-ups get a personal code by email: once, on a first purchase, within ${w.days} days.`;
+  (async () => {
+    const footer = document.querySelector(".site-footer");
+    // gdeNoGift: this browser's person already has a code or has bought (set by the popup and account page).
+    if (!footer || NO_POPUP.includes(page) || store.get("gdeSubscribed") || store.get("gdeNoGift")) return;
+    const w = (await siteConfig()).welcome;
+    if (!w || document.querySelector(".footer-gift")) return;
+    // Its own band just above the footer (inside it, the footer's first-child styles would take it over).
+    const band = document.createElement("section");
+    band.className = "footer-gift-band";
+    band.innerHTML = `<div class="footer-gift"><p class="eyebrow">Welcome gift</p><h3>${giftLine(w)}</h3>
+      <p>Join the collector list or create a free account. ${giftTerms(w)}</p>
+      <button class="button" type="button">Get My Code</button></div>`;
+    band.querySelector("button").addEventListener("click", () => openSignup("footer"));
+    footer.before(band);
+  })();
+
   // ---- email list popup
   let popup = null;
   function closeSignup(remember) {
@@ -83,11 +121,12 @@
   // emailed to it is entered (api/account.js), so nobody can take over someone else's orders or club discount.
   // Creating an account has an "Email me..." box (user, Nov 15; unticked = account only, no promotional email); the
   // choice is saved with the account (subscribe or decline), and the inventory app files it as email consent.
-  // opts: { config, source, onSignedIn(user, created, list), headings: { <view>: fn } (optional, title per view) }
+  // opts: { config, source, onSignedIn(user, created, list), headings: { <view>: fn } (optional, title per view),
+  //         start: the first view (default login; the popup starts on signup while the welcome gift is on) }
   //   list: { chosen: true, subscribed } when they ticked or left the box at sign-up; { chosen: false } on a log-in
   function authPanel(el, opts) {
     const config = opts.config || {};
-    let view = "login", pending = null; // pending: the sign-up or reset being confirmed by code
+    let view = opts.start || "login", pending = null; // pending: the sign-up or reset being confirmed by code
     const field = (name, label, type = "text", extra = "") =>
       `<label class="gde-sr" for="gdeA-${name}">${label}</label><input id="gdeA-${name}" name="${name}" type="${type}" placeholder="${label}" ${extra}>`;
     const googleBlock = config.googleClientId ? `<div class="gde-or"><span>or</span></div><div class="gde-google" data-google></div>` : "";
@@ -193,6 +232,15 @@
         box.previousElementSibling?.remove(); box.remove();
       }
     }
+    // The popup (user, Nov 17: "the sign up and save $100 first, then underneath it shows the login"): a plain
+    // "Log in" button under the sign-up form instead of the small link, and the way back says what sign-up gives.
+    if (opts.loginBelow) {
+      const base = { signup: views.signup, login: views.login };
+      views.signup = () => base.signup().replace(/<p class="gde-auth-switch">[\s\S]*?<\/p>$/,
+        `<div class="gde-auth-other"><span>Already have an account?</span><button class="button secondary" type="button" data-view="login">Log In</button></div>`);
+      views.login = () => base.login().replace(/<p class="gde-auth-switch">[\s\S]*?<\/p>$/,
+        `<p class="gde-auth-switch">New here? <button class="gde-auth-link" type="button" data-view="signup">${esc(opts.loginBelow)}</button></p>`);
+    }
     show(view);
   }
 
@@ -203,9 +251,22 @@
     if (popup || document.querySelector(".age-gate")) return;
     popup = document.createElement("div"); // claimed now so a second call can't open another while this one loads
     let config = {}, me = { user: null };
-    try { config = await api("config"); if (config.ready) me = await api("me"); } catch {}
+    try { config = await siteConfig(); if (config.ready) me = await api("me"); } catch {}
     if (me.subscribed) store.set("gdeSubscribed", "1");
     if (me.subscribed && source === "popup") { popup = null; return; }
+    // The welcome gift, for anyone who can still get one: not on the list, never given a code, never bought.
+    if (me.welcomeOffer || (me.orders || []).length) store.set("gdeNoGift", "1");
+    const w =!me.subscribed && !me.welcomeOffer && !(me.orders || []).length ? config.welcome : null;
+    // Signed in: a gold box over "Join the List". Signed out, the offer is the heading itself (below).
+    const gift = w && me.user ? `<div class="gde-gift"><strong>${giftLine(w)}</strong><span>${me.user ? "Join the list and we'll email you a personal code," : "Create a free account and we'll email you a personal code,"} good once on your first gun for ${w.days} days.</span></div>` : "";
+    // After signing up: only says a code is on its way when the account really has one (a past buyer gets none).
+    const giftDone = async (fallback) => {
+      if (!w) return fallback;
+      let offer = null;
+      try { offer = (await api("me")).welcomeOffer; } catch {}
+      if (offer) { store.set("gdeNoGift", "1"); document.querySelector(".footer-gift-band")?.remove(); }
+      return offer?.usable ? `Check your email for your ${esc(offer.label)} code (${esc(offer.code)}). ${fallback}` : fallback;
+    };
     const body = me.subscribed
       ? `<p class="gde-note">You're already on the list as ${esc(me.user.email)}.</p><a class="button" href="/account">View My Account</a>`
       : me.user
@@ -215,8 +276,9 @@
     popup.setAttribute("role", "dialog"); popup.setAttribute("aria-modal", "true"); popup.setAttribute("aria-labelledby", "gdeSignupTitle");
     popup.innerHTML = `<div class="gde-signup-panel">
       <button class="gde-signup-close" type="button" aria-label="Close">&times;</button>
-      <p class="eyebrow">The collector list</p>
-      <h2 id="gdeSignupTitle">${me.user ? "First look at new collections" : "Log in"}</h2>
+      <p class="eyebrow">${w ? "Welcome gift" : "The collector list"}</p>
+      ${gift}
+      <h2 id="gdeSignupTitle">${me.user ? "First look at new collections" : w ? `Save ${giftMoney(w.amount)} on your first purchase` : "Create your account"}</h2>
       <p class="gde-signup-sub">${me.user ? "New editions, limited releases and collector offers." : "First look at new editions, limited releases and collector offers, plus your orders and collector status in one place."}</p>
       ${body}
       <p class="gde-fine">We never share your email. <a href="/privacy">Privacy</a></p>
@@ -251,7 +313,7 @@
         panel.querySelectorAll("[data-join]").forEach((x) => (x.disabled = true));
         try {
           if (yes) await joinList(); else await api("decline", {});
-          finish(yes ? { eyebrow: "You're on the list", title: "Thank you", text: "You'll hear about the next collection first.", account: true }
+          finish(yes ? { eyebrow: "You're on the list", title: "Thank you", text: await giftDone("You'll hear about the next collection first."), account: true }
             : { eyebrow: "You're logged in", title: "Welcome back", text: "Your orders and collector status are in your account.", account: true });
         } catch (error) {
           panel.querySelectorAll("[data-join]").forEach((x) => (x.disabled = false));
@@ -266,21 +328,27 @@
         button.disabled = true; msg.className = "gde-msg"; msg.textContent = "Joining...";
         try {
           await joinList();
-          finish({ eyebrow: "You're on the list", title: "Thank you", text: "You'll hear about the next collection first." });
+          finish({ eyebrow: "You're on the list", title: "Thank you", text: await giftDone("You'll hear about the next collection first.") });
         } catch (error) { button.disabled = false; msg.className = "gde-msg error"; msg.textContent = error.message; }
       });
       return;
     }
 
-    const title = panel.querySelector("#gdeSignupTitle"), sub = panel.querySelector(".gde-signup-sub");
-    const heading = (t, withSub) => () => { title.textContent = t; sub.hidden = !withSub; };
+    // Sign-up first, log-in under it (user, Nov 17): the popup opens on "Save $100 on your first purchase" and the
+    // create-account form; "Already have an account? Log In" sits underneath.
+    const title = panel.querySelector("#gdeSignupTitle"), sub = panel.querySelector(".gde-signup-sub"), eyebrow = panel.querySelector(".eyebrow");
+    const plainSub = sub.textContent;
+    const offerSub = w ? `Create a free account and we'll email you a personal code for ${giftMoney(w.amount)} off your first gun, good for ${w.days} days. Plus first look at new editions and your orders in one place.` : plainSub;
+    const heading = (t, withSub, text = plainSub, eb = "The collector list") => () => { title.textContent = t; sub.textContent = text; sub.hidden = !withSub; sub.classList.toggle("offer", text === offerSub && !!w); eyebrow.textContent = eb; };
     authPanel(panel.querySelector(".gde-auth-box"), {
-      config, source,
-      headings: { login: heading("Log in", true), signup: heading("Create your account", true), code: heading("Check your email"), reset: heading("Reset your password") },
+      config, source, start: "signup", loginBelow: w ? `Create an account and save ${giftMoney(w.amount)}` : "Create an account",
+      headings: { login: heading("Log in", true), signup: w ? heading(`Save ${giftMoney(w.amount)} on your first purchase`, true, offerSub, "Welcome gift") : heading("Create your account", true),
+        code: heading("Check your email"), reset: heading("Reset your password") },
       onSignedIn: async (user, created, list) => {
         if (list.chosen) {
+          const text = `${list.subscribed ? "You'll hear about the next collection first. " : ""}Your orders and collector status are in your account.`;
           return finish({ eyebrow: created ? "Your account is ready" : "You're signed in", title: "Thank you", account: true,
-            text: `${list.subscribed ? "You'll hear about the next collection first. " : ""}Your orders and collector status are in your account.` });
+            text: created ? await giftDone(text) : text });
         }
         let status = "none";
         try { status = (await api("me")).listStatus || "none"; } catch {}

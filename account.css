@@ -200,3 +200,22 @@
 .gde-signed-in .gde-auth-back{display:none}
 @media(max-width:560px){.gde-auth-back{position:absolute;top:14px;left:14px;height:34px;padding:0 12px 0 9px}}
 @media(max-width:560px){.gde-auth-mode .gde-account{padding-top:72px}}
+
+/* Welcome offer (api/_welcome.js, Nov 17): the gift at the bottom of every page and at the top of the signup popup */
+.footer-gift-band{background:#0a0a0a;border-top:1px solid rgba(210,186,134,.18);padding:34px clamp(22px,4vw,58px) 0}
+.footer-gift-band+.site-footer{border-top:0}
+.footer-gift{box-sizing:border-box;width:100%;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px 28px;padding:22px 26px;border:1px solid rgba(202,163,107,.45);background:rgba(202,163,107,.06);border-radius:10px;text-align:left}
+.footer-gift>*{min-width:0;overflow-wrap:anywhere}
+.footer-gift .eyebrow{grid-column:1;margin:0;color:#caa36b}
+.footer-gift h3{grid-column:1;margin:0;font-size:1.35rem;line-height:1.25;color:#f2efe8;font-weight:500}
+.footer-gift p:not(.eyebrow){grid-column:1;margin:0;font-size:.8rem;line-height:1.55;color:#aaa79f}
+.footer-gift .button{grid-column:2;grid-row:1/span 3;white-space:nowrap}
+@media(max-width:760px){.footer-gift-band{padding:28px 22px 0}.footer-gift{grid-template-columns:1fr;padding:20px}.footer-gift .button{grid-column:1;grid-row:auto;margin-top:10px;justify-self:start}}
+.gde-gift{margin:0 0 18px;padding:12px 14px;border:1px solid rgba(202,163,107,.55);background:rgba(202,163,107,.08);border-radius:8px}
+.gde-gift strong{display:block;font-size:1.05rem;font-weight:500;color:#e7c991;letter-spacing:.01em}
+.gde-gift span{display:block;margin-top:3px;font-size:.74rem;line-height:1.45;color:var(--muted,#a3a3a8)}
+/* Popup (Nov 17): sign-up first, then "Already have an account? Log In" underneath; the offer line stays on phones */
+.gde-auth-other{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin:22px 0 0;padding-top:18px;border-top:1px solid var(--line,#2a2a2d)}
+.gde-auth-other span{font-size:.82rem;color:var(--muted,#a3a3a8);text-align:center}
+.gde-auth-other .button{width:100%}
+@media(max-width:760px){.gde-signup-panel>p.gde-signup-sub.offer{display:block;font-size:.8rem;margin-bottom:16px}}
