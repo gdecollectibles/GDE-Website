@@ -30,7 +30,9 @@
 // Stored next to the orders (see _store.js), one record per person, whether they joined the list, signed in, or both:
 //   gde:subscriber:<email>  { email, firstName, lastName, status: none|declined|subscribed|unsubscribed, account (signed in
 //                             with Google), source, verified, signedInAt, createdAt, updatedAt, consent,
-//                             country, region, city (where they signed up from, by IP; Nov 17) }
+//                             country, region, city (where they signed up from, by IP; Nov 17),
+//                             cameFrom { source, via, ad, campaign }: what brought them to the site, like cart adds (Nov 18;
+//                             google, register and subscribe take the visit's landing for it, see signupSource) }
 //   gde:subscribers         sorted set of emails, by last change (the inventory app pulls them through /api/admin)
 //   gde:pw:<email>          { salt, hash, createdAt, updatedAt }: the password of an email + password account (scrypt).
 //                           Only made after the emailed code proves the email is theirs, so orders and club discounts
@@ -127,6 +129,19 @@ function cartSource(landing, agent) {
   const ad = Boolean(l.gclid) || /^(cpc|ppc|paid|paidsocial|paid_social|paid-social|ads?|display)$/i.test(clean(l.utmMedium, 30));
   return { source, via, ad, campaign: clean(l.utmCampaign, 60) || null };
 }
+
+// Where a sign-up came from (user, Nov 18: "add where it came from, if it was Google, Instagram, Facebook"): the same
+// reading as cart adds, from the first page of that visit (gde-account.js sends it). Kept on the record as cameFrom
+// { source, via, ad, campaign }, only for a new sign-up: a returning sign-in, or a list join by someone who already had
+// an account, says where that visit came from, not where the person first came from. A page from before Nov 18 sends
+// no landing: then only the app it was opened in is known, else nothing.
+function signupSource(landing, request) {
+  const agent = String(request.headers["user-agent"] || "");
+  const from = cartSource(landing, agent);
+  if (landing && typeof landing === "object") return from;
+  return from.via ? { ...from, source: from.via.replace(" app", "") } : null;
+}
+const cameFrom = (old, landing, request) => (old?.cameFrom || old?.account ? {} : { cameFrom: signupSource(landing, request) });
 
 const listSource = (value) => (["popup", "account", "footer", "checkout", "signup"].includes(value) ? value : "website");
 const normEmail = (value) => String(value || "").trim().toLowerCase().slice(0, 254);
@@ -229,7 +244,7 @@ async function useCode(purpose, email, code) {
 }
 
 // Signs the customer in (session cookie) and keeps their record, like a Google sign-in.
-async function signIn(request, response, email, names = {}) {
+async function signIn(request, response, email, names = {}, extra = {}) {
   const old = await getSubscriber(email);
   const firstName = old?.firstName || cleanName(names.firstName), lastName = old?.lastName || cleanName(names.lastName);
   const user = { email, name: [firstName, lastName].filter(Boolean).join(" "), picture: "", via: "password" };
@@ -237,7 +252,7 @@ async function signIn(request, response, email, names = {}) {
   await saveSubscriber(email, {
     account: true, verified: true, signedInAt: new Date().toISOString(), firstName, lastName,
     signupVia: old?.signupVia || (old?.account ? "google" : "password"), // the inventory app's Customers note says which
-    status: old?.status || "none", source: old?.source || "account", ...signupPlace(old, request)
+    status: old?.status || "none", source: old?.source || "account", ...signupPlace(old, request), ...extra
   });
   return { email: user.email, name: user.name, picture: "" };
 }
@@ -297,14 +312,15 @@ module.exports = async function handler(request, response) {
 
     if (action === "google" && post) {
       if (!(await allowed(request, "signin", 30))) return response.status(429).json({ error: "Too many tries. Please wait a while." });
-      const { firstName, lastName, ...user } = await verifyGoogle((await readBody(request)).credential);
+      const body = await readBody(request);
+      const { firstName, lastName, ...user } = await verifyGoogle(body.credential);
       setCookie(request, response, makeSession(user), SESSION_DAYS * 86400);
       // Every account is kept (the inventory app files it in Customers); "none" means not asked about the list yet.
       const old = await getSubscriber(user.email);
       await saveSubscriber(user.email, {
         account: true, verified: true, signedInAt: new Date().toISOString(), signupVia: old?.signupVia || "google",
         firstName: old?.firstName || firstName, lastName: old?.lastName || lastName,
-        status: old?.status || "none", source: old?.source || "account", ...signupPlace(old, request)
+        status: old?.status || "none", source: old?.source || "account", ...signupPlace(old, request), ...cameFrom(old, body.landing, request)
       });
       await welcome(old, user.email, old?.firstName || firstName);
       return response.status(200).json({ ok: true, user: { email: user.email, name: user.name, picture: user.picture } });
@@ -324,7 +340,8 @@ module.exports = async function handler(request, response) {
       // The "Email me" box is kept with the pending sign-up and saved (with the consent wording) once the code is in.
       await startCode("signup", email, {
         firstName, lastName, ...(await hashPassword(body.password)),
-        emails: body.emails === true, source: listSource(body.source), page: String(body.page || "").slice(0, 200)
+        emails: body.emails === true, source: listSource(body.source), page: String(body.page || "").slice(0, 200),
+        cameFrom: signupSource(body.landing, request) // saved once the code is in (verify)
       });
       return response.status(200).json({ ok: true });
     }
@@ -337,7 +354,7 @@ module.exports = async function handler(request, response) {
       const now = new Date().toISOString();
       await store.cmd("SET", `gde:pw:${email}`, JSON.stringify({ salt: pending.salt, hash: pending.hash, createdAt: now, updatedAt: now }));
       const before = await getSubscriber(email);
-      const user = await signIn(request, response, email, pending);
+      const user = await signIn(request, response, email, pending, before?.cameFrom || before?.account ? {} : { cameFrom: pending.cameFrom || null });
       const old = await getSubscriber(email);
       if (pending.emails) {
         await saveSubscriber(email, {
@@ -484,6 +501,7 @@ module.exports = async function handler(request, response) {
         firstName: cleanName(body.firstName) || old?.firstName || (user?.name || "").split(" ")[0] || "",
         source: old?.source || source,
         verified: !!(user || old?.verified), ...signupPlace(old, request),
+        ...(old?.status === "subscribed" ? {} : cameFrom(old, body.landing, request)),
         consent: { text: CONSENT, at: new Date().toISOString(), page: String(body.page || "").slice(0, 200) }
       });
       await welcomeListJoin(email, cleanName(body.firstName) || old?.firstName || (user?.name || "").split(" ")[0] || "", user);

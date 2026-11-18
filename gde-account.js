@@ -23,7 +23,12 @@
     set(k, v) { try { localStorage.setItem(k, v); } catch {} }
   };
 
+  // Where this visit came from (script.js keeps it from the first page), sent with each sign-up so the inventory app
+  // can say whether a new person came from Google, Instagram, Facebook... (user, Nov 18).
+  const SIGNUPS = ["google", "register", "subscribe"];
+  const landing = () => { try { return JSON.parse(sessionStorage.getItem("gdeLanding") || "null") || undefined; } catch { return undefined; } };
   async function api(action, body) {
+    if (body && SIGNUPS.includes(action) && !body.landing) body = { ...body, landing: landing() };
     const response = await fetch(`${API}?action=${action}`, body === undefined
       ? { credentials: "same-origin" }
       : { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
