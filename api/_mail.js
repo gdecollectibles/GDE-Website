@@ -229,4 +229,168 @@ async function sendBatch(emails) {
   return (result.data || []).map((d) => d.id);
 }
 
-module.exports = { configured, send, sendCode, welcomeEmail, sendWelcome, customerEmail, sendBatch };
+// ---- the order confirmation email (user, Nov 19; _orderconfirm.js sends it once per paid order)
+// From orders@ (a Workspace alias; MAIL_FROM_ORDERS in Vercel can change it), replies to info@. A transactional email:
+// no unsubscribe. Same "Letter" design as the welcome email (ivory and gold, gold logo, RP signature).
+// guns: the listings (codex-inventory.json products), for each line's photo and details; missing ones are skipped.
+const ORDERS_FROM = () => process.env.MAIL_FROM_ORDERS || "GDE Collectibles <orders@gdecollectibles.com>";
+const usd = (n) => `$${(Number(n) || 0).toLocaleString("en-US", { minimumFractionDigits: Number(n) % 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
+
+function orderEmail(order, { guns = {} } = {}) {
+  const f = order.form || {};
+  const first = String(f.firstName || "").trim();
+  const name = escHtml(first) || "there";
+  const test = order.environment === "sandbox";
+  const items = (order.items || []).map((i) => ({ ...i, gun: guns[i.listing] || null }));
+  const subtotal = items.reduce((s, i) => s + (Number(i.listPrice ?? i.price) || 0), 0);
+  const total = Number(order.amount) || 0;
+  const saved = Math.round((subtotal - total) * 100) / 100;
+  const discountName = order.discount?.name || "Discount";
+  const when = new Date(order.createdAt || Date.now()).toLocaleDateString("en-US", { timeZone: "America/New_York", month: "long", day: "numeric", year: "numeric" });
+  const card = String(order.payment?.card || "").match(/^(\S+)\s+X*(\d{4})$/i);
+  const paidWith = card ? `${card[1]} ending in ${card[2]}` : "";
+  const ffl = [f.fflBusiness, [f.fflAddress, f.fflAddress2].filter(Boolean).join(", "),
+    [f.fflCity, [f.fflState, f.fflZip].filter(Boolean).join(" ")].filter(Boolean).join(", ")].map((s) => String(s || "").trim()).filter(Boolean);
+  const many = items.length > 1;
+  const subject = `${test ? "[Test] " : ""}Your GDE Collectibles order ${order.invoice}`;
+
+  const GOLD = "#a9864a", INK = "#2b2a27", SOFT = "#55524b", MUTED = "#8a857a", LINE = "#e3dccd";
+  const SERIF = "Georgia,'Times New Roman',serif";
+  const p = (s) => `<p style="margin:0 0 18px;font-family:${SERIF};font-size:17px;line-height:1.7;color:${INK}">${s}</p>`;
+  const label = (s) => `<p style="margin:0 0 16px;font-family:${SERIF};font-size:11px;line-height:1;letter-spacing:.3em;text-transform:uppercase;color:${GOLD}">${s}</p>`;
+  const box = (inner) => `<div style="border:1px solid #d4ccbd;background-color:#fbf9f4;padding:24px 24px 18px">${inner}</div>`;
+  const sumRow = (l, v, strong) => `<tr><td style="padding:7px 0;font-family:${SERIF};font-size:${strong ? 16 : 14}px;line-height:1.5;color:${strong ? INK : SOFT};${strong ? "font-weight:700;" : ""}">${l}</td>
+      <td align="right" style="padding:7px 0;font-family:${SERIF};font-size:${strong ? 16 : 14}px;line-height:1.5;color:${INK};white-space:nowrap;${strong ? "font-weight:700;" : ""}">${v}</td></tr>`;
+  const step = (n, title, s) => `<tr><td valign="top" style="padding:0 14px 16px 0;font-family:Gloock,${SERIF};font-size:20px;line-height:1.2;color:${GOLD}">${n}</td>
+      <td style="padding:0 0 16px"><p style="margin:0 0 4px;font-family:${SERIF};font-size:12px;font-weight:700;line-height:1.4;letter-spacing:.16em;text-transform:uppercase;color:${INK}">${title}</p>
+      <p style="margin:0;font-family:${SERIF};font-size:15px;line-height:1.6;color:${SOFT}">${s}</p></td></tr>`;
+  const contact = (l, href, value) => `<tr><td style="padding:9px 0;border-bottom:1px solid ${LINE};font-family:${SERIF};font-size:11px;line-height:1.5;letter-spacing:.16em;text-transform:uppercase;color:${MUTED}">${l}</td>
+      <td align="right" style="padding:9px 0;border-bottom:1px solid ${LINE};font-family:${SERIF};font-size:15px;line-height:1.5"><a href="${href}" style="color:${INK};text-decoration:none">${value}</a></td></tr>`;
+
+  const itemHtml = items.map((i, n) => {
+    const g = i.gun;
+    const photo = g?.photos?.[0] ? `${SITE}/${String(g.photos[0]).replace(/^\//, "")}` : "";
+    const facts = g ? [/^1 of \d+$/i.test(g.collectionNumber || "") ? `Limited to ${String(g.collectionNumber).replace(/^1 of /i, "")}` : "", g.model, g.caliber, g.finish].filter(Boolean) : [];
+    const pageUrl = `${SITE}/gun/${encodeURIComponent(i.listing || "")}`;
+    return `${photo ? `<a href="${pageUrl}"><img src="${escHtml(photo)}" width="476" alt="${escHtml(i.name)}" style="display:block;width:100%;max-width:476px;height:auto;border:0;margin:${n ? "22px" : "0"} 0 14px"></a>` : n ? `<div style="height:14px"></div>` : ""}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td valign="top" style="font-family:Gloock,${SERIF};font-size:21px;line-height:1.3;color:${INK}">${escHtml(i.name)}</td>
+      <td valign="top" align="right" style="font-family:${SERIF};font-size:16px;line-height:1.6;color:${INK};white-space:nowrap;padding-left:12px">${usd(i.listPrice ?? i.price)}</td></tr></table>
+    ${facts.length ? `<p style="margin:6px 0 0;font-family:${SERIF};font-size:14px;line-height:1.6;color:${SOFT}">${facts.map(escHtml).join(" · ")}</p>` : ""}`;
+  }).join("\n");
+
+  const html = `<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only">
+<title>${escHtml(subject)}</title>
+<style>@media (max-width:620px){.wrap{padding:0!important} .card{border-radius:0!important} .pad{padding-left:24px!important;padding-right:24px!important} .btn{padding:16px 18px!important;letter-spacing:.14em!important}}</style>
+</head><body style="margin:0;padding:0;background:#ffffff">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="background-color:#ffffff"><tr><td class="wrap" align="center" style="padding:32px 12px">
+<table role="presentation" class="card" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f7f4ed" style="width:100%;max-width:600px;background-color:#f7f4ed;border:1px solid #d4ccbd;border-radius:4px">
+<tr><td style="padding:10px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE}">
+  <tr><td align="center" style="padding:40px 40px 6px"><img src="${SITE}/assets/email/welcome-logo-gold.png" width="170" alt="GDE Collectibles" style="display:block;width:170px;height:auto;border:0"></td></tr>
+  <tr><td class="pad" style="padding:20px 52px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 26px"><tr><td style="border-top:1px solid ${GOLD};width:45%"></td><td align="center" style="font-family:${SERIF};font-size:12px;line-height:1;color:${GOLD};padding:0 10px;white-space:nowrap">&#9670;</td><td style="border-top:1px solid ${GOLD};width:45%"></td></tr></table>
+    ${test ? `<p style="margin:0 0 18px;padding:10px 14px;border:1px dashed ${GOLD};font-family:${SERIF};font-size:13px;line-height:1.5;color:${SOFT}">This is a test order. No real payment was taken.</p>` : ""}
+    <p style="margin:0 0 6px;font-family:${SERIF};font-size:11px;line-height:1;letter-spacing:.3em;text-transform:uppercase;color:${GOLD}">Order confirmed</p>
+    <p style="margin:0 0 24px;font-family:Gloock,${SERIF};font-size:30px;line-height:1.25;color:${INK}">Thank you for your order.</p>
+    ${p(`Dear ${name},`)}
+    ${p(`Your payment went through and your order is confirmed. We're truly honored that you chose GDE Collectibles, and we'll take great care of ${many ? "your pieces" : "your piece"} from here.`)}
+  </td></tr>
+  <tr><td class="pad" style="padding:6px 52px 4px">${box(`
+    ${label("Your order")}
+    <p style="margin:0 0 20px;font-family:${SERIF};font-size:14px;line-height:1.6;color:${SOFT}">Order <b style="color:${INK}">${escHtml(order.invoice)}</b> · ${when}</p>
+    ${itemHtml}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0 0;border-top:1px solid ${LINE}">
+    ${saved > 0 ? sumRow("Subtotal", usd(subtotal)) + sumRow(escHtml(discountName), `&minus;${usd(saved)}`) : ""}
+    ${sumRow("Shipping and insurance", "Included")}
+    ${sumRow("Total paid", usd(total), true)}
+    </table>
+    ${paidWith ? `<p style="margin:6px 0 0;font-family:${SERIF};font-size:13px;line-height:1.6;color:${MUTED}">Paid with ${escHtml(paidWith)}</p>` : ""}`)}</td></tr>
+  ${ffl.length ? `<tr><td class="pad" style="padding:18px 52px 4px">${box(`
+    ${label("Ships to your FFL dealer")}
+    <p style="margin:0 0 6px;font-family:${SERIF};font-size:15px;line-height:1.6;color:${INK}">${ffl.map(escHtml).join("<br>")}</p>`)}</td></tr>` : ""}
+  <tr><td class="pad" style="padding:30px 52px 4px">
+    ${label("What happens next")}
+    <table role="presentation" cellpadding="0" cellspacing="0">
+    ${step("I", "We review your order", "We check your order and your FFL dealer's details. If anything is missing, we'll reach out to you.")}
+    ${step("II", "Your gun ships", `Orders paid by card usually ship within 2 to 5 business days, fully insured, to your FFL dealer. We'll let you know when ${many ? "they're" : "it's"} on the way.`)}
+    ${step("III", "Pick it up at your dealer", `Your dealer completes the transfer with you, including the background check, and hands you your ${many ? "guns" : "gun"}.`)}
+    </table>
+  </td></tr>
+  ${order.account ? `<tr><td align="center" style="padding:10px 52px 30px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td bgcolor="${GOLD}" style="background-color:${GOLD}">
+    <a class="btn" href="${SITE}/account" style="display:inline-block;padding:16px 28px;white-space:nowrap;background-color:${GOLD};border:1px solid ${GOLD};font-family:Georgia,serif;font-size:12px;font-weight:700;line-height:12px;letter-spacing:.2em;text-transform:uppercase;color:#ffffff;text-decoration:none">Follow your order</a></td></tr></table></td></tr>` : ""}
+  <tr><td class="pad" style="padding:${order.account ? 0 : 14}px 52px 0">
+    ${p("Questions about your order, your gun's number or your dealer? Just reply to this email, or reach us any way you like:")}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;border-top:1px solid ${LINE}">
+    ${contact("Call or text", "tel:+17869313566", "1-786-931-3566")}
+    ${contact("WhatsApp", "https://wa.me/17869313566", "1-786-931-3566")}
+    ${contact("Email", "mailto:info@gdecollectibles.com", "info@gdecollectibles.com")}
+    </table>
+    <p style="margin:0 0 4px;font-family:${SERIF};font-size:17px;font-style:italic;line-height:1.7;color:${INK}">With gratitude,</p>
+    <img src="${SITE}/assets/email/welcome-signature.png" width="140" alt="RP" style="display:block;width:140px;height:auto;border:0;margin:4px 0">
+    <p style="margin:0 0 36px;font-family:${SERIF};font-size:15px;line-height:1.6;color:${SOFT}">The GDE Collectibles family</p>
+  </td></tr>
+  <tr><td class="pad" style="padding:20px 52px 30px;border-top:1px solid ${LINE};font-family:${SERIF};font-size:12px;line-height:1.6;color:${MUTED}">
+    Family owned · Gun Decor Emporium LLC · <a href="${SITE}" style="color:${MUTED}">gdecollectibles.com</a><br>
+    You're getting this because you placed order ${escHtml(order.invoice)} on gdecollectibles.com.</td></tr>
+</table></td></tr>
+</table>
+</td></tr></table></body></html>`;
+
+  const text = `${test ? "TEST ORDER: no real payment was taken.\n\n" : ""}Thank you for your order.
+
+Dear ${first || "there"},
+
+Your payment went through and your order is confirmed. We're truly honored that you chose GDE Collectibles, and we'll take great care of ${many ? "your pieces" : "your piece"} from here.
+
+YOUR ORDER
+Order ${order.invoice} · ${when}
+${items.map((i) => `- ${i.name}: ${usd(i.listPrice ?? i.price)}`).join("\n")}
+${saved > 0 ? `Subtotal: ${usd(subtotal)}\n${discountName}: -${usd(saved)}\n` : ""}Shipping and insurance: Included
+Total paid: ${usd(total)}${paidWith ? `\nPaid with ${paidWith}` : ""}
+${ffl.length ? `\nSHIPS TO YOUR FFL DEALER\n${ffl.join("\n")}\n` : ""}
+WHAT HAPPENS NEXT
+I. We review your order: we check your order and your FFL dealer's details. If anything is missing, we'll reach out to you.
+II. Your gun ships: orders paid by card usually ship within 2 to 5 business days, fully insured, to your FFL dealer. We'll let you know when ${many ? "they're" : "it's"} on the way.
+III. Pick it up at your dealer: your dealer completes the transfer with you, including the background check, and hands you your ${many ? "guns" : "gun"}.
+${order.account ? `\nFollow your order: ${SITE}/account\n` : ""}
+Questions about your order, your gun's number or your dealer? Just reply to this email, or reach us any way you like:
+- Call or text: 1-786-931-3566
+- WhatsApp: 1-786-931-3566
+- Email: info@gdecollectibles.com
+
+With gratitude,
+The GDE Collectibles family
+
+--
+Family owned · Gun Decor Emporium LLC · gdecollectibles.com
+You're getting this because you placed order ${order.invoice} on gdecollectibles.com.`;
+  return { subject, html, text };
+}
+
+// Sends it from orders@; throws when it can't (so _orderconfirm.js tries again on the next check).
+let gunsCache = null;
+function siteGuns() {
+  if (gunsCache) return gunsCache;
+  try {
+    const fs = require("node:fs"), path = require("node:path");
+    gunsCache = JSON.parse(fs.readFileSync(path.join(process.cwd(), "codex-inventory.json"), "utf8")).products || {};
+  } catch { gunsCache = {}; }
+  return gunsCache;
+}
+async function sendOrderConfirmation(to, order) {
+  if (!configured()) throw new Error("RESEND_API_KEY is not set in Vercel.");
+  const email = orderEmail(order, { guns: siteGuns() });
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json", "Idempotency-Key": `order-${order.invoice}` },
+    body: JSON.stringify({ from: ORDERS_FROM(), to: [to], reply_to: REPLY_TO(), ...email })
+  });
+  if (!response.ok) {
+    const why = await response.text().catch(() => "");
+    console.error("Resend order", response.status, why.slice(0, 300));
+    throw new Error(`Resend refused the order email (${response.status}).`);
+  }
+}
+
+module.exports = { configured, send, sendCode, welcomeEmail, sendWelcome, customerEmail, sendBatch, orderEmail, sendOrderConfirmation };

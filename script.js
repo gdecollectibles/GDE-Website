@@ -1167,7 +1167,14 @@ function showPaymentStep(session, onBack) {
           paid = true;
           localStorage.removeItem("gdeRequestCart");
           localStorage.removeItem("gdeCheckoutDetails");
-          location.href = `/payment-success?order=${encodeURIComponent(session.invoiceNumber || r.orderInvoiceNumber || "")}`;
+          // The order confirmation email goes out now (api/order-confirm.js checks the payment itself); keepalive lets
+          // it finish while the page moves on. If it doesn't reach the site, the app's next order check sends it.
+          const invoice = session.invoiceNumber || r.orderInvoiceNumber || "";
+          try {
+            fetch("/api/order-confirm", { method: "POST", keepalive: true, headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ invoice, transId: String(r.transId || "") }) }).catch(() => {});
+          } catch {}
+          location.href = `/payment-success?order=${encodeURIComponent(invoice)}`;
         } else {
           stepStatus.textContent = "The card was not accepted. Please check the details or try another card.";
         }

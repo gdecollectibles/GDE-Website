@@ -51,11 +51,9 @@ const promo = require("./_promo");
 const welcomeOffer = require("./_welcome");
 const mail = require("./_mail");
 const subscribers = require("./_subscribers");
+const { authorizeSetup, authorizeCall, PAID, paymentOf } = require("./_authorize");
+const { confirmOrder } = require("./_orderconfirm");
 
-const AUTHORIZE_ENDPOINTS = {
-  sandbox: "https://apitest.authorize.net/xml/v1/request.api",
-  production: "https://api.authorize.net/xml/v1/request.api"
-};
 const RECHECK_DAYS = 8;            // how far back payments are looked up
 const UNPAID_AFTER_MS = 60 * 60 * 1000; // Authorize.net's payment page expires long before this
 
@@ -96,27 +94,6 @@ function readBody(request) {
   });
 }
 
-function authorizeSetup() {
-  const environment = process.env.AUTHORIZE_ENV === "production" ? "production" : "sandbox";
-  const loginId = process.env.AUTHORIZE_LOGIN_ID, transactionKey = process.env.AUTHORIZE_TRANSACTION_KEY;
-  return { environment, ready: !!(loginId && transactionKey), auth: { name: loginId, transactionKey } };
-}
-
-async function authorizeCall(setup, requestName, fields) {
-  const response = await fetch(AUTHORIZE_ENDPOINTS[setup.environment], {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ [requestName]: { merchantAuthentication: setup.auth, ...fields } })
-  });
-  const result = await response.json();
-  if (result?.messages?.resultCode !== "Ok") {
-    const code = result?.messages?.message?.[0]?.code;
-    if (code === "I00004") return result; // "no records found" is a normal answer
-    throw new Error(`Authorize.net: ${result?.messages?.message?.map(m => m.text).join(" ") || response.status}`);
-  }
-  return result;
-}
-
 // Every card transaction in the last RECHECK_DAYS days: not yet settled, and settled in each daily batch.
 async function recentTransactions(setup) {
   const list = [];
@@ -136,18 +113,9 @@ async function recentTransactions(setup) {
   return list;
 }
 
-const PAID = new Set(["authorizedPendingCapture", "capturedPendingSettlement", "settledSuccessfully", "FDSPendingReview", "FDSAuthorizedPendingReview"]);
 const DECLINED = new Set(["declined", "generalError", "failedReview", "settlementError", "expired"]);
 const REFUNDED = new Set(["refundSettledSuccessfully", "refundPendingSettlement"]);
 const VOIDED = new Set(["voided", "communicationError"]);
-
-function paymentOf(t) {
-  return {
-    transId: t.transId, status: t.transactionStatus, amount: Number(t.settleAmount),
-    card: [t.accountType, t.accountNumber].filter(Boolean).join(" "), at: t.submitTimeUTC || t.submitTimeLocal,
-    name: [t.firstName, t.lastName].filter(Boolean).join(" ")
-  };
-}
 
 // Works out each recent order's status from its transactions, matched on the invoice number.
 async function refreshPayments(orders) {
@@ -179,7 +147,14 @@ async function refreshPayments(orders) {
     }
   }
   if (changed.length) await store.pipeline(changed.map(o => ["SET", `gde:order:${o.invoice}`, JSON.stringify(o)]));
-  return { checked: recent.length, changed: changed.length };
+  // The buyer's order confirmation email (_orderconfirm.js, Nov 19), once per paid order. Usually the checkout page
+  // already sent it the moment they paid (order-confirm.js); this catches the rest.
+  let confirmed = 0;
+  for (const order of recent) {
+    if (order.status !== "paid") continue;
+    try { if (await confirmOrder(order)) confirmed++; } catch (error) { console.error("Order confirmation", order.invoice, error.message); }
+  }
+  return { checked: recent.length, changed: changed.length, confirmed };
 }
 
 function cleanCatalog(body) {
