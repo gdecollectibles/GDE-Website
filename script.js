@@ -398,16 +398,36 @@ const isBuyable = p => !!p && !p.availability.includes("Archive") && !p.soldOut;
 // Holiday sale (user, Nov 16; was "Christmas"): the listed price is the sale price. The "was" price shown struck through beside it is
 // the listed price ÷ 0.9, rounded to the nearest $100. Display only: buyers still pay the listed price. Ends on its own
 // on SALE.ends; to stop it sooner, set ends to a past date.
-const SALE = { label: "Holiday Discount", off: 0.10, ends: new Date("2026-12-26T00:00:00") };
+// Ends when Black Friday ends (user, Nov 20; was Dec 26): midnight after Fri Nov 27, Miami time, the same moment for every visitor.
+const SALE = { label: "Black Friday", off: 0.10, ends: new Date("2026-11-28T00:00:00-05:00") };
 const saleOn = p => Date.now() < SALE.ends.getTime() && isBuyable(p);
 const wasPrice = p => `$${(Math.round(priceNumber(p.price) / (1 - SALE.off) / 100) * 100).toLocaleString("en-US")}`;
 // Sale banner just under the header on every page (user, Nov 16); it rides along with the sticky/fixed header.
 if (Date.now() < SALE.ends.getTime()) {
   const header = document.querySelector(".site-header");
   if (header && !header.querySelector(".sale-banner")) {
-    const words = `<span>${SALE.label} · ${Math.round(SALE.off * 100)}% off all purchases</span>`.repeat(12); // scrolls across on a loop (user, Nov 16)
-    header.insertAdjacentHTML("beforeend", `<a class="sale-banner" href="/collections" aria-label="${SALE.label}, ${Math.round(SALE.off * 100)}% off all purchases"><span class="sale-track" aria-hidden="true">${words}${words}</span></a>`);
+    // Still (no scrolling, user Nov 20; scrolled Nov 16-20), centred, with a countdown to SALE.ends in the same look. At zero the banner goes away.
+    // Wording and a bigger countdown (user, Nov 20): "Black Friday 10% off ★ Ends in: 7d 07:54:51".
+    const words = `${SALE.label} ${Math.round(SALE.off * 100)}% off<span class="sale-star">★</span> Ends in: <span class="sale-clock"></span>`;
+    header.insertAdjacentHTML("beforeend", `<a class="sale-banner" href="/collections" aria-label="${SALE.label}, ${Math.round(SALE.off * 100)}% off all purchases, ends at midnight Eastern time after Black Friday"><span class="sale-words" aria-hidden="true">${words}</span></a>`);
     document.documentElement.classList.add("has-sale-banner");
+    const banner = header.querySelector(".sale-banner");
+    const clocks = [...banner.querySelectorAll(".sale-clock")];
+    const two = n => String(n).padStart(2, "0");
+    const tick = () => {
+      const left = Math.floor((SALE.ends.getTime() - Date.now()) / 1000);
+      if (left <= 0) {
+        clearInterval(timer);
+        banner.remove();
+        document.documentElement.classList.remove("has-sale-banner");
+        return;
+      }
+      const d = Math.floor(left / 86400), h = Math.floor(left / 3600) % 24, m = Math.floor(left / 60) % 60, s = left % 60;
+      const text = `${d ? `${d}d ` : ""}${two(h)}:${two(m)}:${two(s)}`;
+      for (const c of clocks) c.textContent = text;
+    };
+    const timer = setInterval(tick, 1000);
+    tick();
   }
 }
 const priceHTML = p => p.soldOut ? "Sold Out" : saleOn(p) ? `<s class="was-price">${wasPrice(p)}</s> <span class="sale-price">${p.price}</span>` : p.price;

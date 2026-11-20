@@ -757,7 +757,7 @@ body.side-cart-locked{overflow:hidden}
 }
 
 /* Holiday sale (user, Nov 16): script.js shows the old price small and struck through over the listed sale price (user, Nov 16).
-   The banner under the header says "Holiday Discount"; the guns carry no badge or tag (user, Nov 16). */
+   The banner under the header says "Black Friday 10% off ★ Ends in: …" (Nov 20); the guns carry no badge or tag (user, Nov 16). */
 .was-price{color:var(--muted,#8e8e93);font-size:.72em;text-decoration-thickness:1px;margin-right:6px}
 .product-info .price .was-price,.detail-price .was-price,.cart-item-price .was-price{display:block;margin:0 0 2px;font-size:.72em;line-height:1.2}
 .detail-price .was-price{font-size:.6em}
@@ -777,10 +777,12 @@ body.side-cart-locked{overflow:hidden}
   .has-sale-banner .filters{top:134px;max-height:calc(100vh - 154px)}
   .has-sale-banner .order-summary,.has-sale-banner .cart-summary,.has-sale-banner .payment-summary{top:139px}
 }
-/* The banner text scrolls right to left on a loop: two identical halves, moved by one half (user, Nov 16) */
-.sale-track{display:flex;flex:0 0 auto;animation:sale-scroll 60s linear infinite}
-.sale-track>span{padding:0 2.2em}
-.sale-track>span:after{content:"★";margin-left:4.4em;opacity:.8}
-.sale-banner:hover .sale-track{animation-play-state:paused}
-@keyframes sale-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@media(prefers-reduced-motion:reduce){.sale-track{animation:none}}
+/* The banner text stands still, centred (user, Nov 20; it scrolled Nov 16-20). The countdown to the end of the sale
+   (Black Friday) is part of the line, same look; even-width digits so the line doesn't wobble as it ticks. */
+.sale-banner{justify-content:center}
+.sale-words{padding:0 16px;overflow:hidden;text-overflow:ellipsis}
+.sale-star{margin:0 .9em;opacity:.8}
+.sale-clock{font-variant-numeric:tabular-nums;font-size:1.3em;font-weight:700;letter-spacing:.1em;margin-left:.3em}
+/* Phones: tighter so the whole line fits (checked at 375 and 320 px wide) */
+@media(max-width:600px){.sale-banner{letter-spacing:.06em}.sale-words{padding:0 8px}.sale-star{margin:0 .4em}.sale-clock{font-size:1.22em;letter-spacing:.06em}}
+@media(max-width:360px){.sale-banner{font-size:.56rem;letter-spacing:.04em}.sale-words{padding:0 6px}}
