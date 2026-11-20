@@ -19,6 +19,7 @@
 // Customer emails (user, Nov 15; the app's CRM tab writes them, the Resend key stays here):
 //   POST /api/admin?action=send-email  { subject, body, buttonText?, buttonLink?, address, test?,
 //                                        recipients: [{ email, firstName }] (100 at most per call) }
+//        template: "sale-end" (+ guns: [listing keys]) sends the Black Friday email with the live countdown instead (Nov 20).
 //        Each gets their own unsubscribe link (footer + one-click List-Unsubscribe header). Anyone whose record here
 //        says unsubscribed or declined is skipped (unless test). Answers { sent: [email], skipped: [{ email, why }], failed: [...] }.
 // Welcome email for people who signed up before it existed (user, Nov 17: "send the email to everyone that signed up",
@@ -272,7 +273,19 @@ module.exports = async function handler(request, response) {
       const b = await readBody(request);
       const address = String(b.address || "").trim();
       if (address.length < 8) return response.status(400).json({ error: "Add GDE's mailing address first (it goes at the bottom of every email, by law)." });
-      if (!String(b.subject || "").trim() || !String(b.body || "").trim()) return response.status(400).json({ error: "The email needs a subject and a message." });
+      // template "sale-end" (user, Nov 20): the designed Black Friday email with the live countdown (_mail.js saleEndEmail)
+      // instead of the app's plain message. b.guns: listing keys to show (up to 3), photos and prices from the listings.
+      const saleEnd = b.template === "sale-end";
+      let saleGuns = [];
+      if (saleEnd) {
+        const products = JSON.parse(fs.readFileSync(path.join(process.cwd(), "codex-inventory.json"), "utf8")).products || {};
+        const keys = Array.isArray(b.guns) && b.guns.length ? b.guns : ["remember-the-alamo", "the-capitol", "gold-skull-engraved"];
+        saleGuns = keys.slice(0, 3).map((k) => [String(k), products[k]]).filter(([, g]) => g && g.photos?.[0]).map(([k, g]) => ({
+          name: g.name, url: `https://www.gdecollectibles.com/gun/${encodeURIComponent(k)}`,
+          price: Number(String(g.price).replace(/[^0-9.]/g, "")),
+          photo: `https://www.gdecollectibles.com/${String(g.photos[0]).replace(/^\//, "").replace(/-01\.jpg$/, "-01-phone.jpg")}`
+        }));
+      } else if (!String(b.subject || "").trim() || !String(b.body || "").trim()) return response.status(400).json({ error: "The email needs a subject and a message." });
       const list = Array.isArray(b.recipients) ? b.recipients.slice(0, 100) : [];
       const sent = [], skipped = [], failed = [], outgoing = [], seen = new Set();
       for (const r of list) {
@@ -285,7 +298,9 @@ module.exports = async function handler(request, response) {
           // Left the "Email me" box empty at sign-up (or said no when asked): no promotional email, even if they bought.
           if (sub?.status === "declined") { skipped.push({ email, why: "said no to emails on the website" }); continue; }
         }
-        const content = mail.customerEmail({ ...b, address, firstName: r.firstName, unsubUrl: subscribers.unsubPage(email) });
+        const content = saleEnd
+          ? mail.saleEndEmail({ address, firstName: r.firstName, unsubUrl: subscribers.unsubPage(email), guns: saleGuns })
+          : mail.customerEmail({ ...b, address, firstName: r.firstName, unsubUrl: subscribers.unsubPage(email) });
         outgoing.push({ email, message: {
           to: [email], ...content, subject: (b.test ? "[Test] " : "") + content.subject,
           headers: { "List-Unsubscribe": `<${subscribers.unsubOneClick(email)}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" }
