@@ -103,8 +103,10 @@ async function createPromo(b) {
   const record = { ...cleanNew(b), createdAt: new Date().toISOString(), active: true };
   // A Legacy member's friends and family code with the same name (even a cleared one) would clash at checkout.
   if (await store.cmd("EXISTS", `gde:ffcode:${record.code}`)) fail("A Legacy Club member already uses that code. Try another one.", 409);
-  // SET NX: a code name is never handed out twice.
-  if (!(await store.cmd("SET", `gde:promo:${record.code}`, JSON.stringify(record), "NX"))) fail("That code already exists. Try another one.", 409);
+  // SET NX: a code name is never handed out twice (a deleted code that buyers used keeps its name taken).
+  if (!(await store.cmd("SET", `gde:promo:${record.code}`, JSON.stringify(record), "NX"))) {
+    fail((await getPromo(record.code))?.deleted ? "That code was deleted after orders used it, so its name can't be used again. Try another one." : "That code already exists. Try another one.", 409);
+  }
   await store.cmd("SADD", "gde:promos", record.code);
   return record;
 }
@@ -113,12 +115,26 @@ async function createPromo(b) {
 async function updatePromo(b) {
   const code = cleanCode(b.code);
   const p = await getPromo(code);
-  if (!p) fail("No such code.", 404);
+  if (!p || p.deleted) fail("No such code.", 404);
   if ("active" in b) p.active = !!b.active;
   if ("startsAt" in b || "endsAt" in b) Object.assign(p, cleanTimes(b, p));
   p.changedAt = new Date().toISOString();
   await store.cmd("SET", `gde:promo:${code}`, JSON.stringify(p));
   return p;
+}
+
+// Delete a code (user, Nov 20: "allow me to delete discount codes"): it leaves the app's list and stops working at once.
+// No order ever carried it: it's gone and the name is free again. Orders did carry it: a stub stays (deleted, off) so
+// those orders still say which code they used and the name is never reused for a different discount.
+async function deletePromo(b) {
+  const code = cleanCode(b.code);
+  const p = await getPromo(code);
+  if (!p || p.deleted) fail("No such code.", 404);
+  const used = (await store.listOrders()).some((o) => o.promoCode === code);
+  if (used) await store.cmd("SET", `gde:promo:${code}`, JSON.stringify({ ...p, active: false, deleted: true, deletedAt: new Date().toISOString() }));
+  else await store.cmd("DEL", `gde:promo:${code}`);
+  await store.cmd("SREM", "gde:promos", code);
+  return { code, nameFree: !used };
 }
 
 // Every code, newest first, with its uses and what buyers saved with it (paid orders, current environment).
@@ -137,4 +153,4 @@ async function listPromos(orders) {
   }).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
 }
 
-module.exports = { CODE_RE, cleanCode, checkPromo, applyTo, createPromo, updatePromo, listPromos, label, usesOf, when, cents };
+module.exports = { CODE_RE, cleanCode, checkPromo, applyTo, createPromo, updatePromo, deletePromo, listPromos, label, usesOf, when, cents };

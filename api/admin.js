@@ -36,6 +36,7 @@
 //   GET  /api/admin?action=promo-list     every code with its uses, paid orders, sales and what buyers saved
 //   POST /api/admin?action=promo-create   { code, kind: percent|amount, value, startsAt?, endsAt? (ISO times), maxUses?, note? }
 //   POST /api/admin?action=promo-set      { code, active?, startsAt?, endsAt? }: turns a code off or on, changes its times
+//   POST /api/admin?action=promo-delete   { code }: deletes it (Nov 20); a code orders used keeps a stub so its name stays taken
 // Welcome offer (_welcome.js, user Nov 17: "$100 off your first purchase that lasts 30 days" for every new sign-up):
 //   GET  /api/admin?action=welcome-get    the settings, totals and the latest 100 welcome codes
 //   POST /api/admin?action=welcome-set    { active?, amount?, days?, address? }
@@ -354,10 +355,10 @@ module.exports = async function handler(request, response) {
     if (action === "promo-list" && request.method === "GET") {
       return response.status(200).json({ codes: await promo.listPromos(), environment: authorizeSetup().environment });
     }
-    if ((action === "promo-create" || action === "promo-set") && request.method === "POST") {
+    if (["promo-create", "promo-set", "promo-delete"].includes(action) && request.method === "POST") {
       const b = await readBody(request);
       try {
-        const code = action === "promo-create" ? await promo.createPromo(b) : await promo.updatePromo(b);
+        const code = await (action === "promo-create" ? promo.createPromo(b) : action === "promo-set" ? promo.updatePromo(b) : promo.deletePromo(b));
         return response.status(200).json({ ok: true, code });
       } catch (error) {
         if (error.status) return response.status(error.status).json({ error: error.message });
