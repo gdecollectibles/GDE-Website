@@ -235,7 +235,7 @@ function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc, l
   const label = (s) => `<p style="margin:0 0 14px;font-family:${SERIF};font-size:11px;line-height:1;letter-spacing:.3em;text-transform:uppercase;color:${GOLD}">${s}</p>`;
   // Guns: look B "cards with savings" (user, Nov 21; options in docs/email-templates/gun-section-options.html): each in
   // a white card with "Colt · <caliber>" in gold, the name on one line (row runs wider than the text so "Remember the
-  // Alamo" fits; on phones the cards stack, one per row), was/now side by side, bold sale price (Nov 21), "Save $300", View link.
+  // Alamo" fits; on phones the cards stack, one per row), was/now side by side, bold sale price (Nov 21), bold "Save $300", View link.
   const shown = guns.slice(0, 3);
   const saved = (n) => money(Math.round(n / 0.9 / 100) * 100 - n);
   const gunCells = shown.map((g) => `<td class="gun" valign="top" width="${Math.floor(100 / shown.length)}%" style="padding:0 4px">
@@ -244,7 +244,7 @@ function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc, l
       ${g.caliber ? `<p style="margin:0 0 6px;font-family:${SERIF};font-size:10px;line-height:1.3;letter-spacing:.22em;text-transform:uppercase;color:${GOLD}">Colt · ${escHtml(g.caliber)}</p>` : ""}
       <p class="gname" style="margin:0 0 4px;font-family:Gloock,${SERIF};font-size:15px;line-height:1.3;white-space:nowrap;color:${INK}"><a href="${escHtml(g.url)}" style="color:${INK};text-decoration:none">${escHtml(g.name)}</a></p>
       <p style="margin:6px 0;font-family:${SERIF};font-size:14px;line-height:1.4;color:${INK}"><s style="color:${MUTED};font-size:12px">${was(g.price)}</s>&nbsp; <b style="font-weight:700">${money(g.price)}</b></p>
-      <p style="margin:0 0 12px;font-family:${SERIF};font-size:11px;line-height:1.4;letter-spacing:.12em;text-transform:uppercase;color:${GOLD}">Save ${saved(g.price)}</p>
+      <p style="margin:0 0 12px;font-family:${SERIF};font-size:11px;line-height:1.4;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:${GOLD}">Save ${saved(g.price)}</p>
       <a href="${escHtml(g.url)}" style="font-family:${SERIF};font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:${INK};text-decoration:underline">View</a>
       </td></tr></table></td>`).join("");
   const html = `<!doctype html>
