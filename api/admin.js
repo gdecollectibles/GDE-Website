@@ -279,9 +279,9 @@ module.exports = async function handler(request, response) {
       let saleGuns = [];
       if (saleEnd) {
         const products = JSON.parse(fs.readFileSync(path.join(process.cwd(), "codex-inventory.json"), "utf8")).products || {};
-        const keys = Array.isArray(b.guns) && b.guns.length ? b.guns : ["remember-the-alamo", "the-capitol", "gold-skull-engraved"];
+        const keys = Array.isArray(b.guns) && b.guns.length ? b.guns : ["remember-the-alamo", "the-capitol", "blue-scroll-engraved"];
         saleGuns = keys.slice(0, 3).map((k) => [String(k), products[k]]).filter(([, g]) => g && g.photos?.[0]).map(([k, g]) => ({
-          name: g.name, url: `https://www.gdecollectibles.com/gun/${encodeURIComponent(k)}`,
+          name: g.name, caliber: g.caliber || "", url: `https://www.gdecollectibles.com/gun/${encodeURIComponent(k)}`,
           price: Number(String(g.price).replace(/[^0-9.]/g, "")),
           photo: `https://www.gdecollectibles.com/${String(g.photos[0]).replace(/^\//, "").replace(/-01\.jpg$/, "-01-phone.jpg")}`
         }));

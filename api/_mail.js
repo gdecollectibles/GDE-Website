@@ -219,7 +219,9 @@ function customerEmail({ subject, body, buttonText, buttonLink, address, firstNa
 // (api/countdown.js). guns: up to 3 of { name, url, photo, price } (price a number), shown with the crossed-out
 // "was" price the website shows (price ÷ 0.9, to the nearest $100; see SALE in script.js).
 const SALE_END = "2026-11-28T00:00:00-05:00"; // midnight after Black Friday, Miami time (same as script.js)
-function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc } = {}) {
+// Nov 21 (user): "Black Friday" made the big headline, logo black, dealer line says "in the US".
+// logoSrc / countdownSrc: only for local previews (make_black_friday.js) before the files are on the live site.
+function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc, logoSrc } = {}) {
   const name = escHtml(String(firstName || "").trim()) || "there";
   const addr = String(address || "").trim();
   const subject = "Black Friday: 10% off ends Friday at midnight";
@@ -231,25 +233,34 @@ function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc } 
   const SERIF = "Georgia,'Times New Roman',serif";
   const p = (s) => `<p style="margin:0 0 18px;font-family:${SERIF};font-size:17px;line-height:1.7;color:${INK}">${s}</p>`;
   const label = (s) => `<p style="margin:0 0 14px;font-family:${SERIF};font-size:11px;line-height:1;letter-spacing:.3em;text-transform:uppercase;color:${GOLD}">${s}</p>`;
+  // Guns: look B "cards with savings" (user, Nov 21; options in docs/email-templates/gun-section-options.html): each in
+  // a white card with "Colt · <caliber>" in gold, the name on one line (row runs wider than the text so "Remember the
+  // Alamo" fits; on phones the cards stack, one per row), was/now side by side, "You save", View link.
   const shown = guns.slice(0, 3);
-  const gunCells = shown.map((g) => `<td class="gun" valign="top" width="${Math.floor(100 / shown.length)}%" style="padding:0 5px;text-align:center">
-      <a href="${escHtml(g.url)}"><img src="${escHtml(g.photo)}" width="146" alt="${escHtml(g.name)}" style="display:block;width:100%;max-width:146px;height:auto;border:0;margin:0 auto 10px"></a>
-      <p style="margin:0 0 4px;font-family:${SERIF};font-size:14px;line-height:1.35;color:${INK}"><a href="${escHtml(g.url)}" style="color:${INK};text-decoration:none">${escHtml(g.name)}</a></p>
-      <p style="margin:0;font-family:${SERIF};font-size:13px;line-height:1.4;color:${SOFT}"><s style="color:${MUTED}">${was(g.price)}</s><br>${money(g.price)}</p></td>`).join("");
+  const saved = (n) => money(Math.round(n / 0.9 / 100) * 100 - n);
+  const gunCells = shown.map((g) => `<td class="gun" valign="top" width="${Math.floor(100 / shown.length)}%" style="padding:0 4px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td bgcolor="#ffffff" style="background-color:#ffffff;border:1px solid ${LINE};padding:8px 8px 16px;text-align:center">
+      <a href="${escHtml(g.url)}"><img src="${escHtml(g.photo)}" width="160" class="gimg" alt="${escHtml(g.name)}" style="display:block;width:100%;max-width:160px;height:auto;border:0;margin:0 auto 12px"></a>
+      ${g.caliber ? `<p style="margin:0 0 6px;font-family:${SERIF};font-size:10px;line-height:1.3;letter-spacing:.22em;text-transform:uppercase;color:${GOLD}">Colt · ${escHtml(g.caliber)}</p>` : ""}
+      <p class="gname" style="margin:0 0 4px;font-family:Gloock,${SERIF};font-size:15px;line-height:1.3;white-space:nowrap;color:${INK}"><a href="${escHtml(g.url)}" style="color:${INK};text-decoration:none">${escHtml(g.name)}</a></p>
+      <p style="margin:6px 0;font-family:${SERIF};font-size:14px;line-height:1.4;color:${INK}"><s style="color:${MUTED};font-size:12px">${was(g.price)}</s>&nbsp; ${money(g.price)}</p>
+      <p style="margin:0 0 12px;font-family:${SERIF};font-size:11px;line-height:1.4;letter-spacing:.12em;text-transform:uppercase;color:${GOLD}">You save ${saved(g.price)}</p>
+      <a href="${escHtml(g.url)}" style="font-family:${SERIF};font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:${INK};text-decoration:underline">View</a>
+      </td></tr></table></td>`).join("");
   const html = `<!doctype html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only">
 <title>${subject}</title>
-<style>@media (max-width:620px){.wrap{padding:0!important} .card{border-radius:0!important} .pad{padding-left:24px!important;padding-right:24px!important} .btn{padding:16px 18px!important;letter-spacing:.14em!important} .h1{font-size:28px!important} .gun{padding:0 3px!important}}</style>
+<style>@media (max-width:620px){.wrap{padding:0!important} .card{border-radius:0!important} .pad{padding-left:24px!important;padding-right:24px!important} .btn{padding:16px 18px!important;letter-spacing:.14em!important} .h1{font-size:22px!important} .bf{font-size:38px!important;letter-spacing:.03em!important} .gun{display:block!important;width:100%!important;padding:0 0 12px!important} .gunrow{padding-left:24px!important;padding-right:24px!important} .gimg{max-width:280px!important}}</style>
 </head><body style="margin:0;padding:0;background:#ffffff">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">${preheader}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="background-color:#ffffff"><tr><td class="wrap" align="center" style="padding:32px 12px">
 <table role="presentation" class="card" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f7f4ed" style="width:100%;max-width:600px;background-color:#f7f4ed;border:1px solid #d4ccbd;border-radius:4px">
 <tr><td style="padding:10px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE}">
-  <tr><td align="center" style="padding:40px 40px 6px"><img src="${SITE}/assets/email/welcome-logo-gold.png" width="170" alt="GDE Collectibles" style="display:block;width:170px;height:auto;border:0"></td></tr>
+  <tr><td align="center" style="padding:40px 40px 6px"><img src="${escHtml(logoSrc || `${SITE}/assets/email/welcome-logo-black.png`)}" width="170" alt="GDE Collectibles" style="display:block;width:170px;height:auto;border:0"></td></tr>
   <tr><td class="pad" style="padding:20px 52px 0">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 26px"><tr><td style="border-top:1px solid ${GOLD};width:45%"></td><td align="center" style="font-family:${SERIF};font-size:12px;line-height:1;color:${GOLD};padding:0 10px;white-space:nowrap">&#9670;</td><td style="border-top:1px solid ${GOLD};width:45%"></td></tr></table>
-    <p style="margin:0 0 10px;text-align:center;font-family:${SERIF};font-size:12px;line-height:1;letter-spacing:.34em;text-transform:uppercase;color:${GOLD}">Black Friday</p>
-    <h1 class="h1" style="margin:0 0 28px;text-align:center;font-family:Gloock,${SERIF};font-size:32px;font-weight:400;line-height:1.2;color:${INK}">10% off every gun,<br>until midnight Friday</h1>
+    <h1 class="bf" style="margin:0 0 14px;text-align:center;font-family:Gloock,${SERIF};font-size:54px;font-weight:400;line-height:1.05;letter-spacing:.04em;text-transform:uppercase;color:#111111">Black Friday</h1>
+    <p class="h1" style="margin:0 0 28px;text-align:center;font-family:Gloock,${SERIF};font-size:26px;font-weight:400;line-height:1.25;color:${GOLD}">10% off every gun,<br>until midnight Friday</p>
     ${p(`Dear ${name},`)}
     ${p("Our Black Friday sale ends soon. Until midnight on Friday, November 27 (Eastern time), every gun in our collections is 10% off. The prices on our website already include it, so there's no code to enter.")}
   </td></tr>
@@ -257,9 +268,9 @@ function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc } 
     ${label("Time left")}
     <a href="${SITE}/collections"><img src="${escHtml(clock)}" width="476" alt="The sale ends at midnight on Friday, November 27, Eastern time" style="display:block;width:100%;max-width:476px;height:auto;border:0"></a>
   </td></tr>
-  ${shown.length ? `<tr><td class="pad" style="padding:0 47px 8px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${gunCells}</tr></table></td></tr>` : ""}
+  ${shown.length ? `<tr><td class="gunrow" style="padding:0 14px 8px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${gunCells}</tr></table></td></tr>` : ""}
   <tr><td class="pad" style="padding:22px 52px 0">
-    ${p("Every piece is limited and numbered, made to order, and ships to the licensed FFL dealer of your choice. Shipping and insurance are included.")}
+    ${p("Every piece is limited and numbered, made to order, and ships to the licensed FFL dealer in the US of your choice. Shipping and insurance are included.")}
   </td></tr>
   <tr><td align="center" style="padding:8px 52px 34px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td bgcolor="${GOLD}" style="background-color:${GOLD}">
     <a class="btn" href="${SITE}/collections" style="display:inline-block;padding:16px 28px;white-space:nowrap;background-color:${GOLD};border:1px solid ${GOLD};font-family:Georgia,serif;font-size:12px;font-weight:700;line-height:12px;letter-spacing:.2em;text-transform:uppercase;color:#ffffff;text-decoration:none">Shop the sale</a></td></tr></table></td></tr>
@@ -280,8 +291,8 @@ function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc } 
 Dear ${String(firstName || "").trim() || "there"},
 
 Our Black Friday sale ends soon. Until midnight on Friday, November 27 (Eastern time), every gun in our collections is 10% off. The prices on our website already include it, so there's no code to enter.
-${shown.length ? `\n${shown.map((g) => `- ${g.name}: ${money(g.price)} (was ${was(g.price)}) ${g.url}`).join("\n")}\n` : ""}
-Every piece is limited and numbered, made to order, and ships to the licensed FFL dealer of your choice. Shipping and insurance are included.
+${shown.length ? `\n${shown.map((g) => `- ${g.name}: ${money(g.price)} (was ${was(g.price)}, you save ${saved(g.price)}) ${g.url}`).join("\n")}\n` : ""}
+Every piece is limited and numbered, made to order, and ships to the licensed FFL dealer in the US of your choice. Shipping and insurance are included.
 
 Shop the sale: ${SITE}/collections
 
