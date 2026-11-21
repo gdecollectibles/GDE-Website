@@ -235,7 +235,7 @@ function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc, l
   const label = (s) => `<p style="margin:0 0 14px;font-family:${SERIF};font-size:11px;line-height:1;letter-spacing:.3em;text-transform:uppercase;color:${GOLD}">${s}</p>`;
   // Guns: look B "cards with savings" (user, Nov 21; options in docs/email-templates/gun-section-options.html): each in
   // a white card with "Colt · <caliber>" in gold, the name on one line (row runs wider than the text so "Remember the
-  // Alamo" fits; on phones the cards stack, one per row), was/now side by side, "You save", View link.
+  // Alamo" fits; on phones the cards stack, one per row), was/now side by side, bold sale price (Nov 21), "Save $300", View link.
   const shown = guns.slice(0, 3);
   const saved = (n) => money(Math.round(n / 0.9 / 100) * 100 - n);
   const gunCells = shown.map((g) => `<td class="gun" valign="top" width="${Math.floor(100 / shown.length)}%" style="padding:0 4px">
@@ -243,8 +243,8 @@ function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc, l
       <a href="${escHtml(g.url)}"><img src="${escHtml(g.photo)}" width="160" class="gimg" alt="${escHtml(g.name)}" style="display:block;width:100%;max-width:160px;height:auto;border:0;margin:0 auto 12px"></a>
       ${g.caliber ? `<p style="margin:0 0 6px;font-family:${SERIF};font-size:10px;line-height:1.3;letter-spacing:.22em;text-transform:uppercase;color:${GOLD}">Colt · ${escHtml(g.caliber)}</p>` : ""}
       <p class="gname" style="margin:0 0 4px;font-family:Gloock,${SERIF};font-size:15px;line-height:1.3;white-space:nowrap;color:${INK}"><a href="${escHtml(g.url)}" style="color:${INK};text-decoration:none">${escHtml(g.name)}</a></p>
-      <p style="margin:6px 0;font-family:${SERIF};font-size:14px;line-height:1.4;color:${INK}"><s style="color:${MUTED};font-size:12px">${was(g.price)}</s>&nbsp; ${money(g.price)}</p>
-      <p style="margin:0 0 12px;font-family:${SERIF};font-size:11px;line-height:1.4;letter-spacing:.12em;text-transform:uppercase;color:${GOLD}">You save ${saved(g.price)}</p>
+      <p style="margin:6px 0;font-family:${SERIF};font-size:14px;line-height:1.4;color:${INK}"><s style="color:${MUTED};font-size:12px">${was(g.price)}</s>&nbsp; <b style="font-weight:700">${money(g.price)}</b></p>
+      <p style="margin:0 0 12px;font-family:${SERIF};font-size:11px;line-height:1.4;letter-spacing:.12em;text-transform:uppercase;color:${GOLD}">Save ${saved(g.price)}</p>
       <a href="${escHtml(g.url)}" style="font-family:${SERIF};font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:${INK};text-decoration:underline">View</a>
       </td></tr></table></td>`).join("");
   const html = `<!doctype html>
@@ -291,7 +291,7 @@ function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc, l
 Dear ${String(firstName || "").trim() || "there"},
 
 Our Black Friday sale ends soon. Until midnight on Friday, November 27 (Eastern time), every gun in our collections is 10% off. The prices on our website already include it, so there's no code to enter.
-${shown.length ? `\n${shown.map((g) => `- ${g.name}: ${money(g.price)} (was ${was(g.price)}, you save ${saved(g.price)}) ${g.url}`).join("\n")}\n` : ""}
+${shown.length ? `\n${shown.map((g) => `- ${g.name}: ${money(g.price)} (was ${was(g.price)}, save ${saved(g.price)}) ${g.url}`).join("\n")}\n` : ""}
 Every piece is limited and numbered, made to order, and ships to the licensed FFL dealer in the US of your choice. Shipping and insurance are included.
 
 Shop the sale: ${SITE}/collections
