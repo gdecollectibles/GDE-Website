@@ -69,9 +69,10 @@ module.exports = async function handler(request, response) {
 
   try {
     const body = await readBody(request);
-    if (clean(body.website, 200)) return response.status(200).json({ ok: true }); // spam trap, left empty by people
+    // Spam trap (left empty by people) and the guard; each one caught is kept for the app's Spam list (guard.keep).
+    if (clean(body.website, 200)) { await guard.keep("custom", "trap", body); return response.status(200).json({ ok: true }); }
     const verdict = guard.check(body);
-    if (verdict.bot) { await store.cmd("HINCRBY", "gde:spam:blocked", `custom:${verdict.bot}`, 1).catch(() => {}); return response.status(200).json({ ok: true }); }
+    if (verdict.bot) { await guard.keep("custom", verdict.bot, body); return response.status(200).json({ ok: true }); }
     if (verdict.error) return response.status(400).json({ error: verdict.error });
 
     const list = (value, allowed) => [...new Set([value].flat().filter((v) => allowed.includes(v)))];

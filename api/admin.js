@@ -9,6 +9,8 @@
 //                                       api/custom-request.js save them; kind "custom" for the second), newest first
 //   GET  /api/admin?action=message-file&id=<id>&n=<n>  one reference picture of a custom request: { name, type, size, data (base64) }
 //   POST /api/admin?action=delete-message  { id }: removes one message and its pictures (deleted in the app)
+//   GET  /api/admin?action=blocked     messages the spam guard caught (_formguard.js keep), newest first, + counts by reason
+//   POST /api/admin?action=delete-blocked  { id }: removes one of them (deleted from the app's Spam list)
 //   GET  /api/admin?action=cart-adds   guns added to carts (api/account.js?action=cart), newest first, the last 1000
 // Collector credit (guns bought outside the website, see _credits.js):
 //   GET  /api/admin?action=credit-requests          every request (without file contents) and every account's credited guns
@@ -208,6 +210,20 @@ module.exports = async function handler(request, response) {
       const values = ids.length ? await store.cmd("MGET", ...ids.map((id) => `gde:message:${id}`)) : [];
       const messages = values.map((v) => { try { return JSON.parse(v); } catch { return null; } }).filter(Boolean);
       return response.status(200).json({ messages });
+    }
+    if (action === "blocked" && request.method === "GET") {
+      const [ids, counts] = await store.pipeline([["LRANGE", "gde:blocked", 0, 499], ["HGETALL", "gde:spam:blocked"]]);
+      const values = ids.length ? await store.cmd("MGET", ...ids.map((id) => `gde:blocked:${id}`)) : [];
+      const blocked = values.map((v) => { try { return JSON.parse(v); } catch { return null; } }).filter(Boolean);
+      const byReason = {};
+      for (let i = 0; i + 1 < (counts || []).length; i += 2) byReason[counts[i]] = Number(counts[i + 1]) || 0;
+      return response.status(200).json({ blocked, counts: byReason });
+    }
+    if (action === "delete-blocked" && request.method === "POST") {
+      const id = String((await readBody(request)).id || "");
+      if (!/^B-\d{10,16}-[0-9a-f]{6}$/.test(id)) return response.status(400).json({ error: "That is not a blocked message id." });
+      const [removed] = await store.pipeline([["DEL", `gde:blocked:${id}`], ["LREM", "gde:blocked", 0, id]]);
+      return response.status(200).json({ ok: true, removed: removed > 0 });
     }
     if (action === "cart-adds" && request.method === "GET") {
       const values = await store.cmd("LRANGE", "gde:cartadds", 0, 999);

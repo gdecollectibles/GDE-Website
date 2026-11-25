@@ -58,9 +58,10 @@ module.exports = async function handler(request, response) {
   try {
     const body = await readBody(request);
     // Left empty by people; filled in by spam bots, which then get a normal "thank you".
-    if (clean(body.website, 200)) return reply(200, { ok: true });
+    // Each one is kept for the app's Spam list (guard.keep).
+    if (clean(body.website, 200)) { await guard.keep("contact", "trap", body); return reply(200, { ok: true }); }
     const verdict = guard.check(body);
-    if (verdict.bot) { await store.cmd("HINCRBY", "gde:spam:blocked", `contact:${verdict.bot}`, 1).catch(() => {}); return reply(200, { ok: true }); }
+    if (verdict.bot) { await guard.keep("contact", verdict.bot, body); return reply(200, { ok: true }); }
     if (verdict.error) return reply(400, { error: verdict.error });
 
     const record = {
