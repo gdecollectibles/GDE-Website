@@ -238,11 +238,11 @@ const SALE_COPY = {
     closing: "With gratitude,"
   },
   "last-call": {
-    subject: "Last call: Black Friday 10% off ends tomorrow at midnight",
-    preheader: "Our Black Friday sale ends at midnight tomorrow, Friday, November 27. No code needed.",
+    subject: "Last call: Black Friday 10% off ends soon",
+    preheader: "Our Black Friday sale ends soon, at midnight on Friday, November 27. No code needed.",
     eyebrow: "Last call",
-    subhead: "10% off all purchases<br>ends tomorrow at midnight",
-    intro: "A quick reminder, our Black Friday sale ends tomorrow, Friday, November 27, at midnight Eastern time. Until then, every piece in our collections is 10% off. The prices on our website already include it, so there's no code to enter.",
+    subhead: "10% off all purchases<br>ends soon",
+    intro: "A quick reminder, our Black Friday sale ends soon, at midnight on Friday, November 27, Eastern time. Until then, every piece in our collections is 10% off. The prices on our website already include it, so there's no code to enter.",
     closing: "Happy Thanksgiving, and thank you for being part of GDE."
   }
 };
