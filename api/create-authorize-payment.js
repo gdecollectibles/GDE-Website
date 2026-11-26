@@ -72,14 +72,14 @@ function checkCustomer(customer) {
     return { error: "Please check your email address. It should look like name@example.com." };
   }
   if (!inUS(clean.country, clean.state, clean.zip)) {
-    return { error: "GDE Collectibles sells only to buyers in the United States. Please enter a US billing address with its state and 5-digit ZIP code. Questions? Call us at 1-786-931-3566." };
+    return { error: "GDE Collectibles sells only to buyers in the United States. Please enter a US billing address with its state and 5-digit ZIP code. Questions? Call us at 1-786-473-9020." };
   }
   if (!inUS(clean.fflCountry, clean.fflState, clean.fflZip)) {
     return { error: "Firearms ship only to a licensed FFL dealer in the United States. Please enter the dealer's US address with its state and 5-digit ZIP code." };
   }
   // Terms of Service (Nov 18, 2026): no shipping to Alaska or Hawaii. The checkout's FFL state list leaves them out too.
   if (NO_SHIP_STATES.includes(clean.fflState.toLowerCase())) {
-    return { error: "We do not currently ship to Alaska or Hawaii. Please choose an FFL dealer in another US state, or call us at 1-786-931-3566." };
+    return { error: "We do not currently ship to Alaska or Hawaii. Please choose an FFL dealer in another US state, or call us at 1-786-473-9020." };
   }
   return { customer: clean };
 }
@@ -166,7 +166,7 @@ module.exports = async function handler(request, response) {
       if (promoCheck && !promoCheck.ok) return response.status(400).json({ error: promoCheck.error });
       if (promoCheck) {
         const withCode = promo.applyTo(listPrices, promoCheck);
-        if (sum(withCode) <= 0) return response.status(400).json({ error: "That code is worth more than this order. Please call us at 1-786-931-3566." });
+        if (sum(withCode) <= 0) return response.status(400).json({ error: "That code is worth more than this order. Please call us at 1-786-473-9020." });
         if (sum(withCode) < sum(unitPrices)) { promoCode = promoCheck; unitPrices = withCode; }
       } else if (!isCollector) {
         code = await ffcode.checkCode(body.code, session?.email, orders);
@@ -220,7 +220,7 @@ module.exports = async function handler(request, response) {
       try { await store.saveOrder(Object.assign(order, changes), isNew); return true; } catch (error) { console.error(error); return false; }
     };
     if (!(await saveOrder({}, true))) {
-      return response.status(503).json({ error: "Your checkout details could not be saved. Please try again in a minute, or call us at 1-786-931-3566." });
+      return response.status(503).json({ error: "Your checkout details could not be saved. Please try again in a minute, or call us at 1-786-473-9020." });
     }
     const authorizeRequest = {
       getHostedPaymentPageRequest: {

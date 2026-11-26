@@ -10,7 +10,7 @@
   const day = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }); };
   const STATUS = { pending: "Being checked", approved: "Approved", declined: "Not approved" };
 
-  const fail = (text) => { root.innerHTML = `<div class="credit-card"><p>${esc(text)} You can also call us at <a href="tel:+17869313566">1-786-931-3566</a>.</p></div>`; };
+  const fail = (text) => { root.innerHTML = `<div class="credit-card"><p>${esc(text)} You can also call us at <a href="tel:+17864739020">1-786-473-9020</a>.</p></div>`; };
 
   async function load() {
     let data;

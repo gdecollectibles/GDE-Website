@@ -748,7 +748,7 @@
       const me = config.ready ? await api("me") : { user: null };
       if (me.user) renderSignedIn(me); else renderSignedOut(config);
     } catch (error) {
-      root.innerHTML = `<div class="gde-card"><h2>Accounts are unavailable</h2><p>${esc(error.message)} You can still call us at 1-786-931-3566.</p></div>`;
+      root.innerHTML = `<div class="gde-card"><h2>Accounts are unavailable</h2><p>${esc(error.message)} You can still call us at 1-786-473-9020.</p></div>`;
     }
   }
   load();

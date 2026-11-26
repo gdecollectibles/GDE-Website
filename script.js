@@ -607,7 +607,7 @@ document.querySelectorAll(".site-footer").forEach(footer => {
       <a href="/refund">Refund Policy</a>`;
   }
   const legal = footer.querySelector(".footer-legal");
-  if (legal && !legal.querySelector(".footer-contact")) legal.insertAdjacentHTML("afterbegin", '<div class="footer-contact"><strong>Contact Us</strong><a href="tel:+17869313566">Phone: 1-786-931-3566</a><a href="mailto:info@gdecollectibles.com">Email: info@gdecollectibles.com</a><div><a href="/privacy">Privacy Policy</a><span>|</span><a href="/terms">Terms of Service</a></div></div>');
+  if (legal && !legal.querySelector(".footer-contact")) legal.insertAdjacentHTML("afterbegin", '<div class="footer-contact"><strong>Contact Us</strong><a href="tel:+17864739020">Phone: 1-786-473-9020</a><a href="mailto:info@gdecollectibles.com">Email: info@gdecollectibles.com</a><div><a href="/privacy">Privacy Policy</a><span>|</span><a href="/terms">Terms of Service</a></div></div>');
 });
 
 if (!sessionStorage.getItem("gdeAgeConfirmed")) {
