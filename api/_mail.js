@@ -42,6 +42,10 @@ function sendCode(to, code, purpose) {
 //   account: false, someone only on the email list: a marketing email by law, so it carries GDE's mailing address and
 //   an Unsubscribe link, and invites them to make an account instead of saying theirs is ready.
 const SITE = "https://www.gdecollectibles.com"; // www: the bare domain answers with a redirect first
+// User, Nov 26: "from now on" every email to people who haven't bought (welcome, CRM emails, sale emails) says this,
+// in bold. Not in the order confirmation (buyers already ship to a US dealer).
+const US_ONLY = "We only sell within the United States.";
+const usOnlyHtml = (INK = "#2b2a27") => `<b style="font-weight:700;color:${INK}">${US_ONLY}</b>`;
 // offer: the welcome offer (_welcome.js, Nov 17: $100 off a first purchase for 30 days), shown as a gift box under
 // the greeting, with the code; it also goes in the subject.
 function welcomeEmail(firstName, { subscribed = false, unsubUrl = "", account = true, existing = false, address = "", offer = null } = {}) {
@@ -111,15 +115,15 @@ function welcomeEmail(firstName, { subscribed = false, unsubUrl = "", account = 
     ${perk("IV", "New collections first", news)}
     </table></div></td></tr>
   <tr><td class="pad" style="padding:28px 52px 0">
-    ${p("Every gun is made to order and ships to the licensed FFL dealer of your choice. Shipping and insurance are included.")}
+    ${p(`Every gun is made to order and ships to the licensed FFL dealer of your choice. Shipping and insurance are included. ${usOnlyHtml()}`)}
   </td></tr>
   <tr><td align="center" style="padding:8px 52px 34px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td bgcolor="${GOLD}" style="background-color:${GOLD}">
     <a class="btn" href="${SITE}/collections" style="display:inline-block;padding:16px 28px;white-space:nowrap;background-color:${GOLD};border:1px solid ${GOLD};font-family:Georgia,serif;font-size:12px;font-weight:700;line-height:12px;letter-spacing:.2em;text-transform:uppercase;color:#ffffff;text-decoration:none">See the collections</a></td></tr></table></td></tr>
   <tr><td class="pad" style="padding:0 52px">
     ${p("We're always happy to talk with our community. Whether it's a question about a gun, a number or your dealer, or you just want to say hello, reach out any way you like:")}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;border-top:1px solid ${LINE}">
-    ${row("Call or text", "tel:+17869313566", "1-786-931-3566")}
-    ${row("WhatsApp", "https://wa.me/17869313566", "1-786-931-3566")}
+    ${row("Call or text", "tel:+17864739020", "1-786-473-9020")}
+    ${row("WhatsApp", "https://wa.me/17864739020", "1-786-473-9020")}
     ${row("Email", "mailto:info@gdecollectibles.com", "info@gdecollectibles.com")}
     ${row("Instagram", "https://www.instagram.com/gdecollectibles/", "@gdecollectibles")}
     ${row("Facebook", "https://www.facebook.com/gdecollectibles", "GDE Collectibles")}
@@ -152,14 +156,14 @@ ${listOnly
 - Piece Unique: want something one of a kind? Tell us your idea and we'll design it with you: ${SITE}/piece-unique
 - New collections first: ${newsText}
 
-Every gun is made to order and ships to the licensed FFL dealer of your choice. Shipping and insurance are included.
+Every gun is made to order and ships to the licensed FFL dealer of your choice. Shipping and insurance are included. ${US_ONLY}
 
 See the collections: ${SITE}/collections
 
 We're always happy to talk with our community. Whether it's a question about a gun, a number or your dealer, or you just want to say hello, reach out any way you like:
 
-- Call or text: 1-786-931-3566
-- WhatsApp: 1-786-931-3566
+- Call or text: 1-786-473-9020
+- WhatsApp: 1-786-473-9020
 - Email: reply to this email, or info@gdecollectibles.com
 - Instagram: @gdecollectibles
 - Facebook: facebook.com/gdecollectibles
@@ -196,6 +200,7 @@ function customerEmail({ subject, body, buttonText, buttonLink, address, firstNa
   const name = String(firstName || "").trim();
   const filled = String(body || "").replace(/\{first_name\}/g, name || "there").replace(/\r/g, "").trim();
   const paras = filled.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  const usLine = !/only sell within the united states/i.test(filled); // added after the message unless it's already in it
   const link = /^https:\/\/[^\s"<>]+$/.test(String(buttonLink || "")) ? buttonLink : "";
   const button = buttonText && link
     ? `<p style="margin:30px 0 8px"><a href="${escHtml(link)}" style="display:inline-block;padding:14px 26px;background:#111;color:#fff;text-decoration:none;border-radius:10px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;font-weight:bold">${escHtml(buttonText)}</a></p>` : "";
@@ -203,13 +208,14 @@ function customerEmail({ subject, body, buttonText, buttonLink, address, firstNa
 <div style="max-width:560px;margin:0 auto;padding:36px 24px;font-family:Arial,Helvetica,sans-serif;color:#111">
   <p style="font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#777;margin:0 0 26px">GDE Collectibles</p>
   ${paras.map((p) => `<p style="font-size:15px;line-height:1.65;margin:0 0 16px">${escHtml(p).replace(/\n/g, "<br>")}</p>`).join("\n  ")}
+  ${usLine ? `<p style="font-size:15px;line-height:1.65;margin:0 0 16px">${usOnlyHtml("#111")}</p>` : ""}
   ${button}
   <hr style="border:0;border-top:1px solid #ddd;margin:36px 0 18px">
   <p style="font-size:12px;line-height:1.6;color:#777;margin:0">GDE Collectibles · ${escHtml(address)}<br>
   You're getting this because you bought from GDE Collectibles or joined our list.
   <a href="${escHtml(unsubUrl)}" style="color:#777">Unsubscribe</a></p>
 </div></body></html>`;
-  const text = `${paras.join("\n\n")}${button ? `\n\n${buttonText}: ${link}` : ""}\n\n--\nGDE Collectibles · ${address}\nYou're getting this because you bought from GDE Collectibles or joined our list.\nUnsubscribe: ${unsubUrl}`;
+  const text = `${paras.join("\n\n")}${usLine ? `\n\n${US_ONLY}` : ""}${button ? `\n\n${buttonText}: ${link}` : ""}\n\n--\nGDE Collectibles · ${address}\nYou're getting this because you bought from GDE Collectibles or joined our list.\nUnsubscribe: ${unsubUrl}`;
   return { subject: String(subject || "").slice(0, 200), html, text };
 }
 
@@ -221,11 +227,31 @@ function customerEmail({ subject, body, buttonText, buttonLink, address, firstNa
 const SALE_END = "2026-11-28T00:00:00-05:00"; // midnight after Black Friday, Miami time (same as script.js)
 // Nov 21 (user): "Black Friday" made the big headline, logo black, dealer line says "in the US".
 // logoSrc / countdownSrc: only for local previews (make_black_friday.js) before the files are on the live site.
-function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc, logoSrc } = {}) {
+// Nov 26 (user): "last call" version (variant "last-call"), same design, reminder wording for Thanksgiving day.
+const SALE_COPY = {
+  "sale-end": {
+    subject: "Black Friday: 10% off ends Friday at midnight",
+    preheader: "Every gun is 10% off until midnight on Friday, November 27. No code needed.",
+    eyebrow: "",
+    subhead: "10% off every gun,<br>until midnight Friday",
+    intro: "Our Black Friday sale ends soon. Until midnight on Friday, November 27 (Eastern time), every gun in our collections is 10% off. The prices on our website already include it, so there's no code to enter.",
+    closing: "With gratitude,"
+  },
+  "last-call": {
+    subject: "Last call: Black Friday 10% off ends tomorrow at midnight",
+    preheader: "Our Black Friday sale ends at midnight tomorrow, Friday, November 27. No code needed.",
+    eyebrow: "Last call",
+    subhead: "10% off all purchases<br>ends tomorrow at midnight",
+    intro: "A quick reminder, our Black Friday sale ends tomorrow, Friday, November 27, at midnight Eastern time. Until then, every piece in our collections is 10% off. The prices on our website already include it, so there's no code to enter.",
+    closing: "Happy Thanksgiving, and thank you for being part of GDE."
+  }
+};
+function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc, logoSrc, variant = "sale-end" } = {}) {
+  const copy = SALE_COPY[variant] || SALE_COPY["sale-end"];
   const name = escHtml(String(firstName || "").trim()) || "there";
   const addr = String(address || "").trim();
-  const subject = "Black Friday: 10% off ends Friday at midnight";
-  const preheader = "Every gun is 10% off until midnight on Friday, November 27. No code needed.";
+  const subject = copy.subject;
+  const preheader = copy.preheader;
   const clock = countdownSrc || `${SITE}/api/countdown?to=${encodeURIComponent(SALE_END)}`;
   const money = (n) => `$${Math.round(n).toLocaleString("en-US")}`;
   const was = (n) => money(Math.round(n / 0.9 / 100) * 100);
@@ -259,10 +285,11 @@ function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc, l
   <tr><td align="center" style="padding:40px 40px 6px"><img src="${escHtml(logoSrc || `${SITE}/assets/email/welcome-logo-black.png`)}" width="170" alt="GDE Collectibles" style="display:block;width:170px;height:auto;border:0"></td></tr>
   <tr><td class="pad" style="padding:20px 52px 0">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 26px"><tr><td style="border-top:1px solid ${GOLD};width:45%"></td><td align="center" style="font-family:${SERIF};font-size:12px;line-height:1;color:${GOLD};padding:0 10px;white-space:nowrap">&#9670;</td><td style="border-top:1px solid ${GOLD};width:45%"></td></tr></table>
+    ${copy.eyebrow ? `<p style="margin:0 0 12px;text-align:center;font-family:${SERIF};font-size:13px;line-height:1;letter-spacing:.34em;text-transform:uppercase;font-weight:700;color:${GOLD}">${copy.eyebrow}</p>` : ""}
     <h1 class="bf" style="margin:0 0 14px;text-align:center;font-family:Gloock,${SERIF};font-size:54px;font-weight:400;line-height:1.05;letter-spacing:.04em;text-transform:uppercase;color:#111111">Black Friday</h1>
-    <p class="h1" style="margin:0 0 28px;text-align:center;font-family:Gloock,${SERIF};font-size:26px;font-weight:400;line-height:1.25;color:${GOLD}">10% off every gun,<br>until midnight Friday</p>
+    <p class="h1" style="margin:0 0 28px;text-align:center;font-family:Gloock,${SERIF};font-size:26px;font-weight:400;line-height:1.25;color:${GOLD}">${copy.subhead}</p>
     ${p(`Dear ${name},`)}
-    ${p("Our Black Friday sale ends soon. Until midnight on Friday, November 27 (Eastern time), every gun in our collections is 10% off. The prices on our website already include it, so there's no code to enter.")}
+    ${p(copy.intro)}
   </td></tr>
   <tr><td class="pad" align="center" style="padding:6px 52px 26px">
     ${label("Time left")}
@@ -270,13 +297,13 @@ function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc, l
   </td></tr>
   ${shown.length ? `<tr><td class="gunrow" style="padding:0 14px 8px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${gunCells}</tr></table></td></tr>` : ""}
   <tr><td class="pad" style="padding:22px 52px 0">
-    ${p("Every piece is limited and numbered, made to order, and ships to the licensed FFL dealer in the US of your choice. Shipping and insurance are included.")}
+    ${p(`Every piece is limited and numbered, made to order, and ships to the licensed FFL dealer in the US of your choice. Shipping and insurance are included. ${usOnlyHtml(INK)}`)}
   </td></tr>
   <tr><td align="center" style="padding:8px 52px 34px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td bgcolor="${GOLD}" style="background-color:${GOLD}">
     <a class="btn" href="${SITE}/collections" style="display:inline-block;padding:16px 28px;white-space:nowrap;background-color:${GOLD};border:1px solid ${GOLD};font-family:Georgia,serif;font-size:12px;font-weight:700;line-height:12px;letter-spacing:.2em;text-transform:uppercase;color:#ffffff;text-decoration:none">Shop the sale</a></td></tr></table></td></tr>
   <tr><td class="pad" style="padding:0 52px">
-    ${p(`Questions about a gun, a number or your dealer? Reply to this email, or call or text us at <a href="tel:+17869313566" style="color:${INK}">1-786-931-3566</a>.`)}
-    <p style="margin:0 0 4px;font-family:${SERIF};font-size:17px;font-style:italic;line-height:1.7;color:${INK}">With gratitude,</p>
+    ${p(`Questions about a gun, a number or your dealer? Reply to this email, or call or text us at <a href="tel:+17864739020" style="color:${INK}">1-786-473-9020</a>.`)}
+    <p style="margin:0 0 4px;font-family:${SERIF};font-size:17px;font-style:italic;line-height:1.7;color:${INK}">${copy.closing}</p>
     <img src="${SITE}/assets/email/welcome-signature.png" width="140" alt="RP" style="display:block;width:140px;height:auto;border:0;margin:4px 0">
     <p style="margin:0 0 36px;font-family:${SERIF};font-size:15px;line-height:1.6;color:${SOFT}">The GDE Collectibles family</p>
   </td></tr>
@@ -286,19 +313,19 @@ function saleEndEmail({ firstName, address, unsubUrl, guns = [], countdownSrc, l
 </table></td></tr>
 </table>
 </td></tr></table></body></html>`;
-  const text = `BLACK FRIDAY: 10% off every gun, until midnight Friday
+  const text = `${copy.eyebrow ? `${copy.eyebrow.toUpperCase()} · ` : ""}BLACK FRIDAY: ${copy.subhead.replace(/<br>/g, " ")}
 
 Dear ${String(firstName || "").trim() || "there"},
 
-Our Black Friday sale ends soon. Until midnight on Friday, November 27 (Eastern time), every gun in our collections is 10% off. The prices on our website already include it, so there's no code to enter.
+${copy.intro}
 ${shown.length ? `\n${shown.map((g) => `- ${g.name}: ${money(g.price)} (was ${was(g.price)}, save ${saved(g.price)}) ${g.url}`).join("\n")}\n` : ""}
-Every piece is limited and numbered, made to order, and ships to the licensed FFL dealer in the US of your choice. Shipping and insurance are included.
+Every piece is limited and numbered, made to order, and ships to the licensed FFL dealer in the US of your choice. Shipping and insurance are included. ${US_ONLY}
 
 Shop the sale: ${SITE}/collections
 
-Questions about a gun, a number or your dealer? Reply to this email, or call or text us at 1-786-931-3566.
+Questions about a gun, a number or your dealer? Reply to this email, or call or text us at 1-786-473-9020.
 
-With gratitude,
+${copy.closing}
 The GDE Collectibles family
 
 --
@@ -417,8 +444,8 @@ function orderEmail(order, { guns = {} } = {}) {
   <tr><td class="pad" style="padding:${order.account ? 0 : 14}px 52px 0">
     ${p("Questions about your order, your gun's number or your dealer? Just reply to this email, or reach us any way you like:")}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;border-top:1px solid ${LINE}">
-    ${contact("Call or text", "tel:+17869313566", "1-786-931-3566")}
-    ${contact("WhatsApp", "https://wa.me/17869313566", "1-786-931-3566")}
+    ${contact("Call or text", "tel:+17864739020", "1-786-473-9020")}
+    ${contact("WhatsApp", "https://wa.me/17864739020", "1-786-473-9020")}
     ${contact("Email", "mailto:info@gdecollectibles.com", "info@gdecollectibles.com")}
     </table>
     <p style="margin:0 0 4px;font-family:${SERIF};font-size:17px;font-style:italic;line-height:1.7;color:${INK}">With gratitude,</p>
@@ -450,8 +477,8 @@ II. Your gun ships: orders paid by card usually ship within 2 to 5 business days
 III. Pick it up at your dealer: your dealer completes the transfer with you, including the background check, and hands you your ${many ? "guns" : "gun"}.
 ${order.account ? `\nFollow your order: ${SITE}/account\n` : ""}
 Questions about your order, your gun's number or your dealer? Just reply to this email, or reach us any way you like:
-- Call or text: 1-786-931-3566
-- WhatsApp: 1-786-931-3566
+- Call or text: 1-786-473-9020
+- WhatsApp: 1-786-473-9020
 - Email: info@gdecollectibles.com
 
 With gratitude,

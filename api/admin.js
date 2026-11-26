@@ -291,7 +291,9 @@ module.exports = async function handler(request, response) {
       if (address.length < 8) return response.status(400).json({ error: "Add GDE's mailing address first (it goes at the bottom of every email, by law)." });
       // template "sale-end" (user, Nov 20): the designed Black Friday email with the live countdown (_mail.js saleEndEmail)
       // instead of the app's plain message. b.guns: listing keys to show (up to 3), photos and prices from the listings.
-      const saleEnd = b.template === "sale-end";
+      // "sale-last-call" (Nov 26): same design, the "last call" wording (_mail.js SALE_COPY).
+      const saleEnd = b.template === "sale-end" || b.template === "sale-last-call";
+      const saleVariant = b.template === "sale-last-call" ? "last-call" : "sale-end";
       let saleGuns = [];
       if (saleEnd) {
         const products = JSON.parse(fs.readFileSync(path.join(process.cwd(), "codex-inventory.json"), "utf8")).products || {};
@@ -315,7 +317,7 @@ module.exports = async function handler(request, response) {
           if (sub?.status === "declined") { skipped.push({ email, why: "said no to emails on the website" }); continue; }
         }
         const content = saleEnd
-          ? mail.saleEndEmail({ address, firstName: r.firstName, unsubUrl: subscribers.unsubPage(email), guns: saleGuns })
+          ? mail.saleEndEmail({ address, firstName: r.firstName, unsubUrl: subscribers.unsubPage(email), guns: saleGuns, variant: saleVariant })
           : mail.customerEmail({ ...b, address, firstName: r.firstName, unsubUrl: subscribers.unsubPage(email) });
         outgoing.push({ email, message: {
           to: [email], ...content, subject: (b.test ? "[Test] " : "") + content.subject,
